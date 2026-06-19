@@ -1,0 +1,4562 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Romaneio - Sucena Empreendimentos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(160deg, #0c1a3a 0%, #1e3c72 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 28px 72px rgba(0,0,0,0.45);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 22px 30px 18px;
+            text-align: center;
+            border-bottom: 3px solid #F5B800;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9em;
+            margin: 5px 0;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .app-hidden {
+            display: none;
+        }
+
+        .access-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(155deg, #0c1a3a 0%, #142954 55%, #1e3c72 100%);
+            padding: 20px;
+        }
+
+        .access-screen.app-hidden {
+            display: none !important;
+        }
+
+        .login-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 44px 42px 38px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
+            text-align: center;
+        }
+
+        .login-logo-area {
+            margin-bottom: 4px;
+        }
+
+        .login-brand-title {
+            font-size: 2.4em;
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: #1a2f5e;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        .login-brand-sub {
+            font-size: 0.85em;
+            font-weight: 500;
+            letter-spacing: 3px;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-top: 4px;
+            margin-bottom: 6px;
+        }
+
+        .header-brand-title {
+            font-size: 1.9em;
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: #ffffff;
+            text-transform: uppercase;
+        }
+
+        .login-sys-label {
+            display: block;
+            font-size: 0.68em;
+            font-weight: 700;
+            letter-spacing: 3.5px;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 22px;
+        }
+
+        .login-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+            margin-bottom: 26px;
+        }
+
+        .login-field {
+            text-align: left;
+            margin-bottom: 16px;
+        }
+
+        .login-field label {
+            display: block;
+            font-size: 0.73em;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .login-field select,
+        .login-field input[type="password"] {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.97em;
+            background: #f8fafc;
+            color: #1e293b;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+            outline: none;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+        }
+
+        .login-field select:focus,
+        .login-field input[type="password"]:focus {
+            border-color: #F5B800;
+            background: #fffef5;
+            box-shadow: 0 0 0 3px rgba(245,184,0,0.16);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #F5B800 0%, #d9a400 100%);
+            color: #1a1a00;
+            font-size: 0.92em;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: transform 0.15s, box-shadow 0.15s;
+            box-shadow: 0 6px 24px rgba(245,184,0,0.4);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 32px rgba(245,184,0,0.55);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 14px rgba(245,184,0,0.3);
+        }
+
+        .login-user-info {
+            margin-top: 18px;
+            padding: 11px 15px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            border-left: 3px solid #F5B800;
+            font-size: 0.84em;
+            color: #334155;
+            text-align: left;
+            min-height: 42px;
+            display: flex;
+            align-items: center;
+            line-height: 1.55;
+        }
+
+        .login-footer-note {
+            margin-top: 18px;
+            font-size: 0.7em;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        .access-title { display: none; }
+        .access-note  { display: none; }
+        .user-summary-box { display: none; }
+
+        .session-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 20px;
+            background: #0c1424;
+            color: #e2e8f0;
+            font-size: 0.88em;
+            border-bottom: 2px solid #F5B800;
+        }
+
+        .session-bar strong {
+            color: #fff;
+        }
+
+        .admin-panel {
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #F5B800;
+            border-radius: 10px;
+            background: #f8fafc;
+            padding: 16px;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .kpi-card {
+            border: 1px solid #e2e8f0;
+            border-top: 3px solid #F5B800;
+            border-radius: 10px;
+            background: #fff;
+            padding: 12px;
+        }
+
+        .kpi-label {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            color: #64748b;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .kpi-value {
+            margin-top: 5px;
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #1e3c72;
+        }
+
+        .admin-users-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: #fff;
+        }
+
+        .admin-users-table th,
+        .admin-users-table td {
+            border: 1px solid #dbe3f4;
+            padding: 8px;
+            text-align: left;
+            font-size: 0.88em;
+        }
+
+        .admin-users-table th {
+            background: #f1f5f9;
+            color: #1a2f5e;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #F5B800;
+            box-shadow: 0 0 0 3px rgba(245,184,0,0.12);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .row-4 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .control-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 3px solid #1a2f5e;
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+
+        .section-title {
+            background: #1a2f5e;
+            color: white;
+            padding: 11px 18px;
+            border-radius: 8px;
+            margin: 28px 0 18px 0;
+            font-size: 0.95em;
+            font-weight: 700;
+            border-left: 4px solid #F5B800;
+            letter-spacing: 0.4px;
+        }
+
+        .fornecedor-box {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #F5B800;
+        }
+
+        .fornecedor-box p {
+            margin: 5px 0;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .fornecedor-box strong {
+            color: #333;
+        }
+
+        .materials-section {
+            margin: 30px 0;
+        }
+
+        .material-item {
+            display: grid;
+            grid-template-columns: 50px 2fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 12px;
+            padding: 14px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            align-items: center;
+        }
+
+        .material-item input[type="checkbox"] {
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+        }
+
+        .material-item label {
+            margin: 0;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #0093E9 0%, #80D0C7 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .preview {
+            margin-top: 30px;
+            padding: 30px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            display: none;
+            background: white;
+        }
+
+        .preview.active {
+            display: block;
+        }
+
+        .via {
+            page-break-after: always;
+            padding: 20px;
+            border: 2px solid #000;
+            margin-bottom: 20px;
+        }
+
+        .via:last-child {
+            page-break-after: auto;
+        }
+
+        .preview-header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #000;
+        }
+
+        .preview-header h2 {
+            font-size: 1.4em;
+            margin-bottom: 5px;
+        }
+
+        .preview-header h3 {
+            font-size: 1.1em;
+            margin-top: 10px;
+        }
+
+        .preview-header p {
+            font-size: 0.85em;
+            margin: 3px 0;
+        }
+
+        .via-label {
+            text-align: right;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            padding: 5px 10px;
+            background: #f0f0f0;
+            border: 2px solid #000;
+            display: inline-block;
+            float: right;
+        }
+
+        .preview-content {
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+
+        .preview-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+
+        .fiscal-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .identificacao-box {
+            margin: 15px 0;
+            border: 1px solid #000;
+            padding: 10px;
+            display: grid;
+            grid-template-columns: 1fr 130px;
+            gap: 12px;
+            align-items: start;
+        }
+
+        .qr-preview-box {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .qr-preview-box p {
+            margin: 0;
+            font-size: 0.75em;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .qr-preview-box img {
+            width: 92px;
+            height: 92px;
+            margin-top: 6px;
+            border: 1px solid #ddd;
+            object-fit: contain;
+            background: #fff;
+        }
+
+        .qr-preview-box small {
+            display: block;
+            margin-top: 6px;
+            font-size: 0.68em;
+            line-height: 1.2;
+        }
+
+        .danfe-box {
+            margin: 15px 0;
+            border: 1px solid #000;
+            background: #fff;
+        }
+
+        .danfe-title {
+            background: #ececec;
+            border-bottom: 1px solid #000;
+            padding: 6px 8px;
+            font-size: 0.78em;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        .danfe-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+        }
+
+        .danfe-cell {
+            padding: 8px;
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            min-height: 45px;
+        }
+
+        .danfe-cell:nth-child(2n) {
+            border-right: none;
+        }
+
+        .danfe-cell.full {
+            grid-column: 1 / -1;
+            border-right: none;
+        }
+
+        .danfe-cell.last-row {
+            border-bottom: none;
+        }
+
+        .fotos-upload-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .foto-upload-box {
+            border: 1px dashed #6b7280;
+            border-radius: 8px;
+            padding: 12px;
+            background: #fafafa;
+        }
+
+        .foto-upload-box input[type="file"] {
+            margin-top: 8px;
+            border: 1px solid #d1d5db;
+            background: #fff;
+            padding: 8px;
+        }
+
+        .foto-preview {
+            margin-top: 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            display: none;
+            background: #fff;
+        }
+
+        .foto-preview.active {
+            display: block;
+        }
+
+        .fotos-via-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .foto-via-box {
+            border: 1px solid #000;
+            min-height: 210px;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .foto-via-label {
+            font-size: 0.72em;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .foto-via-img {
+            width: 170px;
+            height: 170px;
+            object-fit: cover;
+            border: 1px solid #d1d5db;
+            background: #fff;
+            display: none;
+        }
+
+        .foto-via-img.active {
+            display: block;
+        }
+
+        .foto-via-empty {
+            width: 170px;
+            height: 170px;
+            border: 1px dashed #d1d5db;
+            color: #777;
+            font-size: 0.76em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 6px;
+        }
+
+        .auth-footer {
+            margin-top: 12px;
+            border-top: 1px dashed #000;
+            padding-top: 8px;
+            font-size: 0.75em;
+            line-height: 1.4;
+        }
+
+        .database-panel {
+            margin-top: 24px;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #1a2f5e;
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .database-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 20px;
+            margin-top: 10px;
+        }
+
+        .database-info {
+            font-size: 0.9em;
+            color: #334155;
+        }
+
+        .database-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
+
+        .database-actions button {
+            padding: 10px 14px;
+            font-size: 0.9em;
+        }
+
+        .custom-materials-box {
+            margin-top: 15px;
+            border: 1px dashed #94a3b8;
+            border-radius: 8px;
+            padding: 12px;
+            background: #f8fafc;
+        }
+
+        .custom-material-row {
+            display: grid;
+            grid-template-columns: 60px 2fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .custom-material-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .custom-material-row input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            justify-self: center;
+        }
+
+        .fornecedor-novo-box,
+        .contrato-novo-box {
+            margin-top: 12px;
+            border: 1px dashed #94a3b8;
+            border-radius: 8px;
+            padding: 12px;
+            background: #f8fafc;
+            display: none;
+        }
+
+        .danfe-label {
+            display: block;
+            font-size: 0.68em;
+            font-weight: 700;
+            color: #444;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .danfe-value {
+            font-size: 0.88em;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .info-box {
+            border: 1px solid #000;
+            padding: 10px;
+            background: #f9f9f9;
+        }
+
+        .info-box p {
+            margin: 5px 0;
+        }
+
+        .materiais-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .materiais-table th,
+        .materiais-table td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .materiais-table th {
+            background: #e0e0e0;
+            font-weight: bold;
+        }
+
+        .assinaturas {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .assinatura-box {
+            flex: 1;
+            text-align: center;
+        }
+
+        .assinatura-linha {
+            border-top: 2px solid #000;
+            margin-top: 50px;
+            padding-top: 5px;
+            font-size: 0.9em;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+            
+            .btn-group, 
+            .access-screen,
+            .session-bar,
+            .admin-panel,
+            .content > .section-title,
+            .content > .form-group,
+            .content > .row,
+            .content > .row-3,
+            .content > .fornecedor-box,
+            .content > #origemCustom,
+            .content > .materials-section,
+            .content > .database-panel {
+                display: none !important;
+            }
+            
+            .header {
+                display: none !important;
+            }
+            
+            .preview {
+                display: block !important;
+                border: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .via {
+                page-break-after: always;
+                padding: 15mm;
+                border: none;
+                margin: 0;
+            }
+
+            .via:last-child {
+                page-break-after: auto;
+            }
+
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+        }
+
+        @media print {
+            @page {
+                margin: 10mm;
+            }
+            
+            /* Remove cabeçalho e rodapé padrão do navegador */
+            body::before,
+            body::after {
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .row, .row-3, .row-4, .material-item, .preview-grid, .fiscal-grid, .identificacao-box, .danfe-grid, .database-grid, .custom-material-row, .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e3c72">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+</head>
+<body>
+    <div class="container">
+        <div id="accessScreen" class="access-screen">
+            <div class="login-card">
+
+                <div class="login-logo-area">
+                    <div class="login-brand-title">SUCENA</div>
+                    <div class="login-brand-sub">Empreendimentos</div>
+                </div>
+
+                <span class="login-sys-label">Sistema de Romaneio</span>
+                <div class="login-divider"></div>
+
+                <div class="login-field">
+                    <label>Usuário</label>
+                    <select id="loginUserSelect"></select>
+                </div>
+
+                <div class="login-field">
+                    <label>Senha</label>
+                    <input type="password" id="loginSenha" placeholder="Digite sua senha" autocomplete="current-password">
+                </div>
+
+                <button class="login-btn" type="button" id="btnEntrarSistema">Acessar Sistema</button>
+
+                <div class="login-user-info" id="loginUserSummary">Selecione um usuário para ver as informações.</div>
+
+                <p class="login-footer-note">Acesso padrão &nbsp;·&nbsp; Admin / Operador &nbsp;·&nbsp; Senha: 1234</p>
+            </div>
+        </div>
+
+        <div class="header app-hidden" id="mainHeader">
+            <div class="header-brand-title">SUCENA EMPREENDIMENTOS</div>
+            <p style="font-size: 0.82em; opacity: 0.75; margin-top: 6px;">Sistema de Controle de Romaneio de Materiais</p>
+            <p style="font-size: 0.72em; opacity: 0.5; margin-top: 3px;">CNPJ: 19.381.283/0001-97 &nbsp;&middot;&nbsp; Rua São Francisco, 720 &middot; Açailândia/MA</p>
+        </div>
+
+        <div id="sessionBar" class="session-bar app-hidden">
+            <div>
+                <strong id="sessaoNome">-</strong> |
+                Perfil: <span id="sessaoPerfil">-</span> |
+                Local: <span id="sessaoLocal">-</span> |
+                Campo: <span id="sessaoCampo">-</span>
+            </div>
+            <button class="btn-warning" type="button" id="btnSairSistema">Sair</button>
+        </div>
+
+        <div id="syncBar" class="session-bar app-hidden" style="background: #141c2d; border-top: 1px solid #334155; border-bottom: 2px solid #56ab2f; font-size: 0.85em; display: flex; align-items: center; justify-content: space-between; padding: 8px 20px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span id="syncStatusBadge" style="padding: 3px 8px; border-radius: 20px; font-weight: bold; background: #64748b; color: white;">Detectando...</span>
+                <span>Pendentes de Envio: <strong id="syncPendingCount" style="color: #f2c94c; font-size: 1.1em;">0</strong></span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button class="btn-success" type="button" id="btnSyncPendentes" onclick="sincronizarPendentesComNuvem()" style="padding: 6px 12px; font-size: 0.85em; background: linear-gradient(135deg, #56ab2f 0%, #3d7e22 100%); line-height: 1.2;">🔄 Sincronizar Nuvem</button>
+            </div>
+        </div>
+
+        <div class="content app-hidden" id="mainContent">
+            <div class="admin-panel admin-only app-hidden" id="adminPanel">
+                <div class="section-title" style="margin-top: 0;">🛡️ ADMIN - GESTÃO DE USUÁRIOS E KPI</div>
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total Usuários</div>
+                        <div class="kpi-value" id="kpiTotalUsuarios">0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Admins</div>
+                        <div class="kpi-value" id="kpiAdmins">0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Operadores</div>
+                        <div class="kpi-value" id="kpiOperadores">0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Romaneios Salvos</div>
+                        <div class="kpi-value" id="kpiRomaneiosTotal">0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Romaneios Hoje</div>
+                        <div class="kpi-value" id="kpiRomaneiosHoje">0</div>
+                    </div>
+                </div>
+
+                <div class="row-3">
+                    <div class="form-group">
+                        <label>Primeiro nome</label>
+                        <input type="text" id="adminPrimeiroNome" placeholder="Ex: João">
+                    </div>
+                    <div class="form-group">
+                        <label>Segundo nome</label>
+                        <input type="text" id="adminSegundoNome" placeholder="Ex: Silva">
+                    </div>
+                    <div class="form-group">
+                        <label>Perfil</label>
+                        <select id="adminPerfil">
+                            <option value="operador">Operador</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row-3">
+                    <div class="form-group">
+                        <label>Local</label>
+                        <input type="text" id="adminLocal" value="FÁBRICA VERONA - AÇAILÂNDIA">
+                    </div>
+                    <div class="form-group">
+                        <label>Campo / Frente</label>
+                        <input type="text" id="adminCampo" placeholder="Ex: PACOTE 8, MURO, PRAÇA">
+                    </div>
+                    <div class="form-group">
+                        <label>Pacotes permitidos (operador)</label>
+                        <input type="text" id="adminPacotesPermitidos" placeholder="Ex: 8,9,10">
+                    </div>
+                </div>
+
+                <div class="row-3">
+                    <div class="form-group">
+                        <label>Senha do novo usuário</label>
+                        <input type="password" id="adminSenha" placeholder="Ex: senha123">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmar senha</label>
+                        <input type="password" id="adminSenhaConfirma" placeholder="Confirme a senha">
+                    </div>
+                    <div class="form-group"></div>
+                </div>
+
+                <button class="btn-primary" type="button" id="btnAdminCriarUsuario">Criar usuário</button>
+
+                <table class="admin-users-table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Perfil</th>
+                            <th>Local</th>
+                            <th>Campo</th>
+                            <th>Pacotes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminUsersTableBody"></tbody>
+                </table>
+
+                <div class="section-title" style="margin-top: 25px;">🔗 INTEGRAÇÃO GOOGLE (PLANILHA E DRIVE)</div>
+                <div class="row">
+                    <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 10px;">
+                        <label>URL do Web App do Google Apps Script</label>
+                        <input type="text" id="googleAppsScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" style="font-family: monospace; font-size: 0.9em;">
+                        <small style="color: #64748b; margin-top: 4px; display: block;">Esta URL conecta a PWA ao Google Sheets (Mapa de Rastreabilidade) e ao Google Drive (PDFs).</small>
+                    </div>
+                </div>
+                <button class="btn-primary" type="button" id="btnSalvarConfigGoogle" onclick="salvarConfiguracaoGoogle()">Salvar Configuração Google</button>
+            </div>
+
+            <div class="section-title">📋 IDENTIFICAÇÃO DO ROMANEIO</div>
+            
+            <div class="row-3">
+                <div class="form-group">
+                    <label>Número do Romaneio</label>
+                    <input type="text" id="numeroRomaneio" placeholder="Gerado automaticamente" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Registro Interno Sucena</label>
+                    <input type="text" id="registroInterno" placeholder="Gerado automaticamente" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Data</label>
+                    <input type="date" id="dataRomaneio">
+                </div>
+            </div>
+
+            <div class="control-box">
+                <div class="section-title" style="margin: 0 0 15px 0;">🔐 CONTROLE DOCUMENTAL (ISO 9001 / PBQP-H)</div>
+                <div class="row-4">
+                    <div class="form-group">
+                        <label>TAC</label>
+                        <select id="tacNumero"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Pacote</label>
+                        <select id="pacoteNumero"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Sequência</label>
+                        <select id="sequenciaNumero"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Revisão</label>
+                        <select id="revisaoDocumento"></select>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Código de Controle</label>
+                    <input type="text" id="codigoControle" readonly>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label>Placa do Caminhão</label>
+                    <input type="text" id="placaCaminhao" placeholder="Ex: ABC-1234" style="text-transform: uppercase;">
+                </div>
+                <div class="form-group">
+                    <label>Responsável</label>
+                    <input type="text" id="responsavel" placeholder="Nome do responsável">
+                </div>
+            </div>
+
+            <div class="section-title">🏪 FORNECEDOR / ORIGEM</div>
+
+            <div class="form-group">
+                <label>Selecione o Fornecedor</label>
+                <select id="fornecedor" onchange="atualizarFornecedor()">
+                    <option value="">Selecione...</option>
+                    <option value="gf6">GF6 EMPREENDIMENTOS IMOBILIÁRIOS LTDA</option>
+                    <option value="pedreira">PEDREIRA SÃO FRANCISCO</option>
+                    <option value="roque">ROQUE MATERIAIS DE CONSTRUÇÃO LTDA</option>
+                    <option value="add_new_supplier">+ Adicionar novo fornecedor</option>
+                    <option value="custom">Outro (Personalizar)</option>
+                </select>
+            </div>
+
+            <div id="fornecedorInfo" class="fornecedor-box" style="display: none;">
+                <p><strong>Razão Social:</strong> <span id="fornecedorNome"></span></p>
+                <p><strong>CNPJ:</strong> <span id="fornecedorCNPJ"></span></p>
+            </div>
+
+            <div class="form-group" id="origemCustom" style="display: none;">
+                <label>Local de Origem Personalizado</label>
+                <input type="text" id="origemPersonalizada" placeholder="Digite o local de origem">
+            </div>
+
+            <div id="fornecedorNovoBox" class="fornecedor-novo-box">
+                <div class="row-3">
+                    <div class="form-group">
+                        <label>Razão Social (novo fornecedor)</label>
+                        <input type="text" id="novoFornecedorNome" placeholder="Ex: NOVO FORNECEDOR LTDA">
+                    </div>
+                    <div class="form-group">
+                        <label>CNPJ</label>
+                        <input type="text" id="novoFornecedorCNPJ" placeholder="Ex: 00.000.000/0001-00">
+                    </div>
+                    <div class="form-group">
+                        <label>Local</label>
+                        <input type="text" id="novoFornecedorLocal" placeholder="Ex: Açailândia/MA">
+                    </div>
+                </div>
+                <button class="btn-primary" type="button" onclick="adicionarFornecedorPersonalizado()">Adicionar fornecedor</button>
+            </div>
+
+            <div class="section-title" id="tituloDadosFiscais">🧾 DADOS FISCAIS E PRODUTO</div>
+
+            <div class="form-group">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="modoPlacasMuro" style="width: 20px; height: 20px;">
+                    <span>Ponto de placas para muro de vedação (substitui NF por ILS/Controle de Concreto)</span>
+                </label>
+            </div>
+
+            <div class="fiscal-grid">
+                <div class="form-group" id="nfGroup">
+                    <label>Número da Nota Fiscal</label>
+                    <input type="text" id="numeroNotaFiscal" placeholder="Ex: 000123">
+                </div>
+                <div class="form-group" id="ilsGroup" style="display: none;">
+                    <label>ILS: Nº</label>
+                    <input type="text" id="ilsNumero" placeholder="Ex: ILS-001">
+                </div>
+                <div class="form-group" id="controleConcretoGroup" style="display: none;">
+                    <label>Controle de Concreto: Nº</label>
+                    <input type="text" id="controleConcretoNumero" placeholder="Ex: CC-001">
+                </div>
+                <div class="form-group">
+                    <label>Razão Social do Fornecedor</label>
+                    <input type="text" id="razaoSocialFornecedor" placeholder="Ex: FORNECEDOR LTDA">
+                </div>
+                <div class="form-group">
+                    <label>CNPJ do Fornecedor</label>
+                    <input type="text" id="cnpjFornecedorFiscal" placeholder="Ex: 00.000.000/0001-00">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label>Código do Produto</label>
+                    <input type="text" id="codigoProdutoFiscal" placeholder="Ex: MAT-001">
+                </div>
+                <div class="form-group">
+                    <label>Descrição do Produto</label>
+                    <input type="text" id="descricaoProdutoFiscal" placeholder="Ex: Areia lavada fina">
+                </div>
+            </div>
+
+            <div class="section-title">📍 DESTINO</div>
+            
+            <div class="row">
+                <div class="form-group">
+                    <label>Contrato</label>
+                    <select id="contrato" onchange="atualizarContrato()"></select>
+                </div>
+                <div class="form-group">
+                    <label>Local de Destino</label>
+                    <input type="text" id="destino" value="Obra KM 266+000">
+                </div>
+            </div>
+
+            <div id="contratoNovoBox" class="contrato-novo-box">
+                <div class="row" style="align-items: end;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Novo contrato</label>
+                        <input type="text" id="novoContratoNome" placeholder="Ex: OBRA KM 266+000">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0; text-align: right;">
+                        <button class="btn-primary" type="button" onclick="adicionarContratoPersonalizado()">Adicionar contrato</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">📸 FOTOS DA CARGA</div>
+
+            <div class="fotos-upload-grid">
+                <div class="foto-upload-box">
+                    <label for="fotoCarga1">Foto da Carga 1</label>
+                    <input type="file" id="fotoCarga1" accept="image/*">
+                    <img id="fotoCargaPreview1" class="foto-preview" alt="Prévia da foto da carga 1">
+                </div>
+                <div class="foto-upload-box">
+                    <label for="fotoCarga2">Foto da Carga 2</label>
+                    <input type="file" id="fotoCarga2" accept="image/*">
+                    <img id="fotoCargaPreview2" class="foto-preview" alt="Prévia da foto da carga 2">
+                </div>
+            </div>
+
+            <div class="section-title">📦 MATERIAIS TRANSPORTADOS</div>
+
+            <div class="materials-section">
+                <div class="material-item">
+                    <input type="checkbox" id="areiaCheck">
+                    <div>
+                        <label>AREIA LAVADA</label>
+                    </div>
+                    <div>
+                        <input type="number" id="areiaQtd" placeholder="Quantidade" step="0.01">
+                    </div>
+                    <div>
+                        <select id="areiaUnidade">
+                            <option value="m³">m³</option>
+                            <option value="ton">Toneladas</option>
+                            <option value="cargas">Cargas</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="material-item">
+                    <input type="checkbox" id="britaCheck">
+                    <div>
+                        <label>BRITA - 1</label>
+                    </div>
+                    <div>
+                        <input type="number" id="britaQtd" placeholder="Quantidade" step="0.01">
+                    </div>
+                    <div>
+                        <select id="britaUnidade">
+                            <option value="m³">m³</option>
+                            <option value="ton">Toneladas</option>
+                            <option value="cargas">Cargas</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="material-item">
+                    <input type="checkbox" id="cimentoCheck">
+                    <div>
+                        <label>CIMENTO</label>
+                        <select id="cimentoTipo" style="margin-top: 5px; padding: 8px;">
+                            <option value="CIMENTO POTY 50 KG">CIMENTO POTY 50 KG</option>
+                            <option value="CIMENTO NASSAU 50 KG">CIMENTO NASSAU 50 KG</option>
+                        </select>
+                    </div>
+                    <div>
+                        <input type="number" id="cimentoQtd" placeholder="Quantidade" step="1">
+                    </div>
+                    <div>
+                        <select id="cimentoUnidade">
+                            <option value="sacos">Sacos</option>
+                            <option value="ton">Toneladas</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="material-item">
+                    <input type="checkbox" id="acoCheck">
+                    <div>
+                        <label>AÇO</label>
+                    </div>
+                    <div>
+                        <input type="number" id="acoQtd" placeholder="Quantidade" step="0.01">
+                    </div>
+                    <div>
+                        <select id="acoUnidade">
+                            <option value="kg">Kg</option>
+                            <option value="ton">Toneladas</option>
+                            <option value="barras">Barras</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="material-item">
+                    <input type="checkbox" id="poste11Check">
+                    <div>
+                        <label>POSTE DE 11 METROS</label>
+                    </div>
+                    <div>
+                        <input type="number" id="poste11Qtd" placeholder="Quantidade" step="1">
+                    </div>
+                    <div>
+                        <select id="poste11Unidade">
+                            <option value="un">Unidades</option>
+                            <option value="postes">Postes</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="material-item">
+                    <input type="checkbox" id="poste14Check">
+                    <div>
+                        <label>POSTE DE 14 METROS</label>
+                    </div>
+                    <div>
+                        <input type="number" id="poste14Qtd" placeholder="Quantidade" step="1">
+                    </div>
+                    <div>
+                        <select id="poste14Unidade">
+                            <option value="un">Unidades</option>
+                            <option value="postes">Postes</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="custom-materials-box">
+                <div class="row" style="align-items: center;">
+                    <div><strong>Materiais personalizados</strong></div>
+                    <div style="text-align: right;">
+                        <button class="btn-info" type="button" onclick="adicionarMaterialPersonalizado()">+ Adicionar outro material</button>
+                    </div>
+                </div>
+                <div id="customMaterialsContainer" style="margin-top: 10px;"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Observações</label>
+                <textarea id="observacoes" rows="3" placeholder="Informações adicionais sobre o transporte"></textarea>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label>Data de Recebimento dos Materiais</label>
+                    <input type="date" id="dataRecebimento">
+                </div>
+                <div class="form-group">
+                    <label style="margin-top: 32px;">Atestado de recebimento</label>
+                    <p style="color: #4b5563; font-size: 0.9em;">Preenchimento físico no documento impresso.</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" id="gerarSegundaVia" checked style="width: 20px; height: 20px;">
+                    <span>Gerar segunda via do romaneio (PDF e impressão)</span>
+                </label>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-primary" id="btnVisualizar" onclick="gerarPrevia()">👁️ Visualizar</button>
+                <button class="btn-success" id="btnImprimir" onclick="imprimirRomaneio()">🖨️ Imprimir</button>
+                <button class="btn-success" id="btnExportarPdf" onclick="exportarPDF()">📄 Exportar PDF</button>
+                <button class="btn-info" id="btnExportarExcel" onclick="exportarExcel()">📊 Exportar Excel</button>
+                <button class="btn-primary" id="btnSalvarBase" onclick="salvarRegistroBaseLocal()">💾 Salvar na Base</button>
+                <button class="btn-info admin-only" id="btnCarregarUltimo" onclick="carregarUltimoRegistroBaseLocal()">📂 Carregar Último</button>
+                <button class="btn-warning admin-only" id="btnMapaRastreio" onclick="exportarMapaRastreabilidadeExcel()">🧭 Exportar Mapa de Rastreabilidade</button>
+                <button class="btn-warning" id="btnWhatsapp" onclick="compartilharWhatsApp()">📱 WhatsApp (PDF)</button>
+                <button class="btn-info" id="btnEmail" onclick="enviarEmail()">✉️ E-mail (PDF)</button>
+            </div>
+
+            <div class="database-panel admin-only">
+                <div class="section-title" style="margin: 0 0 10px 0;">🗄️ BASE DE DADOS LOCAL (SEQUÊNCIA PERMANENTE)</div>
+                <div class="database-grid">
+                    <div class="database-info"><strong>Registros salvos:</strong> <span id="dbTotalRegistros">0</span></div>
+                    <div class="database-info"><strong>Último salvamento:</strong> <span id="dbUltimoSalvamento">Nenhum</span></div>
+                    <div class="database-info"><strong>Próxima sequência:</strong> <span id="dbProximaSequencia">1</span></div>
+                    <div class="database-info"><strong>Escopo:</strong> Navegador atual (offline)</div>
+                </div>
+                <div class="database-actions">
+                    <button class="btn-success" type="button" onclick="salvarRegistroBaseLocal()">Salvar registro</button>
+                    <button class="btn-info admin-only" type="button" onclick="carregarUltimoRegistroBaseLocal()">Carregar último</button>
+                    <button class="btn-primary admin-only" type="button" onclick="aplicarProximaSequenciaBanco(true)">Aplicar próxima sequência</button>
+                    <button class="btn-warning admin-only" type="button" onclick="exportarBaseDadosJson()">Exportar base JSON</button>
+                    <button class="btn-info admin-only" type="button" onclick="document.getElementById('importarBaseJson').click()">Importar base JSON</button>
+                    <button class="btn-warning admin-only" type="button" onclick="exportarMapaRastreabilidadeExcel()">Exportar mapa rastreio</button>
+                    <button class="btn-info admin-only" type="button" onclick="exportarLogAuditoriaJson()">Exportar log auditoria</button>
+                </div>
+                <input type="file" id="importarBaseJson" accept="application/json" style="display: none;">
+
+                <div class="section-title" style="margin: 20px 0 10px 0;">☁️ STATUS DE SINCRONIZAÇÃO NUVEM</div>
+                <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; overflow-x: auto;">
+                    <p style="font-size: 0.9em; margin-bottom: 8px;"><strong>API Google:</strong> <span id="dbGoogleApiStatus" style="font-weight: bold; color: #dc2626;">Desconfigurada</span></p>
+                    <table class="admin-users-table" style="margin-top: 5px;">
+                        <thead>
+                            <tr>
+                                <th>Cód. Controle</th>
+                                <th>Data</th>
+                                <th>Placa</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dbSyncTableBody">
+                            <tr><td colspan="4" style="text-align: center; color: #64748b;">Nenhum registro pendente</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="preview" id="preview">
+                <!-- VIA 1 -->
+                <div class="via">
+                    <div class="via-label">1ª VIA - CLIENTE</div>
+                    <div style="clear: both;"></div>
+                    
+                    <div class="preview-header">
+                        <h2>SUCENA EMPREENDIMENTOS LTDA</h2>
+                        <p>CNPJ: 19.381.283/0001-97</p>
+                        <p>Rua São Francisco, 720 - Centro - Açailândia/MA - CEP: 65930-000</p>
+                        <h3>ROMANEIO DE MATERIAIS</h3>
+                    </div>
+
+                    <div class="identificacao-box">
+                        <div>
+                            <p><strong>Romaneio Nº:</strong> <span id="previewNumero1"></span></p>
+                            <p><strong>Registro Interno:</strong> <span id="previewRegistro1"></span></p>
+                            <p><strong>Código de Controle:</strong> <span id="previewControle1"></span></p>
+                            <p><strong>Revisão:</strong> <span id="previewRevisao1"></span></p>
+                            <p><strong>Data:</strong> <span id="previewData1"></span></p>
+                        </div>
+                        <div class="qr-preview-box">
+                            <p>QR CONTROLE</p>
+                            <img id="previewQr1" alt="QR Code de controle - Via 1">
+                            <small id="previewQrText1"></small>
+                            <small id="previewHashText1"></small>
+                        </div>
+                    </div>
+
+                    <div class="preview-grid">
+                        <div class="info-box">
+                            <p><strong>FORNECEDOR/ORIGEM:</strong></p>
+                            <p id="previewFornecedor1" style="margin-top: 5px;"></p>
+                            <p id="previewCNPJ1" style="margin-top: 5px;"></p>
+                        </div>
+                        <div class="info-box">
+                            <p><strong>DESTINO:</strong></p>
+                            <p id="previewDestino1" style="margin-top: 5px;"></p>
+                        </div>
+                    </div>
+
+                    <div style="margin: 15px 0; border: 1px solid #000; padding: 10px;">
+                        <p><strong>PLACA DO CAMINHÃO:</strong> <span id="previewPlaca1"></span></p>
+                        <p style="margin-top: 5px;"><strong>RESPONSÁVEL:</strong> <span id="previewResponsavel1"></span></p>
+                    </div>
+
+                    <div class="danfe-box">
+                        <div class="danfe-title">Bloco Fiscal - Referência DANFE</div>
+                        <div class="danfe-grid">
+                            <div class="danfe-cell">
+                                <span class="danfe-label" id="previewDocFiscalLabel1">Número da Nota Fiscal</span>
+                                <span class="danfe-value" id="previewDocFiscal1"></span>
+                            </div>
+                            <div class="danfe-cell">
+                                <span class="danfe-label">CNPJ do Fornecedor</span>
+                                <span class="danfe-value" id="previewCnpjFornecedor1"></span>
+                            </div>
+                            <div class="danfe-cell full">
+                                <span class="danfe-label">Razão Social do Fornecedor</span>
+                                <span class="danfe-value" id="previewRazaoFornecedor1"></span>
+                            </div>
+                            <div class="danfe-cell">
+                                <span class="danfe-label">Código do Produto</span>
+                                <span class="danfe-value" id="previewCodigoProduto1"></span>
+                            </div>
+                            <div class="danfe-cell last-row">
+                                <span class="danfe-label">Descrição do Produto</span>
+                                <span class="danfe-value" id="previewDescricaoProduto1"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 style="margin: 15px 0 10px 0; font-size: 1em;">MATERIAIS TRANSPORTADOS:</h4>
+                    <table class="materiais-table">
+                        <thead>
+                            <tr>
+                                <th>Material</th>
+                                <th style="width: 100px; text-align: center;">Quantidade</th>
+                                <th style="width: 80px; text-align: center;">Unidade</th>
+                            </tr>
+                        </thead>
+                        <tbody id="previewMateriais1"></tbody>
+                    </table>
+
+                    <h4 style="margin: 12px 0 8px 0; font-size: 0.95em;">REGISTRO FOTOGRÁFICO DA CARGA:</h4>
+                    <div class="fotos-via-grid">
+                        <div class="foto-via-box">
+                            <div class="foto-via-label">Foto da Carga 1</div>
+                            <img id="previewFotoVia1A" class="foto-via-img" alt="Foto da carga 1 - Via 1">
+                            <div id="previewFotoVia1AEmpty" class="foto-via-empty">Sem foto anexada</div>
+                        </div>
+                        <div class="foto-via-box">
+                            <div class="foto-via-label">Foto da Carga 2</div>
+                            <img id="previewFotoVia1B" class="foto-via-img" alt="Foto da carga 2 - Via 1">
+                            <div id="previewFotoVia1BEmpty" class="foto-via-empty">Sem foto anexada</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 15px; border: 1px solid #000; padding: 10px;">
+                        <p><strong>OBSERVAÇÕES:</strong></p>
+                        <p id="previewObs1" style="margin-top: 5px; min-height: 40px;"></p>
+                    </div>
+
+                    <div style="margin-top: 10px; border: 1px solid #000; padding: 10px;">
+                        <p><strong>DATA DE RECEBIMENTO:</strong> <span id="previewDataReceb1"></span></p>
+                        <p style="margin-top: 5px;"><strong>ATESTO DE RECEBIMENTO TOTAL:</strong> _________________________________________</p>
+                    </div>
+
+                    <div class="assinaturas">
+                        <div class="assinatura-box">
+                            <div class="assinatura-linha">Almoxerifado</div>
+                        </div>
+                        <div class="assinatura-box">
+                            <div class="assinatura-linha">Eng. Obra/Preposto</div>
+                        </div>
+                    </div>
+                    <div class="assinaturas">
+                        <div class="assinatura-box">
+                            <div class="assinatura-linha">Téc. Qualidade</div>
+                        </div>
+                        <div class="assinatura-box">
+                            <div class="assinatura-linha">Fiscal de Qualidade</div>
+                        </div>
+                    </div>
+
+                    <div class="auth-footer">
+                        <p><strong>Código de Autenticação:</strong> <span id="previewAuthCode1"></span></p>
+                        <p id="previewAuthMeta1"></p>
+                    </div>
+                </div>
+
+                <!-- VIA 2 -->
+                <div class="via">
+                    <div class="via-label">2ª VIA - EMPRESA</div>
+                    <div style="clear: both;"></div>
+                    
+                    <div class="preview-header">
+                        <h2>SUCENA EMPREENDIMENTOS LTDA</h2>
+                        <p>CNPJ: 19.381.283/0001-97</p>
+                        <p>Rua São Francisco, 720 - Centro - Açailândia/MA - CEP: 65930-000</p>
+                        <h3>ROMANEIO DE MATERIAIS</h3>
+                    </div>
+
+                    <div class="identificacao-box">
+                        <div>
+                            <p><strong>Romaneio Nº:</strong> <span id="previewNumero2"></span></p>
+                            <p><strong>Registro Interno:</strong> <span id="previewRegistro2"></span></p>
+                            <p><strong>Código de Controle:</strong> <span id="previewControle2"></span></p>
+                            <p><strong>Revisão:</strong> <span id="previewRevisao2"></span></p>
+                            <p><strong>Data:</strong> <span id="previewData2"></span></p>
+                        </div>
+                        <div class="qr-preview-box">
+                            <p>QR CONTROLE</p>
+                            <img id="previewQr2" alt="QR Code de controle - Via 2">
+                            <small id="previewQrText2"></small>
+                            <small id="previewHashText2"></small>
+                        </div>
+                    </div>
+
+                    <div class="preview-grid">
+                        <div class="info-box">
+                            <p><strong>FORNECEDOR/ORIGEM:</strong></p>
+                            <p id="previewFornecedor2" style="margin-top: 5px;"></p>
+                            <p id="previewCNPJ2" style="margin-top: 5px;"></p>
+                        </div>
+                        <div class="info-box">
+                            <p><strong>DESTINO:</strong></p>
+                            <p id="previewDestino2" style="margin-top: 5px;"></p>
+                        </div>
+                    </div>
+
+                    <div style="margin: 15px 0; border: 1px solid #000; padding: 10px;">
+                        <p><strong>PLACA DO CAMINHÃO:</strong> <span id="previewPlaca2"></span></p>
+                        <p style="margin-top: 5px;"><strong>RESPONSÁVEL:</strong> <span id="previewResponsavel2"></span></p>
+                    </div>
+
+                    <div class="danfe-box">
+                        <div class="danfe-title">Bloco Fiscal - Referência DANFE</div>
+                        <div class="danfe-grid">
+                            <div class="danfe-cell">
+                                <span class="danfe-label" id="previewDocFiscalLabel2">Número da Nota Fiscal</span>
+                                <span class="danfe-value" id="previewDocFiscal2"></span>
+                            </div>
+                            <div class="danfe-cell">
+                                <span class="danfe-label">CNPJ do Fornecedor</span>
+                                <span class="danfe-value" id="previewCnpjFornecedor2"></span>
+                            </div>
+                            <div class="danfe-cell full">
+                                <span class="danfe-label">Razão Social do Fornecedor</span>
+                                <span class="danfe-value" id="previewRazaoFornecedor2"></span>
+                            </div>
+                            <div class="danfe-cell">
+                                <span class="danfe-label">Código do Produto</span>
+                                <span class="danfe-value" id="previewCodigoProduto2"></span>
+                            </div>
+                            <div class="danfe-cell last-row">
+                                <span class="danfe-label">Descrição do Produto</span>
+                                <span class="danfe-value" id="previewDescricaoProduto2"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 style="margin: 15px 0 10px 0; font-size: 1em;">MATERIAIS TRANSPORTADOS:</h4>
+                    <table class="materiais-table">
+                        <thead>
+                            <tr>
+                                <th>Material</th>
+                                <th style="width: 100px; text-align: center;">Quantidade</th>
+                                <th style="width: 80px; text-align: center;">Unidade</th>
+                            </tr>
+                        </thead>
+                        <tbody id="previewMateriais2"></tbody>
+                    </table>
+
+                    <h4 style="margin: 12px 0 8px 0; font-size: 0.95em;">REGISTRO FOTOGRÁFICO DA CARGA:</h4>
+                    <div class="fotos-via-grid">
+                        <div class="foto-via-box">
+                            <div class="foto-via-label">Foto da Carga 1</div>
+                            <img id="previewFotoVia2A" class="foto-via-img" alt="Foto da carga 1 - Via 2">
+                            <div id="previewFotoVia2AEmpty" class="foto-via-empty">Sem foto anexada</div>
+                        </div>
+                        <div class="foto-via-box">
+                            <div class="foto-via-label">Foto da Carga 2</div>
+                            <img id="previewFotoVia2B" class="foto-via-img" alt="Foto da carga 2 - Via 2">
+                            <div id="previewFotoVia2BEmpty" class="foto-via-empty">Sem foto anexada</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 15px; border: 1px solid #000; padding: 10px;">
+                        <p><strong>OBSERVAÇÕES:</strong></p>
+                        <p id="previewObs2" style="margin-top: 5px; min-height: 40px;"></p>
+                    </div>
+
+                    <div style="margin-top: 10px; border: 1px solid #000; padding: 10px;">
+                        <p><strong>DATA DE RECEBIMENTO:</strong> <span id="previewDataReceb2"></span></p>
+                        <p style="margin-top: 5px;"><strong>ATESTO DE RECEBIMENTO TOTAL:</strong> _________________________________________</p>
+                    </div>
+
+                    <div class="assinaturas">
+                        <div class="assinatura-box">
+                            <div class="assinatura-linha">Almoxerifado</div>
+                        </div>
+                        <div class="assinatura-box">
+                            <div class="assinatura-linha">Eng. Obra/Preposto</div>
+                        </div>
+                    </div>
+                    <div class="assinaturas">
+                        <div class="assinatura-box">
+                            <div class="assinatura-linha">Téc. Qualidade</div>
+                        </div>
+                        <div class="assinatura-box">
+                            <div class="assinatura-linha">Fiscal de Qualidade</div>
+                        </div>
+                    </div>
+
+                    <div class="auth-footer">
+                        <p><strong>Código de Autenticação:</strong> <span id="previewAuthCode2"></span></p>
+                        <p id="previewAuthMeta2"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Definir data atual
+        document.getElementById('dataRomaneio').valueAsDate = new Date();
+
+        const BASE_DADOS_STORAGE_KEY = 'sucena_romaneios_db_v1';
+        const FORNECEDORES_EXTRA_STORAGE_KEY = 'sucena_fornecedores_extra_v1';
+        const CONTRATOS_EXTRA_STORAGE_KEY = 'sucena_contratos_extra_v1';
+        const MAPA_RASTREABILIDADE_STORAGE_KEY = 'sucena_mapa_rastreabilidade_v1';
+        const AUDITORIA_LOG_STORAGE_KEY = 'sucena_auditoria_log_v1';
+        const USERS_STORAGE_KEY = 'sucena_users_v1';
+        const GOOGLE_API_URL_STORAGE_KEY = 'sucena_google_api_url_v1';
+        
+        let cacheRomaneios = [];
+        let sequenceState = {};
+
+        // --- INDEXEDDB WRAPPER ---
+        const DB_NAME = 'SucenaRomaneioDB';
+        const DB_VERSION = 1;
+        const STORE_ROMANEIOS = 'romaneios';
+
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = function(e) {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE_ROMANEIOS)) {
+                        db.createObjectStore(STORE_ROMANEIOS, { keyPath: 'codigoControle' });
+                    }
+                };
+                request.onsuccess = function(e) {
+                    resolve(e.target.result);
+                };
+                request.onerror = function(e) {
+                    reject(e.target.error);
+                };
+            });
+        }
+
+        function dbSalvarRomaneio(romaneio) {
+            return initDB().then(db => {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction([STORE_ROMANEIOS], 'readwrite');
+                    const store = transaction.objectStore(STORE_ROMANEIOS);
+                    const request = store.put(romaneio);
+                    request.onsuccess = () => resolve(true);
+                    request.onerror = (e) => reject(e.target.error);
+                });
+            });
+        }
+
+        function dbObterRomaneios() {
+            return initDB().then(db => {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction([STORE_ROMANEIOS], 'readonly');
+                    const store = transaction.objectStore(STORE_ROMANEIOS);
+                    const request = store.getAll();
+                    request.onsuccess = (e) => resolve(e.target.result || []);
+                    request.onerror = (e) => reject(e.target.error);
+                });
+            });
+        }
+
+        function dbExcluirRomaneio(codigoControle) {
+            return initDB().then(db => {
+                return new Promise((resolve, reject) => {
+                    const transaction = db.transaction([STORE_ROMANEIOS], 'readwrite');
+                    const store = transaction.objectStore(STORE_ROMANEIOS);
+                    const request = store.delete(codigoControle);
+                    request.onsuccess = () => resolve(true);
+                    request.onerror = (e) => reject(e.target.error);
+                });
+            });
+        }
+
+        let fornecedoresExtras = [];
+        let contratosExtras = [];
+        let usuariosSistema = [];
+        let usuarioAtual = null;
+        let customMaterialCounter = 0;
+        let authContext = {
+            device: 'DESKTOP',
+            geo: 'SEM-GPS',
+            platform: (navigator.platform || 'N/D')
+        };
+
+        function criarUsuariosPadrao() {
+            return [
+                {
+                    id: 'adm_master',
+                    primeiroNome: 'ADMIN',
+                    segundoNome: 'MASTER',
+                    perfil: 'admin',
+                    local: 'FÁBRICA VERONA - AÇAILÂNDIA',
+                    campo: 'TODOS',
+                    pacotesPermitidos: [],
+                    senha: '1234'
+                },
+                {
+                    id: 'op_padrao',
+                    primeiroNome: 'USUARIO',
+                    segundoNome: 'ROMANEIO',
+                    perfil: 'operador',
+                    local: 'FÁBRICA VERONA - AÇAILÂNDIA',
+                    campo: 'PACOTE 8, MURO, PRAÇA',
+                    pacotesPermitidos: [8],
+                    senha: '1234'
+                }
+            ];
+        }
+
+        function getUsuariosSistema() {
+            try {
+                const bruto = localStorage.getItem(USERS_STORAGE_KEY);
+                if (!bruto) return criarUsuariosPadrao();
+                let lista = JSON.parse(bruto);
+                if (!Array.isArray(lista) || !lista.length) return criarUsuariosPadrao();
+                
+                // Migração: garantir que todos os usuários têm senha
+                lista = lista.map(function(user) {
+                    if (!user.senha) {
+                        user.senha = '1234'; // Senha padrão para usuários antigos
+                    }
+                    return user;
+                });
+                
+                // Salvar usuários migrados se houve alteração
+                const necessitaMigracao = bruto.indexOf('"senha"') === -1;
+                if (necessitaMigracao) {
+                    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(lista));
+                }
+                
+                return lista;
+            } catch (e) {
+                console.error('Erro ao carregar usuários:', e);
+                return criarUsuariosPadrao();
+            }
+        }
+
+        function setUsuariosSistema(lista) {
+            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(lista));
+        }
+
+        function obterNomeUsuario(usuario) {
+            if (!usuario) return 'Sem usuário';
+            return (usuario.primeiroNome + ' ' + usuario.segundoNome).trim();
+        }
+
+        function renderLoginUsers() {
+            const select = document.getElementById('loginUserSelect');
+            if (!select) return;
+
+            while (select.options.length > 0) {
+                select.remove(0);
+            }
+
+            usuariosSistema.forEach(function(user) {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = obterNomeUsuario(user) + ' (' + user.perfil.toUpperCase() + ')';
+                select.appendChild(option);
+            });
+
+            atualizarResumoUsuarioSelecionado();
+        }
+
+        function obterUsuarioSelecionadoLogin() {
+            const select = document.getElementById('loginUserSelect');
+            const id = select ? select.value : '';
+            return usuariosSistema.find(function(user) { return user.id === id; }) || null;
+        }
+
+        function atualizarResumoUsuarioSelecionado() {
+            const user = obterUsuarioSelecionadoLogin();
+            const resumo = document.getElementById('loginUserSummary');
+            if (!resumo) return;
+
+            if (!user) {
+                resumo.textContent = 'Selecione um usuário para ver nome, local, campo e perfil.';
+                return;
+            }
+
+            const pacotesTxt = user.pacotesPermitidos && user.pacotesPermitidos.length
+                ? user.pacotesPermitidos.join(', ')
+                : 'TODOS';
+            resumo.textContent = 'Nome: ' + obterNomeUsuario(user) +
+                ' | Perfil: ' + user.perfil.toUpperCase() +
+                ' | Local: ' + (user.local || 'N/D') +
+                ' | Campo: ' + (user.campo || 'N/D') +
+                ' | Pacotes: ' + pacotesTxt;
+        }
+
+        function aplicarRestricaoPacotesUsuario() {
+            const select = document.getElementById('pacoteNumero');
+            if (!select) return;
+
+            const permitidos = usuarioAtual && usuarioAtual.perfil === 'operador' && Array.isArray(usuarioAtual.pacotesPermitidos)
+                ? usuarioAtual.pacotesPermitidos
+                : [];
+            const restringir = usuarioAtual && usuarioAtual.perfil === 'operador' && permitidos.length > 0;
+
+            Array.from(select.options).forEach(function(option) {
+                if (!restringir) {
+                    option.disabled = false;
+                    return;
+                }
+
+                const numero = parseInt(option.value, 10);
+                option.disabled = !Number.isFinite(numero) || permitidos.indexOf(numero) === -1;
+            });
+
+            if (restringir) {
+                const atual = parseInt(select.value, 10);
+                if (!Number.isFinite(atual) || permitidos.indexOf(atual) === -1) {
+                    const primeiro = Array.from(select.options).find(function(option) {
+                        return !option.disabled;
+                    });
+                    if (primeiro) {
+                        select.value = primeiro.value;
+                    }
+                }
+            }
+        }
+
+        function aplicarPermissoesPorPerfil() {
+            const isAdmin = !!(usuarioAtual && usuarioAtual.perfil === 'admin');
+            document.querySelectorAll('.admin-only').forEach(function(el) {
+                if (isAdmin) {
+                    el.classList.remove('app-hidden');
+                } else {
+                    el.classList.add('app-hidden');
+                }
+            });
+
+            aplicarRestricaoPacotesUsuario();
+
+            const responsavel = document.getElementById('responsavel');
+            if (responsavel && !responsavel.value) {
+                responsavel.value = obterNomeUsuario(usuarioAtual);
+            }
+
+            gerarCodigoControle();
+            atualizarQrPrevia();
+            atualizarKpisAdmin();
+            renderTabelaUsuariosAdmin();
+        }
+
+        function entrarSistema() {
+            const user = obterUsuarioSelecionadoLogin();
+            if (!user) {
+                alert('Selecione um usuário válido.');
+                return;
+            }
+
+            const senhaInput = document.getElementById('loginSenha').value.trim();
+            if (!senhaInput) {
+                alert('Informe a senha.');
+                document.getElementById('loginSenha').focus();
+                return;
+            }
+            
+            // Garantir que o usuário tem a propriedade senha (migração)
+            if (!user.senha) {
+                user.senha = '1234';
+                setUsuariosSistema(usuariosSistema);
+            }
+
+            if (senhaInput !== user.senha) {
+                alert('Senha incorreta. Tente novamente.\n\nDica: Verifique se o CapsLock está ativo.');
+                document.getElementById('loginSenha').value = '';
+                document.getElementById('loginSenha').focus();
+                return;
+            }
+
+            usuarioAtual = user;
+            document.getElementById('accessScreen').classList.add('app-hidden');
+            document.getElementById('mainHeader').classList.remove('app-hidden');
+            document.getElementById('sessionBar').classList.remove('app-hidden');
+            document.getElementById('mainContent').classList.remove('app-hidden');
+
+            document.getElementById('sessaoNome').textContent = obterNomeUsuario(user);
+            document.getElementById('sessaoPerfil').textContent = user.perfil.toUpperCase();
+            document.getElementById('sessaoLocal').textContent = user.local || 'N/D';
+            document.getElementById('sessaoCampo').textContent = user.campo || 'N/D';
+
+            document.getElementById('loginSenha').value = '';
+            aplicarPermissoesPorPerfil();
+            registrarAuditoria('login', 'Entrada no sistema: ' + obterNomeUsuario(user));
+        }
+
+        function sairSistema() {
+            if (usuarioAtual) {
+                registrarAuditoria('logout', 'Saída do sistema: ' + obterNomeUsuario(usuarioAtual));
+            }
+            usuarioAtual = null;
+
+            document.getElementById('mainHeader').classList.add('app-hidden');
+            document.getElementById('sessionBar').classList.add('app-hidden');
+            document.getElementById('mainContent').classList.add('app-hidden');
+            document.getElementById('accessScreen').classList.remove('app-hidden');
+            document.getElementById('loginSenha').value = '';
+        }
+
+        function parsePacotesPermitidos(texto) {
+            if (!texto || !texto.trim()) return [];
+            return texto
+                .split(',')
+                .map(function(p) { return parseInt(p.trim(), 10); })
+                .filter(function(p) { return Number.isFinite(p) && p >= 1 && p <= 30; });
+        }
+
+        function criarUsuarioAdmin() {
+            if (!usuarioAtual || usuarioAtual.perfil !== 'admin') {
+                alert('Somente Admin pode criar usuários.');
+                return;
+            }
+
+            const primeiroNome = (document.getElementById('adminPrimeiroNome').value || '').trim().toUpperCase();
+            const segundoNome = (document.getElementById('adminSegundoNome').value || '').trim().toUpperCase();
+            const perfil = document.getElementById('adminPerfil').value;
+            const local = (document.getElementById('adminLocal').value || '').trim().toUpperCase() || 'FÁBRICA VERONA - AÇAILÂNDIA';
+            const campo = (document.getElementById('adminCampo').value || '').trim().toUpperCase() || 'NÃO INFORMADO';
+            const pacotes = parsePacotesPermitidos(document.getElementById('adminPacotesPermitidos').value || '');
+            const senha = (document.getElementById('adminSenha').value || '').trim();
+            const senhaConfirma = (document.getElementById('adminSenhaConfirma').value || '').trim();
+
+            if (!primeiroNome || !segundoNome) {
+                alert('Informe primeiro e segundo nome do usuário.');
+                return;
+            }
+
+            if (!senha) {
+                alert('Informe a senha do novo usuário.');
+                return;
+            }
+
+            if (senha !== senhaConfirma) {
+                alert('As senhas não conferem.');
+                return;
+            }
+
+            if (senha.length < 3) {
+                alert('A senha deve ter no mínimo 3 caracteres.');
+                return;
+            }
+
+            const jaExiste = usuariosSistema.some(function(user) {
+                return user.primeiroNome === primeiroNome && user.segundoNome === segundoNome;
+            });
+
+            if (jaExiste) {
+                alert('Usuário já existe.');
+                return;
+            }
+
+            const novo = {
+                id: 'usr_' + Date.now(),
+                primeiroNome: primeiroNome,
+                segundoNome: segundoNome,
+                perfil: perfil,
+                local: local,
+                campo: campo,
+                pacotesPermitidos: perfil === 'operador' ? pacotes : [],
+                senha: senha
+            };
+
+            usuariosSistema.push(novo);
+            setUsuariosSistema(usuariosSistema);
+            renderLoginUsers();
+            renderTabelaUsuariosAdmin();
+            atualizarKpisAdmin();
+
+            document.getElementById('adminPrimeiroNome').value = '';
+            document.getElementById('adminSegundoNome').value = '';
+            document.getElementById('adminCampo').value = '';
+            document.getElementById('adminPacotesPermitidos').value = '';
+            document.getElementById('adminSenha').value = '';
+            document.getElementById('adminSenhaConfirma').value = '';
+
+            registrarAuditoria('admin_criar_usuario', 'Usuário criado: ' + obterNomeUsuario(novo) + ' (' + novo.perfil + ')');
+            alert('Usuário criado com sucesso. Senha: ' + senha);
+        }
+
+        function renderTabelaUsuariosAdmin() {
+            const tbody = document.getElementById('adminUsersTableBody');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+            usuariosSistema.forEach(function(user) {
+                const tr = document.createElement('tr');
+                const pacotesTxt = user.pacotesPermitidos && user.pacotesPermitidos.length
+                    ? user.pacotesPermitidos.join(', ')
+                    : 'TODOS';
+                tr.innerHTML = '' +
+                    '<td>' + obterNomeUsuario(user) + '</td>' +
+                    '<td>' + user.perfil.toUpperCase() + '</td>' +
+                    '<td>' + (user.local || '-') + '</td>' +
+                    '<td>' + (user.campo || '-') + '</td>' +
+                    '<td>' + pacotesTxt + '</td>';
+                tbody.appendChild(tr);
+            });
+        }
+
+        function atualizarKpisAdmin() {
+            const totalUsuarios = usuariosSistema.length;
+            const totalAdmins = usuariosSistema.filter(function(user) { return user.perfil === 'admin'; }).length;
+            const totalOperadores = usuariosSistema.filter(function(user) { return user.perfil === 'operador'; }).length;
+            const db = getBaseDadosLocal();
+            const totalRomaneios = db.romaneios.length;
+            const hojeIso = new Date().toISOString().slice(0, 10);
+            const romaneiosHoje = db.romaneios.filter(function(item) {
+                return item.savedAt && String(item.savedAt).slice(0, 10) === hojeIso;
+            }).length;
+
+            document.getElementById('kpiTotalUsuarios').textContent = String(totalUsuarios);
+            document.getElementById('kpiAdmins').textContent = String(totalAdmins);
+            document.getElementById('kpiOperadores').textContent = String(totalOperadores);
+            document.getElementById('kpiRomaneiosTotal').textContent = String(totalRomaneios);
+            document.getElementById('kpiRomaneiosHoje').textContent = String(romaneiosHoje);
+        }
+
+        function validarPermissaoAdmin() {
+            if (!usuarioAtual || usuarioAtual.perfil !== 'admin') {
+                alert('Acesso restrito ao perfil Admin.');
+                return false;
+            }
+            return true;
+        }
+
+        function detectarTipoDispositivo() {
+            const ua = navigator.userAgent || '';
+            return /Mobi|Android|iPhone|iPad/i.test(ua) ? 'CELULAR' : 'PC';
+        }
+
+        function inicializarContextoAutenticacao() {
+            authContext.device = detectarTipoDispositivo();
+            if (!navigator.geolocation) {
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(function(pos) {
+                const lat = pos.coords && Number.isFinite(pos.coords.latitude)
+                    ? pos.coords.latitude.toFixed(5)
+                    : '0.00000';
+                const lon = pos.coords && Number.isFinite(pos.coords.longitude)
+                    ? pos.coords.longitude.toFixed(5)
+                    : '0.00000';
+                authContext.geo = lat + ',' + lon;
+            }, function() {
+                authContext.geo = 'SEM-GPS';
+            }, {
+                enableHighAccuracy: false,
+                timeout: 4000,
+                maximumAge: 180000
+            });
+        }
+
+        function gerarCodigoAutenticacao() {
+            const agora = new Date();
+            const horario = agora.toTimeString().slice(0, 8).replace(/:/g, '');
+            const data = agora.toISOString().slice(0, 10).replace(/-/g, '');
+            const codigoControle = document.getElementById('codigoControle').value || 'SEM-CONTROLE';
+            const base = [data, horario, authContext.device, authContext.geo, codigoControle].join('|');
+            const hash = assinaturaCurta(base);
+            return {
+                code: 'AUTH-' + data + '-' + horario + '-' + hash,
+                meta: authContext.device + ' | ' + authContext.geo + ' | ' + agora.toLocaleString('pt-BR')
+            };
+        }
+
+        function getLogAuditoria() {
+            try {
+                const bruto = localStorage.getItem(AUDITORIA_LOG_STORAGE_KEY);
+                if (!bruto) return [];
+                const lista = JSON.parse(bruto);
+                return Array.isArray(lista) ? lista : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function setLogAuditoria(lista) {
+            localStorage.setItem(AUDITORIA_LOG_STORAGE_KEY, JSON.stringify(lista));
+        }
+
+        function registrarAuditoria(acao, detalhes) {
+            const lista = getLogAuditoria();
+            lista.push({
+                timestamp: new Date().toISOString(),
+                acao: acao,
+                codigoControle: document.getElementById('codigoControle').value || '',
+                numeroRomaneio: document.getElementById('numeroRomaneio').value || '',
+                dispositivo: authContext.device,
+                localizacao: authContext.geo,
+                detalhes: detalhes || ''
+            });
+            setLogAuditoria(lista);
+        }
+
+        function exportarLogAuditoriaJson() {
+            if (!validarPermissaoAdmin()) {
+                return;
+            }
+            const logs = getLogAuditoria();
+            if (!logs.length) {
+                alert('Não há eventos de auditoria registrados.');
+                return;
+            }
+            const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'log_auditoria_romaneio.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            registrarAuditoria('export_log_auditoria', 'Exportou log em JSON');
+        }
+
+        function popularSelectNumericoComNa(selectId, inicio, fim, valorPadrao, incluirNa) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+
+            while (select.options.length > 0) {
+                select.remove(0);
+            }
+
+            for (let i = inicio; i <= fim; i++) {
+                const option = document.createElement('option');
+                option.value = String(i);
+                option.textContent = String(i);
+                select.appendChild(option);
+            }
+
+            if (incluirNa !== false) {
+                const optionNa = document.createElement('option');
+                optionNa.value = 'NA';
+                optionNa.textContent = 'N/A';
+                select.appendChild(optionNa);
+            }
+
+            select.value = String(valorPadrao);
+        }
+
+        function inicializarControlesDocumentais() {
+            popularSelectNumericoComNa('tacNumero', 1, 30, 2);
+            popularSelectNumericoComNa('pacoteNumero', 1, 30, 5, false);
+            popularSelectNumericoComNa('sequenciaNumero', 1, 500, 1);
+            popularSelectNumericoComNa('revisaoDocumento', 0, 30, 0);
+        }
+
+        function garantirOpcaoNoSelect(selectId, valor) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+
+            const valorTexto = String(valor);
+            const existe = Array.from(select.options).some(function(option) {
+                return option.value === valorTexto;
+            });
+
+            if (!existe) {
+                const opcao = document.createElement('option');
+                opcao.value = valorTexto;
+                opcao.textContent = valorTexto;
+                const naOption = Array.from(select.options).find(function(option) {
+                    return option.value === 'NA';
+                });
+                if (naOption) {
+                    select.insertBefore(opcao, naOption);
+                } else {
+                    select.appendChild(opcao);
+                }
+            }
+        }
+
+        function obterValorControle(id, fallback) {
+            const valorBruto = (document.getElementById(id).value || '').trim();
+            if (valorBruto === 'NA') {
+                return 'NA';
+            }
+            const numero = parseInt(valorBruto, 10);
+            if (Number.isFinite(numero)) {
+                return numero;
+            }
+            return fallback;
+        }
+
+        function formatarParteControle(prefixo, valor, tamanho) {
+            if (valor === 'NA') {
+                return '';
+            }
+            return prefixo + padNumero(valor, tamanho);
+        }
+
+        function padNumero(valor, tamanho) {
+            return String(valor).padStart(tamanho, '0');
+        }
+
+        function obterAnoSequencia() {
+            const data = document.getElementById('dataRomaneio').value;
+            if (!data) {
+                return String(new Date().getFullYear());
+            }
+            return String(new Date(data + 'T00:00:00').getFullYear());
+        }
+
+        function chaveSequenciaAtual() {
+            const tacValor = obterValorControle('tacNumero', 1);
+            const pacoteValor = obterValorControle('pacoteNumero', 1);
+            const ano = obterAnoSequencia();
+            const partes = [];
+            if (tacValor !== 'NA') {
+                partes.push('TAC' + padNumero(Math.max(1, tacValor), 2));
+            }
+            if (pacoteValor !== 'NA') {
+                partes.push('P' + padNumero(Math.max(1, pacoteValor), 2));
+            }
+            partes.push(ano);
+            return partes.join('-');
+        }
+
+        function atualizarRegistroInternoAutomatico() {
+            const pacote = parseInt(document.getElementById('pacoteNumero').value, 10);
+            const sequencia = obterValorControle('sequenciaNumero', 1);
+            const ano = obterAnoSequencia();
+
+            if (!Number.isFinite(pacote)) {
+                document.getElementById('registroInterno').value = '';
+                return;
+            }
+
+            const seqTexto = sequencia === 'NA' ? '0000' : padNumero(Math.max(1, sequencia), 4);
+            document.getElementById('registroInterno').value = 'SUC-P' + padNumero(pacote, 2) + '-' + ano + '-' + seqTexto;
+        }
+
+        function getBaseDadosLocal() {
+            return {
+                version: 1,
+                romaneios: cacheRomaneios,
+                sequenceState: sequenceState
+            };
+        }
+
+        function setBaseDadosLocal(db) {
+            sequenceState = db.sequenceState;
+            localStorage.setItem('sucena_sequence_state_v1', JSON.stringify(sequenceState));
+        }
+
+        function getMapaRastreabilidade() {
+            try {
+                const bruto = localStorage.getItem(MAPA_RASTREABILIDADE_STORAGE_KEY);
+                if (!bruto) return { version: 1, itens: [] };
+                const mapa = JSON.parse(bruto);
+                if (!mapa || !Array.isArray(mapa.itens)) {
+                    return { version: 1, itens: [] };
+                }
+                return mapa;
+            } catch (e) {
+                return { version: 1, itens: [] };
+            }
+        }
+
+        function setMapaRastreabilidade(mapa) {
+            localStorage.setItem(MAPA_RASTREABILIDADE_STORAGE_KEY, JSON.stringify(mapa));
+        }
+
+        function validarCamposObrigatorios() {
+            const pacote = document.getElementById('pacoteNumero').value;
+            const contrato = document.getElementById('contrato').value;
+            const pacoteNumero = parseInt(pacote, 10);
+
+            if (!pacote || pacote === 'NA') {
+                alert('Pacote é obrigatório no controle documental.');
+                return false;
+            }
+
+            if (
+                usuarioAtual &&
+                usuarioAtual.perfil === 'operador' &&
+                Array.isArray(usuarioAtual.pacotesPermitidos) &&
+                usuarioAtual.pacotesPermitidos.length > 0 &&
+                (!Number.isFinite(pacoteNumero) || usuarioAtual.pacotesPermitidos.indexOf(pacoteNumero) === -1)
+            ) {
+                alert('Este usuário não possui permissão para o pacote selecionado.');
+                return false;
+            }
+
+            if (!contrato || contrato === 'add_new_contract') {
+                alert('Contrato é obrigatório. Se necessário, cadastre um novo contrato e selecione-o.');
+                return false;
+            }
+
+            return true;
+        }
+
+        function obterOrigemTextoMapa() {
+            const fornSelect = document.getElementById('fornecedor').value;
+            if (fornSelect === 'custom') {
+                return document.getElementById('origemPersonalizada').value || 'Não informado';
+            }
+            if (fornSelect) {
+                const fornObj = obterFornecedorSelecionado(fornSelect);
+                if (fornObj) {
+                    return fornObj.local || fornObj.nome || 'Não informado';
+                }
+            }
+            return 'Não informado';
+        }
+
+        function obterDocumentoRastreio() {
+            if (isModoPlacasMuro()) {
+                const ils = document.getElementById('ilsNumero').value || 'Não informado';
+                const concreto = document.getElementById('controleConcretoNumero').value || 'Não informado';
+                return 'FVS/ILS: ILS ' + ils + ' | CC ' + concreto;
+            }
+            return 'NF: ' + (document.getElementById('numeroNotaFiscal').value || 'Não informado');
+        }
+
+        function atualizarMapaRastreabilidadeComRomaneio() {
+            const codigoControle = document.getElementById('codigoControle').value || '';
+            if (!codigoControle) {
+                return;
+            }
+
+            const mapa = getMapaRastreabilidade();
+            mapa.itens = mapa.itens.filter(function(item) {
+                return item.codigoControle !== codigoControle;
+            });
+
+            const materiais = obterMateriaisSelecionados();
+            const data = formatarData(document.getElementById('dataRomaneio').value);
+            const dataReceb = formatarData(document.getElementById('dataRecebimento').value);
+            const origem = obterOrigemTextoMapa();
+            const destinoFinal = document.getElementById('destino').value || 'Não informado';
+            const placa = document.getElementById('placaCaminhao').value.toUpperCase() || 'Não informada';
+            const motorista = document.getElementById('responsavel').value || 'Não informado';
+            const contrato = document.getElementById('contrato').value || 'Não informado';
+            const pacote = document.getElementById('pacoteNumero').value || 'Não informado';
+            const docRef = obterDocumentoRastreio();
+
+            materiais.forEach(function(mat) {
+                mapa.itens.push({
+                    dataRomaneio: data,
+                    dataRecebimento: dataReceb,
+                    origem: origem,
+                    destinoFinal: destinoFinal,
+                    material: mat.nome,
+                    quantidade: String(mat.qtd),
+                    unidade: mat.unidade,
+                    placa: placa,
+                    motorista: motorista,
+                    codigoControle: codigoControle,
+                    documentoRef: docRef,
+                    pacote: pacote,
+                    contrato: contrato
+                });
+            });
+
+            setMapaRastreabilidade(mapa);
+        }
+
+        function exportarMapaRastreabilidadeExcel() {
+            if (!validarPermissaoAdmin()) {
+                return;
+            }
+            const mapa = getMapaRastreabilidade();
+            if (!mapa.itens.length) {
+                alert('Não há itens no mapa de rastreabilidade para exportar.');
+                return;
+            }
+
+            const revisaoValor = document.getElementById('revisaoDocumento').value;
+            const revisaoMapa = revisaoValor === 'NA'
+                ? '00'
+                : padNumero(Math.max(0, parseInt(revisaoValor, 10) || 0), 2);
+            const dataCabecalho = new Date().toLocaleDateString('pt-BR');
+            const pacoteAtual = document.getElementById('pacoteNumero').value || 'S/N';
+            const contratoAtual = document.getElementById('contrato').value || 'SEM CONTRATO';
+            const codigoRastreio = 'MRR-' + padNumero(mapa.itens.length, 2);
+
+            const dados = [
+                ['MAPA DE RASTREABILIDADE DE REGISTROS', '', '', '', '', '', '', '', '', '', '', '', ''],
+                ['Nº FORMULÁRIO', '', 'ELABORADO:', '', 'APROVADO:', '', 'SETOR:', '', 'REVISÃO:', '', 'DATA:', '', ''],
+                ['MRR-01-VALE-001', '', 'BRUNO RAMOS', '', 'DIRETORIA', '', 'QUALIDADE', '', revisaoMapa, '', dataCabecalho, '', ''],
+                ['PACOTE ' + pacoteAtual + ' - ' + contratoAtual, '', '', '', '', '', '', '', 'DATA DE ATUALIZAÇÃO:', '', dataCabecalho, '', ''],
+                ['RELATÓRIO DE INSPEÇÃO E LIBERAÇÃO DE SERVIÇOS - ILS', '', '', '', '', '', '', '', 'CÓD DO REGISTRO:', '', 'Nº ILS', '', 'CÓD. RAST.: ' + codigoRastreio],
+                [],
+                ['Data', 'Data Receb.', 'Origem', 'Destino Final', 'Material', 'Quantidade', 'Unidade', 'Placa Caminhão', 'Motorista/Responsável', 'Código Controle', 'NF ou FVS/ILS', 'Pacote', 'Contrato']
+            ];
+
+            mapa.itens
+                .slice()
+                .sort(function(a, b) {
+                    if (a.pacote !== b.pacote) return String(a.pacote).localeCompare(String(b.pacote));
+                    if (a.contrato !== b.contrato) return String(a.contrato).localeCompare(String(b.contrato));
+                    return String(a.dataRomaneio).localeCompare(String(b.dataRomaneio));
+                })
+                .forEach(function(item) {
+                    dados.push([
+                        item.dataRomaneio,
+                        item.dataRecebimento,
+                        item.origem,
+                        item.destinoFinal,
+                        item.material,
+                        item.quantidade,
+                        item.unidade,
+                        item.placa,
+                        item.motorista,
+                        item.codigoControle,
+                        item.documentoRef,
+                        item.pacote,
+                        item.contrato
+                    ]);
+                });
+
+            const ws = XLSX.utils.aoa_to_sheet(dados);
+            ws['!merges'] = [
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 12 } },
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 1 } },
+                { s: { r: 1, c: 2 }, e: { r: 1, c: 3 } },
+                { s: { r: 1, c: 4 }, e: { r: 1, c: 5 } },
+                { s: { r: 1, c: 6 }, e: { r: 1, c: 7 } },
+                { s: { r: 1, c: 8 }, e: { r: 1, c: 9 } },
+                { s: { r: 1, c: 10 }, e: { r: 1, c: 12 } },
+                { s: { r: 2, c: 0 }, e: { r: 2, c: 1 } },
+                { s: { r: 2, c: 2 }, e: { r: 2, c: 3 } },
+                { s: { r: 2, c: 4 }, e: { r: 2, c: 5 } },
+                { s: { r: 2, c: 6 }, e: { r: 2, c: 7 } },
+                { s: { r: 2, c: 8 }, e: { r: 2, c: 9 } },
+                { s: { r: 2, c: 10 }, e: { r: 2, c: 12 } },
+                { s: { r: 3, c: 0 }, e: { r: 3, c: 7 } },
+                { s: { r: 3, c: 8 }, e: { r: 3, c: 9 } },
+                { s: { r: 3, c: 10 }, e: { r: 3, c: 12 } },
+                { s: { r: 4, c: 0 }, e: { r: 4, c: 7 } },
+                { s: { r: 4, c: 8 }, e: { r: 4, c: 9 } },
+                { s: { r: 4, c: 11 }, e: { r: 4, c: 12 } }
+            ];
+            ws['!cols'] = [
+                { wch: 12 }, { wch: 12 }, { wch: 18 }, { wch: 16 }, { wch: 18 },
+                { wch: 15 }, { wch: 14 }, { wch: 16 }, { wch: 14 }, { wch: 22 },
+                { wch: 24 }, { wch: 10 }, { wch: 18 }
+            ];
+            ws['!autofilter'] = {
+                ref: 'A7:M' + String(dados.length)
+            };
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'MapaRastreabilidade');
+            XLSX.writeFile(wb, 'Mapa_Rastreabilidade_Geral.xlsx');
+            registrarAuditoria('export_mapa_rastreabilidade', 'Exportou mapa geral em Excel');
+        }
+
+        function atualizarStatusBaseDados() {
+            const db = getBaseDadosLocal();
+            const chave = chaveSequenciaAtual();
+            const ultimo = db.romaneios.length > 0 ? db.romaneios[db.romaneios.length - 1] : null;
+            const ultimaData = ultimo && ultimo.savedAt ? new Date(ultimo.savedAt).toLocaleString('pt-BR') : 'Nenhum';
+            const proxima = (db.sequenceState[chave] || 0) + 1;
+
+            document.getElementById('dbTotalRegistros').textContent = String(db.romaneios.length);
+            document.getElementById('dbUltimoSalvamento').textContent = ultimaData;
+            document.getElementById('dbProximaSequencia').textContent = String(proxima);
+        }
+
+        function aplicarProximaSequenciaBanco(force) {
+            if (document.getElementById('sequenciaNumero').value === 'NA') {
+                atualizarStatusBaseDados();
+                gerarCodigoControle();
+                return;
+            }
+
+            const db = getBaseDadosLocal();
+            const chave = chaveSequenciaAtual();
+            const proxima = (db.sequenceState[chave] || 0) + 1;
+            const atual = parseInt(document.getElementById('sequenciaNumero').value, 10) || 0;
+
+            if (force || !atual) {
+                garantirOpcaoNoSelect('sequenciaNumero', proxima);
+                document.getElementById('sequenciaNumero').value = proxima;
+                gerarCodigoControle();
+            }
+
+            atualizarStatusBaseDados();
+        }
+
+        function persistirSequenciaAtualNoBanco() {
+            if (document.getElementById('sequenciaNumero').value === 'NA') {
+                atualizarStatusBaseDados();
+                return;
+            }
+
+            const db = getBaseDadosLocal();
+            const chave = chaveSequenciaAtual();
+            const sequencia = Math.max(1, parseInt(document.getElementById('sequenciaNumero').value, 10) || 1);
+            db.sequenceState[chave] = Math.max(db.sequenceState[chave] || 0, sequencia);
+            setBaseDadosLocal(db);
+            atualizarStatusBaseDados();
+        }
+
+        function coletarSnapshotMateriais() {
+            return [
+                { check: 'areiaCheck', qtd: 'areiaQtd', unidade: 'areiaUnidade' },
+                { check: 'britaCheck', qtd: 'britaQtd', unidade: 'britaUnidade' },
+                { check: 'cimentoCheck', qtd: 'cimentoQtd', unidade: 'cimentoUnidade', tipo: 'cimentoTipo' },
+                { check: 'acoCheck', qtd: 'acoQtd', unidade: 'acoUnidade' },
+                { check: 'poste11Check', qtd: 'poste11Qtd', unidade: 'poste11Unidade' },
+                { check: 'poste14Check', qtd: 'poste14Qtd', unidade: 'poste14Unidade' }
+            ].map(function(m) {
+                return {
+                    check: m.check,
+                    checked: document.getElementById(m.check).checked,
+                    qtd: m.qtd,
+                    qtdValor: document.getElementById(m.qtd).value,
+                    unidade: m.unidade,
+                    unidadeValor: document.getElementById(m.unidade).value,
+                    tipo: m.tipo || '',
+                    tipoValor: m.tipo ? document.getElementById(m.tipo).value : ''
+                };
+            });
+        }
+
+        function getFornecedoresExtras() {
+            try {
+                const bruto = localStorage.getItem(FORNECEDORES_EXTRA_STORAGE_KEY);
+                if (!bruto) return [];
+                const lista = JSON.parse(bruto);
+                return Array.isArray(lista) ? lista : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function setFornecedoresExtras(lista) {
+            localStorage.setItem(FORNECEDORES_EXTRA_STORAGE_KEY, JSON.stringify(lista));
+        }
+
+        function getContratosExtras() {
+            try {
+                const bruto = localStorage.getItem(CONTRATOS_EXTRA_STORAGE_KEY);
+                if (!bruto) return [];
+                const lista = JSON.parse(bruto);
+                return Array.isArray(lista) ? lista : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function setContratosExtras(lista) {
+            localStorage.setItem(CONTRATOS_EXTRA_STORAGE_KEY, JSON.stringify(lista));
+        }
+
+        function renderContratosNoSelect() {
+            const select = document.getElementById('contrato');
+            const valorAtual = select.value;
+
+            while (select.options.length > 0) {
+                select.remove(0);
+            }
+
+            const opcoesBase = [
+                { value: '', text: 'Selecione...' },
+                { value: 'VR 177', text: 'VR 177' },
+                { value: 'ILUMINAÇÃO KM 312', text: 'ILUMINAÇÃO KM 312' }
+            ];
+
+            opcoesBase.forEach(function(op) {
+                const option = document.createElement('option');
+                option.value = op.value;
+                option.textContent = op.text;
+                select.appendChild(option);
+            });
+
+            contratosExtras.forEach(function(nomeContrato) {
+                const option = document.createElement('option');
+                option.value = nomeContrato;
+                option.textContent = nomeContrato;
+                select.appendChild(option);
+            });
+
+            const addOption = document.createElement('option');
+            addOption.value = 'add_new_contract';
+            addOption.textContent = '+ Adicionar novo contrato';
+            select.appendChild(addOption);
+
+            if ([...select.options].some(function(opt) { return opt.value === valorAtual; })) {
+                select.value = valorAtual;
+            }
+        }
+
+        function atualizarContrato() {
+            const contratoSelecionado = document.getElementById('contrato').value;
+            const boxNovo = document.getElementById('contratoNovoBox');
+            boxNovo.style.display = contratoSelecionado === 'add_new_contract' ? 'block' : 'none';
+        }
+
+        function adicionarContratoPersonalizado() {
+            const input = document.getElementById('novoContratoNome');
+            const nome = input.value.trim().toUpperCase();
+
+            if (!nome) {
+                alert('Informe o nome do novo contrato.');
+                return;
+            }
+
+            const jaExisteBase = ['VR 177', 'ILUMINAÇÃO KM 312'].includes(nome);
+            const jaExisteExtra = contratosExtras.includes(nome);
+
+            if (jaExisteBase || jaExisteExtra) {
+                alert('Este contrato já existe na lista.');
+                return;
+            }
+
+            contratosExtras.push(nome);
+            setContratosExtras(contratosExtras);
+            renderContratosNoSelect();
+            document.getElementById('contrato').value = nome;
+            input.value = '';
+            atualizarContrato();
+            alert('Contrato adicionado com sucesso.');
+        }
+
+        function renderFornecedoresNoSelect() {
+            const select = document.getElementById('fornecedor');
+            const valorAtual = select.value;
+
+            while (select.options.length > 0) {
+                select.remove(0);
+            }
+
+            const opcoesBase = [
+                { value: '', text: 'Selecione...' },
+                { value: 'gf6', text: 'GF6 EMPREENDIMENTOS IMOBILIÁRIOS LTDA' },
+                { value: 'pedreira', text: 'PEDREIRA SÃO FRANCISCO' },
+                { value: 'roque', text: 'ROQUE MATERIAIS DE CONSTRUÇÃO LTDA' }
+            ];
+
+            opcoesBase.forEach(function(op) {
+                const option = document.createElement('option');
+                option.value = op.value;
+                option.textContent = op.text;
+                select.appendChild(option);
+            });
+
+            if (fornecedoresExtras.length > 0) {
+                fornecedoresExtras.forEach(function(f) {
+                    const option = document.createElement('option');
+                    option.value = f.id;
+                    option.textContent = f.nome;
+                    select.appendChild(option);
+                });
+            }
+
+            const addOption = document.createElement('option');
+            addOption.value = 'add_new_supplier';
+            addOption.textContent = '+ Adicionar novo fornecedor';
+            select.appendChild(addOption);
+
+            const customOption = document.createElement('option');
+            customOption.value = 'custom';
+            customOption.textContent = 'Outro (Personalizar)';
+            select.appendChild(customOption);
+
+            if ([...select.options].some(function(opt) { return opt.value === valorAtual; })) {
+                select.value = valorAtual;
+            }
+        }
+
+        function adicionarFornecedorPersonalizado() {
+            const nome = document.getElementById('novoFornecedorNome').value.trim();
+            const cnpj = document.getElementById('novoFornecedorCNPJ').value.trim();
+            const local = document.getElementById('novoFornecedorLocal').value.trim();
+
+            if (!nome) {
+                alert('Informe a razão social do novo fornecedor.');
+                return;
+            }
+
+            const novo = {
+                id: 'extra_' + Date.now(),
+                nome: nome,
+                cnpj: cnpj || 'Não informado',
+                local: local || 'Local não informado'
+            };
+
+            fornecedoresExtras.push(novo);
+            setFornecedoresExtras(fornecedoresExtras);
+            renderFornecedoresNoSelect();
+
+            document.getElementById('fornecedor').value = novo.id;
+            document.getElementById('novoFornecedorNome').value = '';
+            document.getElementById('novoFornecedorCNPJ').value = '';
+            document.getElementById('novoFornecedorLocal').value = '';
+
+            atualizarFornecedor();
+            alert('Fornecedor adicionado com sucesso.');
+        }
+
+        function obterFornecedorSelecionado(selectValue) {
+            if (fornecedores[selectValue]) {
+                return fornecedores[selectValue];
+            }
+            return fornecedoresExtras.find(function(f) { return f.id === selectValue; }) || null;
+        }
+
+        function adicionarMaterialPersonalizado(material) {
+            customMaterialCounter += 1;
+            const container = document.getElementById('customMaterialsContainer');
+            const row = document.createElement('div');
+            row.className = 'custom-material-row';
+            row.setAttribute('data-row-id', String(customMaterialCounter));
+
+            row.innerHTML = '' +
+                '<input type="checkbox" class="custom-mat-check" ' + ((material && material.checked) ? 'checked' : '') + '>' +
+                '<input type="text" class="custom-mat-nome" placeholder="Nome do material" value="' + ((material && material.nome) ? material.nome.replace(/"/g, '&quot;') : '') + '">' +
+                '<input type="number" class="custom-mat-qtd" placeholder="Qtd" step="0.01" value="' + ((material && material.qtd) ? material.qtd : '') + '">' +
+                '<input type="text" class="custom-mat-unidade" placeholder="Unidade" value="' + ((material && material.unidade) ? material.unidade.replace(/"/g, '&quot;') : '') + '">' +
+                '<button type="button" class="btn-warning">Remover</button>';
+
+            const btnRemover = row.querySelector('button');
+            btnRemover.addEventListener('click', function() {
+                row.remove();
+            });
+
+            container.appendChild(row);
+        }
+
+        function coletarMateriaisPersonalizados() {
+            const rows = document.querySelectorAll('#customMaterialsContainer .custom-material-row');
+            const lista = [];
+            rows.forEach(function(row) {
+                const checked = row.querySelector('.custom-mat-check').checked;
+                const nome = row.querySelector('.custom-mat-nome').value.trim();
+                const qtd = row.querySelector('.custom-mat-qtd').value;
+                const unidade = row.querySelector('.custom-mat-unidade').value.trim();
+
+                if (nome) {
+                    lista.push({
+                        checked: checked,
+                        nome: nome,
+                        qtd: qtd,
+                        unidade: unidade || '-'
+                    });
+                }
+            });
+            return lista;
+        }
+
+        function obterMateriaisSelecionados() {
+            const materiaisBase = [
+                { nome: 'AREIA LAVADA', check: 'areiaCheck', qtd: 'areiaQtd', unidade: 'areiaUnidade' },
+                { nome: 'BRITA - 1', check: 'britaCheck', qtd: 'britaQtd', unidade: 'britaUnidade' },
+                { nome: document.getElementById('cimentoTipo').value, check: 'cimentoCheck', qtd: 'cimentoQtd', unidade: 'cimentoUnidade' },
+                { nome: 'AÇO', check: 'acoCheck', qtd: 'acoQtd', unidade: 'acoUnidade' },
+                { nome: 'POSTE DE 11 METROS', check: 'poste11Check', qtd: 'poste11Qtd', unidade: 'poste11Unidade' },
+                { nome: 'POSTE DE 14 METROS', check: 'poste14Check', qtd: 'poste14Qtd', unidade: 'poste14Unidade' }
+            ];
+
+            const selecionados = [];
+
+            materiaisBase.forEach(function(mat) {
+                const checked = document.getElementById(mat.check).checked;
+                const qtd = document.getElementById(mat.qtd).value;
+                const unidade = document.getElementById(mat.unidade).value;
+
+                if (checked) {
+                    selecionados.push({
+                        nome: mat.nome,
+                        qtd: qtd && parseFloat(qtd) > 0 ? qtd : '-',
+                        unidade: unidade,
+                        origem: 'base',
+                        enviado: 'SIM'
+                    });
+                }
+            });
+
+            const personalizados = coletarMateriaisPersonalizados();
+            personalizados.forEach(function(mat) {
+                if (mat.checked) {
+                    selecionados.push({
+                        nome: mat.nome,
+                        qtd: mat.qtd && parseFloat(mat.qtd) > 0 ? mat.qtd : '-',
+                        unidade: mat.unidade || '-',
+                        origem: 'custom',
+                        enviado: 'SIM'
+                    });
+                }
+            });
+
+            return selecionados;
+        }
+
+        function salvarRegistroBaseLocal() {
+            if (!validarCamposObrigatorios()) {
+                return;
+            }
+
+            gerarCodigoControle();
+            const fotos = atualizarFotosNaPrevia();
+            const db = getBaseDadosLocal();
+            const chave = chaveSequenciaAtual();
+            const sequenciaRaw = document.getElementById('sequenciaNumero').value;
+            const sequencia = sequenciaRaw === 'NA' ? 0 : Math.max(1, parseInt(sequenciaRaw, 10) || 1);
+
+            const registro = {
+                savedAt: new Date().toISOString(),
+                codigoControle: document.getElementById('codigoControle').value || '',
+                hashIntegridade: assinaturaCurta(baseIntegridadeRomaneio()),
+                chaveSequencia: chave,
+                sequencia: sequencia,
+                campos: {
+                    numeroRomaneio: document.getElementById('numeroRomaneio').value,
+                    registroInterno: document.getElementById('registroInterno').value,
+                    dataRomaneio: document.getElementById('dataRomaneio').value,
+                    tacNumero: document.getElementById('tacNumero').value,
+                    pacoteNumero: document.getElementById('pacoteNumero').value,
+                    sequenciaNumero: document.getElementById('sequenciaNumero').value,
+                    revisaoDocumento: document.getElementById('revisaoDocumento').value,
+                    placaCaminhao: document.getElementById('placaCaminhao').value,
+                    responsavel: document.getElementById('responsavel').value,
+                    fornecedor: document.getElementById('fornecedor').value,
+                    origemPersonalizada: document.getElementById('origemPersonalizada').value,
+                    modoPlacasMuro: document.getElementById('modoPlacasMuro').checked,
+                    numeroNotaFiscal: document.getElementById('numeroNotaFiscal').value,
+                    ilsNumero: document.getElementById('ilsNumero').value,
+                    controleConcretoNumero: document.getElementById('controleConcretoNumero').value,
+                    razaoSocialFornecedor: document.getElementById('razaoSocialFornecedor').value,
+                    cnpjFornecedorFiscal: document.getElementById('cnpjFornecedorFiscal').value,
+                    codigoProdutoFiscal: document.getElementById('codigoProdutoFiscal').value,
+                    descricaoProdutoFiscal: document.getElementById('descricaoProdutoFiscal').value,
+                    contrato: document.getElementById('contrato').value,
+                    destino: document.getElementById('destino').value,
+                    observacoes: document.getElementById('observacoes').value,
+                    dataRecebimento: document.getElementById('dataRecebimento').value,
+                    gerarSegundaVia: document.getElementById('gerarSegundaVia').checked
+                },
+                materiais: coletarSnapshotMateriais(),
+                materiaisPersonalizados: coletarMateriaisPersonalizados(),
+                fotos: {
+                    foto1: fotos.foto1 || '',
+                    foto2: fotos.foto2 || ''
+                },
+                syncStatus: 'pending'
+            };
+
+            const idxExistente = db.romaneios.findIndex(function(item) {
+                return item.codigoControle === registro.codigoControle;
+            });
+
+            if (idxExistente >= 0) {
+                db.romaneios[idxExistente] = registro;
+            } else {
+                db.romaneios.push(registro);
+            }
+
+            if (sequenciaRaw !== 'NA') {
+                db.sequenceState[chave] = Math.max(db.sequenceState[chave] || 0, sequencia);
+            }
+            setBaseDadosLocal(db);
+            atualizarStatusBaseDados();
+            atualizarMapaRastreabilidadeComRomaneio();
+
+            const proxima = (db.sequenceState[chave] || 0) + 1;
+            if (sequenciaRaw !== 'NA') {
+                garantirOpcaoNoSelect('sequenciaNumero', proxima);
+                document.getElementById('sequenciaNumero').value = String(proxima);
+            }
+            gerarCodigoControle();
+
+            dbSalvarRomaneio(registro).then(function() {
+                atualizarKpisAdmin();
+                atualizarTabelaPendentesSincronizacao();
+                registrarAuditoria('salvar_romaneio', 'Registro salvo no IndexedDB local');
+
+                if (sequenciaRaw === 'NA') {
+                    alert('Registro salvo na base local com sucesso.');
+                } else {
+                    alert('Registro salvo na base local com sucesso. Próxima sequência: ' + proxima + '.');
+                }
+
+                if (navigator.onLine) {
+                    sincronizarRomaneioComNuvem(registro);
+                }
+            }).catch(function(err) {
+                console.error("Erro ao salvar no IndexedDB:", err);
+                alert("Erro ao gravar romaneio no IndexedDB local: " + err.toString());
+            });
+        }
+
+        function aplicarRegistroNoFormulario(registro) {
+            if (!registro || !registro.campos) {
+                alert('Registro inválido na base local.');
+                return;
+            }
+
+            const campos = registro.campos;
+            Object.keys(campos).forEach(function(chave) {
+                const el = document.getElementById(chave);
+                if (!el) return;
+                if (typeof campos[chave] === 'boolean') {
+                    el.checked = campos[chave];
+                } else {
+                    if (el.tagName === 'SELECT') {
+                        garantirOpcaoNoSelect(chave, campos[chave]);
+                    }
+                    el.value = campos[chave];
+                }
+            });
+
+            if (Array.isArray(registro.materiais)) {
+                registro.materiais.forEach(function(m) {
+                    const check = document.getElementById(m.check);
+                    const qtd = document.getElementById(m.qtd);
+                    const unidade = document.getElementById(m.unidade);
+                    const tipo = m.tipo ? document.getElementById(m.tipo) : null;
+
+                    if (check) check.checked = !!m.checked;
+                    if (qtd) qtd.value = m.qtdValor || '';
+                    if (unidade) unidade.value = m.unidadeValor || unidade.value;
+                    if (tipo && m.tipoValor) tipo.value = m.tipoValor;
+                });
+            }
+
+            const container = document.getElementById('customMaterialsContainer');
+            container.innerHTML = '';
+            if (Array.isArray(registro.materiaisPersonalizados)) {
+                registro.materiaisPersonalizados.forEach(function(m) {
+                    adicionarMaterialPersonalizado(m);
+                });
+            }
+
+            atualizarFornecedor();
+
+            const foto1 = registro.fotos && registro.fotos.foto1 ? registro.fotos.foto1 : '';
+            const foto2 = registro.fotos && registro.fotos.foto2 ? registro.fotos.foto2 : '';
+            const fotoPrev1 = document.getElementById('fotoCargaPreview1');
+            const fotoPrev2 = document.getElementById('fotoCargaPreview2');
+
+            if (foto1) {
+                fotoPrev1.src = foto1;
+                fotoPrev1.classList.add('active');
+            } else {
+                fotoPrev1.removeAttribute('src');
+                fotoPrev1.classList.remove('active');
+            }
+
+            if (foto2) {
+                fotoPrev2.src = foto2;
+                fotoPrev2.classList.add('active');
+            } else {
+                fotoPrev2.removeAttribute('src');
+                fotoPrev2.classList.remove('active');
+            }
+
+            gerarCodigoControle();
+            atualizarQrPrevia();
+            atualizarFotosNaPrevia();
+            atualizarContrato();
+            atualizarModoPlacasMuro();
+            gerarPrevia();
+            atualizarStatusBaseDados();
+        }
+
+        function carregarUltimoRegistroBaseLocal() {
+            if (!validarPermissaoAdmin()) {
+                return;
+            }
+            const db = getBaseDadosLocal();
+            if (!db.romaneios.length) {
+                alert('Não há registros salvos na base local.');
+                return;
+            }
+            const ultimo = db.romaneios[db.romaneios.length - 1];
+            aplicarRegistroNoFormulario(ultimo);
+            registrarAuditoria('carregar_ultimo', 'Carregou último registro da base');
+        }
+
+        function exportarBaseDadosJson() {
+            if (!validarPermissaoAdmin()) {
+                return;
+            }
+            const db = getBaseDadosLocal();
+            const pacoteBackup = {
+                baseRomaneios: db,
+                mapaRastreabilidade: getMapaRastreabilidade()
+            };
+            const blob = new Blob([JSON.stringify(pacoteBackup, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'base_romaneios_sucena.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            registrarAuditoria('export_base_json', 'Exportou backup da base local');
+        }
+
+        function importarBaseDadosJson(arquivo) {
+            if (!validarPermissaoAdmin()) {
+                return;
+            }
+            if (!arquivo) {
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const texto = e.target && e.target.result ? e.target.result : '{}';
+                    const conteudo = JSON.parse(texto);
+                    const db = conteudo.baseRomaneios ? conteudo.baseRomaneios : conteudo;
+                    if (!db || !Array.isArray(db.romaneios) || typeof db.sequenceState !== 'object') {
+                        throw new Error('Formato inválido');
+                    }
+                    
+                    cacheRomaneios = db.romaneios;
+                    setBaseDadosLocal(db);
+                    
+                    Promise.all(cacheRomaneios.map(function(r) {
+                        if (!r.syncStatus) r.syncStatus = 'pending';
+                        return dbSalvarRomaneio(r);
+                    })).then(function() {
+                        if (conteudo.mapaRastreabilidade && Array.isArray(conteudo.mapaRastreabilidade.itens)) {
+                            setMapaRastreabilidade({
+                                version: 1,
+                                itens: conteudo.mapaRastreabilidade.itens
+                            });
+                        }
+                        atualizarStatusBaseDados();
+                        aplicarProximaSequenciaBanco(true);
+                        atualizarKpisAdmin();
+                        atualizarTabelaPendentesSincronizacao();
+                        alert('Base de dados importada com sucesso.');
+                        registrarAuditoria('import_base_json', 'Importou backup da base local');
+                        if (navigator.onLine) {
+                            sincronizarPendentesComNuvem();
+                        }
+                    }).catch(function(err) {
+                        console.error("Erro ao salvar importados no IndexedDB:", err);
+                        alert("Erro ao gravar importações no IndexedDB: " + err.toString());
+                    });
+                } catch (err) {
+                    alert('Não foi possível importar. Verifique o arquivo JSON da base.');
+                }
+            };
+            reader.readAsText(arquivo);
+        }
+
+        // --- GOOGLE SHEETS & DRIVE INTEGRATION & SYNC LOGIC ---
+
+        function salvarConfiguracaoGoogle() {
+            const urlInput = document.getElementById('googleAppsScriptUrl');
+            if (!urlInput) return;
+            const url = urlInput.value.trim();
+            localStorage.setItem(GOOGLE_API_URL_STORAGE_KEY, url);
+            atualizarTabelaPendentesSincronizacao();
+            alert('Configuração da API Google salva com sucesso!');
+        }
+
+        function carregarConfiguracaoGoogle() {
+            const urlInput = document.getElementById('googleAppsScriptUrl');
+            if (!urlInput) return;
+            const url = localStorage.getItem(GOOGLE_API_URL_STORAGE_KEY) || "";
+            urlInput.value = url;
+            
+            const statusEl = document.getElementById('dbGoogleApiStatus');
+            if (statusEl) {
+                if (url) {
+                    statusEl.textContent = "Configurada";
+                    statusEl.style.color = "#16a34a";
+                } else {
+                    statusEl.textContent = "Desconfigurada";
+                    statusEl.style.color = "#dc2626";
+                }
+            }
+        }
+
+        function atualizarStatusConectividadeVisual() {
+            const badge = document.getElementById('syncStatusBadge');
+            if (!badge) return;
+            if (navigator.onLine) {
+                badge.textContent = "Online";
+                badge.style.background = "#16a34a";
+            } else {
+                badge.textContent = "Offline";
+                badge.style.background = "#475569";
+            }
+        }
+
+        function atualizarTabelaPendentesSincronizacao() {
+            const tbody = document.getElementById('dbSyncTableBody');
+            if (!tbody) return;
+
+            carregarConfiguracaoGoogle();
+            const pendentes = cacheRomaneios.filter(r => r.syncStatus === 'pending');
+            const countPending = pendentes.length;
+
+            const pendingCountEl = document.getElementById('syncPendingCount');
+            if (pendingCountEl) {
+                pendingCountEl.textContent = String(countPending);
+            }
+
+            tbody.innerHTML = '';
+            if (countPending === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #64748b; padding: 12px;">Todos os registros estão sincronizados com a Nuvem.</td></tr>';
+                return;
+            }
+
+            pendentes.forEach(function(r) {
+                const tr = document.createElement('tr');
+                const data = formatarData(r.campos.dataRomaneio);
+                const placa = (r.campos.placaCaminhao || 'S/N').toUpperCase();
+                
+                tr.innerHTML = '' +
+                    '<td><strong>' + r.codigoControle + '</strong></td>' +
+                    '<td>' + data + '</td>' +
+                    '<td>' + placa + '</td>' +
+                    '<td><span style="color: #d97706; font-weight: bold;">Pendente</span></td>';
+                tbody.appendChild(tr);
+            });
+        }
+
+        let isCurrentlySyncing = false;
+
+        function sincronizarRomaneioComNuvem(registro) {
+            const apiUrl = localStorage.getItem(GOOGLE_API_URL_STORAGE_KEY) || "";
+            if (!apiUrl) {
+                console.warn("API Google Sheets/Drive não configurada. Romaneio mantido como pendente.");
+                return Promise.resolve(false);
+            }
+
+            const badge = document.getElementById('syncStatusBadge');
+            if (badge) {
+                badge.textContent = "Sincronizando...";
+                badge.style.background = "#d97706";
+            }
+
+            // Mapeia materiais
+            const materiaisBase = [
+                { nome: 'AREIA LAVADA', check: 'areiaCheck', qtd: registro.campos.areiaQtd, unidade: registro.campos.areiaUnidade, checked: registro.materiais.find(m => m.check === 'areiaCheck').checked },
+                { nome: 'BRITA - 1', check: 'britaCheck', qtd: registro.campos.britaQtd, unidade: registro.campos.britaUnidade, checked: registro.materiais.find(m => m.check === 'britaCheck').checked },
+                { nome: registro.campos.cimentoTipo || 'CIMENTO', check: 'cimentoCheck', qtd: registro.campos.cimentoQtd, unidade: registro.campos.cimentoUnidade, checked: registro.materiais.find(m => m.check === 'cimentoCheck').checked },
+                { nome: 'AÇO', check: 'acoCheck', qtd: registro.campos.acoQtd, unidade: registro.campos.acoUnidade, checked: registro.materiais.find(m => m.check === 'acoCheck').checked },
+                { nome: 'POSTE DE 11 METROS', check: 'poste11Check', qtd: registro.campos.poste11Qtd, unidade: registro.campos.poste11Unidade, checked: registro.materiais.find(m => m.check === 'poste11Check').checked },
+                { nome: 'POSTE DE 14 METROS', check: 'poste14Check', qtd: registro.campos.poste14Qtd, unidade: registro.campos.poste14Unidade, checked: registro.materiais.find(m => m.check === 'poste14Check').checked }
+            ];
+
+            const materiaisSelecionados = [];
+            materiaisBase.forEach(function(mat) {
+                if (mat.checked) {
+                    materiaisSelecionados.push({
+                        nome: mat.nome,
+                        qtd: mat.qtd && parseFloat(mat.qtd) > 0 ? mat.qtd : '-',
+                        unidade: mat.unidade
+                    });
+                }
+            });
+
+            if (Array.isArray(registro.materiaisPersonalizados)) {
+                registro.materiaisPersonalizados.forEach(function(mat) {
+                    if (mat.checked) {
+                        materiaisSelecionados.push({
+                            nome: mat.nome,
+                            qtd: mat.qtd && parseFloat(mat.qtd) > 0 ? mat.qtd : '-',
+                            unidade: mat.unidade
+                        });
+                    }
+                });
+            }
+
+            return obterBase64PDF(registro.campos.gerarSegundaVia).then(function(pdfBase64) {
+                const payload = {
+                    codigoControle: registro.codigoControle,
+                    campos: registro.campos,
+                    materiaisSelecionados: materiaisSelecionados,
+                    pdfBase64: pdfBase64
+                };
+
+                return fetch(apiUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    cache: 'no-cache',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                }).then(function() {
+                    registro.syncStatus = 'synced';
+                    return dbSalvarRomaneio(registro).then(function() {
+                        atualizarTabelaPendentesSincronizacao();
+                        atualizarStatusConectividadeVisual();
+                        console.log("Romaneio " + registro.codigoControle + " sincronizado na nuvem.");
+                        return true;
+                    });
+                }).catch(function(err) {
+                    console.error("Erro no fetch de sincronização:", err);
+                    atualizarStatusConectividadeVisual();
+                    return false;
+                });
+            });
+        }
+
+        function sincronizarPendentesComNuvem() {
+            if (isCurrentlySyncing) return;
+            
+            const apiUrl = localStorage.getItem(GOOGLE_API_URL_STORAGE_KEY) || "";
+            if (!apiUrl) {
+                alert("Por favor, configure a URL do Google Apps Script nas configurações Admin primeiro.");
+                return;
+            }
+
+            if (!navigator.onLine) {
+                alert("Você está offline no momento. Conecte-se à internet para sincronizar.");
+                return;
+            }
+
+            const pendentes = cacheRomaneios.filter(r => r.syncStatus === 'pending');
+            if (pendentes.length === 0) {
+                alert("Todos os registros já estão sincronizados!");
+                return;
+            }
+
+            isCurrentlySyncing = true;
+            const btn = document.getElementById('btnSyncPendentes');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = "Sincronizando...";
+            }
+
+            let chain = Promise.resolve();
+            let successCount = 0;
+
+            pendentes.forEach(function(r) {
+                chain = chain.then(function() {
+                    return sincronizarRomaneioComNuvem(r).then(function(success) {
+                        if (success) successCount++;
+                    });
+                });
+            });
+
+            chain.then(function() {
+                isCurrentlySyncing = false;
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = "🔄 Sincronizar Nuvem";
+                }
+                atualizarTabelaPendentesSincronizacao();
+                alert("Sincronização concluída! " + successCount + " de " + pendentes.length + " romaneio(s) sincronizado(s).");
+            }).catch(function(err) {
+                isCurrentlySyncing = false;
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = "🔄 Sincronizar Nuvem";
+                }
+                atualizarTabelaPendentesSincronizacao();
+                console.error("Erro na sincronização em lote:", err);
+                alert("Ocorreu um erro durante a sincronização em lote.");
+            });
+        }
+
+        // Listeners de conectividade
+        window.addEventListener('online', function() {
+            atualizarStatusConectividadeVisual();
+            atualizarTabelaPendentesSincronizacao();
+            sincronizarPendentesComNuvem();
+        });
+
+        window.addEventListener('offline', function() {
+            atualizarStatusConectividadeVisual();
+            atualizarTabelaPendentesSincronizacao();
+        });
+
+        function gerarCodigoControle() {
+            const tacRaw = obterValorControle('tacNumero', 1);
+            const pacoteRaw = obterValorControle('pacoteNumero', 1);
+            const sequenciaRaw = obterValorControle('sequenciaNumero', 1);
+            const revisaoRaw = obterValorControle('revisaoDocumento', 0);
+
+            const tac = tacRaw === 'NA' ? 'NA' : Math.max(1, tacRaw);
+            const pacote = pacoteRaw === 'NA' ? 'NA' : Math.max(1, pacoteRaw);
+            const sequencia = sequenciaRaw === 'NA' ? 'NA' : Math.max(1, sequenciaRaw);
+            const revisao = revisaoRaw === 'NA' ? 'NA' : Math.max(0, revisaoRaw);
+            const ano = new Date().getFullYear();
+
+            const partesCodigo = ['RM'];
+            if (tac !== 'NA') {
+                partesCodigo.push('TAC' + padNumero(tac, 2));
+            }
+            if (pacote !== 'NA') {
+                partesCodigo.push('P' + padNumero(pacote, 2));
+            }
+            partesCodigo.push(String(ano));
+            if (sequencia !== 'NA') {
+                partesCodigo.push(padNumero(sequencia, 4));
+            }
+            if (revisao !== 'NA') {
+                partesCodigo.push('R' + padNumero(revisao, 2));
+            }
+
+            const codigo = partesCodigo.join('-');
+            document.getElementById('codigoControle').value = codigo;
+
+            const numeroInput = document.getElementById('numeroRomaneio');
+            const partesNumero = ['RM'];
+            if (tac !== 'NA') {
+                partesNumero.push('TAC' + padNumero(tac, 2));
+            }
+            if (pacote !== 'NA') {
+                partesNumero.push('P' + padNumero(pacote, 2));
+            }
+            partesNumero.push(String(ano));
+            if (sequencia !== 'NA') {
+                partesNumero.push(padNumero(sequencia, 4));
+            }
+            numeroInput.value = partesNumero.join('-');
+            atualizarRegistroInternoAutomatico();
+        }
+
+        function isModoPlacasMuro() {
+            return document.getElementById('modoPlacasMuro').checked;
+        }
+
+        function atualizarModoPlacasMuro() {
+            const modo = isModoPlacasMuro();
+            document.getElementById('nfGroup').style.display = modo ? 'none' : 'block';
+            document.getElementById('ilsGroup').style.display = modo ? 'block' : 'none';
+            document.getElementById('controleConcretoGroup').style.display = modo ? 'block' : 'none';
+            document.getElementById('tituloDadosFiscais').textContent = modo
+                ? '🧾 CONTROLE DE PLACAS (MURO DE VEDAÇÃO)'
+                : '🧾 DADOS FISCAIS E PRODUTO';
+
+            if (modo) {
+                document.getElementById('numeroNotaFiscal').value = '';
+            } else {
+                document.getElementById('ilsNumero').value = '';
+                document.getElementById('controleConcretoNumero').value = '';
+            }
+
+            atualizarQrPrevia();
+        }
+
+        function obterDocumentoFiscalTexto() {
+            if (isModoPlacasMuro()) {
+                const ils = document.getElementById('ilsNumero').value || 'Não informado';
+                const concreto = document.getElementById('controleConcretoNumero').value || 'Não informado';
+                return {
+                    label: 'ILS / Controle de Concreto',
+                    valor: 'ILS: ' + ils + ' | CC: ' + concreto,
+                    payload: 'ILS=' + ils + ';CC=' + concreto
+                };
+            }
+
+            const nf = document.getElementById('numeroNotaFiscal').value || 'Não informado';
+            return {
+                label: 'Número da Nota Fiscal',
+                valor: nf,
+                payload: 'NF=' + nf
+            };
+        }
+
+        function assinaturaCurta(texto) {
+            let hash = 2166136261;
+            for (let i = 0; i < texto.length; i++) {
+                hash ^= texto.charCodeAt(i);
+                hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+            }
+            return (hash >>> 0).toString(16).toUpperCase().padStart(8, '0').slice(0, 8);
+        }
+
+        function baseIntegridadeRomaneio() {
+            const codigoControle = document.getElementById('codigoControle').value || 'SEM-CONTROLE';
+            const numero = document.getElementById('numeroRomaneio').value || 'S/N';
+            const registro = document.getElementById('registroInterno').value || 'S/N';
+            const data = formatarData(document.getElementById('dataRomaneio').value);
+            const docFiscal = obterDocumentoFiscalTexto().payload;
+            const cnpjFornecedorFiscal = document.getElementById('cnpjFornecedorFiscal').value || 'SEM-CNPJ';
+            const codigoProdutoFiscal = document.getElementById('codigoProdutoFiscal').value || 'SEM-COD-PROD';
+            const contrato = document.getElementById('contrato').value || 'SEM-CONTRATO';
+
+            return [codigoControle, numero, registro, data, docFiscal, cnpjFornecedorFiscal, codigoProdutoFiscal, contrato].join('|');
+        }
+
+        function montarPayloadQr() {
+            const codigoControle = document.getElementById('codigoControle').value || 'SEM-CONTROLE';
+            const numero = document.getElementById('numeroRomaneio').value || 'S/N';
+            const data = formatarData(document.getElementById('dataRomaneio').value);
+            const docFiscal = obterDocumentoFiscalTexto();
+            const cnpjFornecedorFiscal = document.getElementById('cnpjFornecedorFiscal').value || 'SEM-CNPJ';
+            const codigoProdutoFiscal = document.getElementById('codigoProdutoFiscal').value || 'SEM-COD-PROD';
+            const assinatura = assinaturaCurta(baseIntegridadeRomaneio());
+
+            return [
+                'ROMANEIO-SUCENA',
+                'CONTROLE=' + codigoControle,
+                'ROM=' + numero,
+                'DATA=' + data,
+                docFiscal.payload,
+                'CNPJ_FORN=' + cnpjFornecedorFiscal,
+                'COD_PROD=' + codigoProdutoFiscal,
+                'HASH=' + assinatura
+            ].join('|');
+        }
+
+        function gerarQrDataUrl() {
+            if (typeof QRious === 'undefined') {
+                return '';
+            }
+
+            const qr = new QRious({
+                value: montarPayloadQr(),
+                size: 220,
+                level: 'H'
+            });
+
+            return qr.toDataURL('image/png');
+        }
+
+        function atualizarQrPrevia() {
+            const qrDataUrl = gerarQrDataUrl();
+            const codigoControle = document.getElementById('codigoControle').value || 'SEM-CONTROLE';
+            const assinatura = assinaturaCurta(baseIntegridadeRomaneio());
+
+            ['1', '2'].forEach(function(via) {
+                const img = document.getElementById('previewQr' + via);
+                const texto = document.getElementById('previewQrText' + via);
+                const textoHash = document.getElementById('previewHashText' + via);
+
+                if (img) {
+                    img.src = qrDataUrl;
+                    img.alt = 'QR Code de controle ' + codigoControle;
+                }
+
+                if (texto) {
+                    texto.textContent = codigoControle;
+                }
+
+                if (textoHash) {
+                    textoHash.textContent = 'HASH: ' + assinatura;
+                }
+            });
+
+            return qrDataUrl;
+        }
+
+        function compressImage(file, maxWidth = 1200, maxHeight = 1200, quality = 0.7) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > height) {
+                            if (width > maxWidth) {
+                                height = Math.round((height * maxWidth) / width);
+                                width = maxWidth;
+                            }
+                        } else {
+                            if (height > maxHeight) {
+                                width = Math.round((width * maxHeight) / height);
+                                height = maxHeight;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                        resolve(compressedBase64);
+                    };
+                    img.onerror = function(err) {
+                        reject(err);
+                    };
+                };
+                reader.onerror = function(err) {
+                    reject(err);
+                };
+            });
+        }
+
+        function lerImagemArquivo(inputId, previewId, callback) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+
+            if (!input || !preview || !input.files || !input.files[0]) {
+                if (preview) {
+                    preview.removeAttribute('src');
+                    preview.classList.remove('active');
+                }
+                if (callback) callback('');
+                return;
+            }
+
+            const file = input.files[0];
+            
+            compressImage(file, 1200, 1200, 0.7)
+                .then(function(compressedBase64) {
+                    preview.src = compressedBase64;
+                    preview.classList.add('active');
+                    if (callback) callback(compressedBase64);
+                })
+                .catch(function(err) {
+                    console.error("Erro ao comprimir imagem:", err);
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const rawBase64 = e.target && e.target.result ? e.target.result : '';
+                        preview.src = rawBase64;
+                        preview.classList.add('active');
+                        if (callback) callback(rawBase64);
+                    };
+                    reader.readAsDataURL(file);
+                });
+        }
+
+        function atualizarFotoVia(imgId, emptyId, dataUrl) {
+            const img = document.getElementById(imgId);
+            const empty = document.getElementById(emptyId);
+
+            if (!img || !empty) {
+                return;
+            }
+
+            if (dataUrl) {
+                img.src = dataUrl;
+                img.classList.add('active');
+                empty.style.display = 'none';
+            } else {
+                img.removeAttribute('src');
+                img.classList.remove('active');
+                empty.style.display = 'flex';
+            }
+        }
+
+        function atualizarFotosNaPrevia() {
+            const foto1 = document.getElementById('fotoCargaPreview1').getAttribute('src') || '';
+            const foto2 = document.getElementById('fotoCargaPreview2').getAttribute('src') || '';
+
+            atualizarFotoVia('previewFotoVia1A', 'previewFotoVia1AEmpty', foto1);
+            atualizarFotoVia('previewFotoVia1B', 'previewFotoVia1BEmpty', foto2);
+            atualizarFotoVia('previewFotoVia2A', 'previewFotoVia2AEmpty', foto1);
+            atualizarFotoVia('previewFotoVia2B', 'previewFotoVia2BEmpty', foto2);
+
+            return { foto1: foto1, foto2: foto2 };
+        }
+
+        const fornecedores = {
+            gf6: {
+                nome: 'GF6 EMPREENDIMENTOS IMOBILIÁRIOS LTDA',
+                cnpj: '16.586.275/0001-99',
+                local: 'Shopping da Construção - Açailândia/MA'
+            },
+            pedreira: {
+                nome: 'PEDREIRA SÃO FRANCISCO',
+                cnpj: '14.618.811/0001-65',
+                local: 'Pedreira São Francisco - Açailândia/MA'
+            },
+            roque: {
+                nome: 'ROQUE MATERIAIS DE CONSTRUÇÃO LTDA',
+                cnpj: '06.944.437/0004-02',
+                local: 'Roque Materiais de Construção - Açailândia/MA'
+            }
+        };
+
+        function atualizarFornecedor() {
+            const select = document.getElementById('fornecedor').value;
+            const infoBox = document.getElementById('fornecedorInfo');
+            const customBox = document.getElementById('origemCustom');
+            const novoFornecedorBox = document.getElementById('fornecedorNovoBox');
+
+            if (select === 'custom') {
+                infoBox.style.display = 'none';
+                customBox.style.display = 'block';
+                novoFornecedorBox.style.display = 'none';
+            } else if (select === 'add_new_supplier') {
+                infoBox.style.display = 'none';
+                customBox.style.display = 'none';
+                novoFornecedorBox.style.display = 'block';
+            } else if (select) {
+                const forn = obterFornecedorSelecionado(select);
+                if (!forn) {
+                    infoBox.style.display = 'none';
+                    customBox.style.display = 'none';
+                    novoFornecedorBox.style.display = 'none';
+                    return;
+                }
+                document.getElementById('fornecedorNome').textContent = forn.nome;
+                document.getElementById('fornecedorCNPJ').textContent = forn.cnpj;
+                infoBox.style.display = 'block';
+                customBox.style.display = 'none';
+                novoFornecedorBox.style.display = 'none';
+            } else {
+                infoBox.style.display = 'none';
+                customBox.style.display = 'none';
+                novoFornecedorBox.style.display = 'none';
+            }
+        }
+
+        function gerarPrevia() {
+            if (!validarCamposObrigatorios()) {
+                return;
+            }
+
+            gerarCodigoControle();
+
+            const numero = document.getElementById('numeroRomaneio').value || 'S/N';
+            const registro = document.getElementById('registroInterno').value || 'S/N';
+            const codigoControle = document.getElementById('codigoControle').value || 'Não gerado';
+            const revisaoValor = obterValorControle('revisaoDocumento', 0);
+            const revisao = revisaoValor === 'NA' ? 'R-NA' : 'R' + padNumero(Math.max(0, revisaoValor), 2);
+            const data = document.getElementById('dataRomaneio').value;
+            const placa = document.getElementById('placaCaminhao').value.toUpperCase() || 'Não informada';
+            const responsavel = document.getElementById('responsavel').value || 'Não informado';
+            const docFiscal = obterDocumentoFiscalTexto();
+            const razaoFornecedorFiscal = document.getElementById('razaoSocialFornecedor').value || 'Não informado';
+            const cnpjFornecedorFiscal = document.getElementById('cnpjFornecedorFiscal').value || 'Não informado';
+            const codigoProdutoFiscal = document.getElementById('codigoProdutoFiscal').value || 'Não informado';
+            const descricaoProdutoFiscal = document.getElementById('descricaoProdutoFiscal').value || 'Não informada';
+            const contrato = document.getElementById('contrato').value;
+            const contratoTexto = contrato && contrato !== 'add_new_contract' ? contrato : 'Não informado';
+            const destinoBase = document.getElementById('destino').value || 'Não informado';
+            const destino = contratoTexto !== 'Não informado' ? contratoTexto + ' - ' + destinoBase : destinoBase;
+            const obs = document.getElementById('observacoes').value || 'Nenhuma observação';
+            const dataRecebimento = formatarData(document.getElementById('dataRecebimento').value);
+            const auth = gerarCodigoAutenticacao();
+
+            // Atualizar VIA 1
+            document.getElementById('previewNumero1').textContent = numero;
+            document.getElementById('previewRegistro1').textContent = registro;
+            document.getElementById('previewControle1').textContent = codigoControle;
+            document.getElementById('previewRevisao1').textContent = revisao;
+            document.getElementById('previewData1').textContent = formatarData(data);
+            document.getElementById('previewPlaca1').textContent = placa;
+            document.getElementById('previewResponsavel1').textContent = responsavel;
+            document.getElementById('previewDocFiscalLabel1').textContent = docFiscal.label;
+            document.getElementById('previewDocFiscal1').textContent = docFiscal.valor;
+            document.getElementById('previewRazaoFornecedor1').textContent = razaoFornecedorFiscal;
+            document.getElementById('previewCnpjFornecedor1').textContent = cnpjFornecedorFiscal;
+            document.getElementById('previewCodigoProduto1').textContent = codigoProdutoFiscal;
+            document.getElementById('previewDescricaoProduto1').textContent = descricaoProdutoFiscal;
+            document.getElementById('previewDestino1').textContent = destino;
+            document.getElementById('previewObs1').textContent = obs;
+            document.getElementById('previewDataReceb1').textContent = dataRecebimento;
+            document.getElementById('previewAuthCode1').textContent = auth.code;
+            document.getElementById('previewAuthMeta1').textContent = auth.meta;
+
+            // Atualizar VIA 2
+            document.getElementById('previewNumero2').textContent = numero;
+            document.getElementById('previewRegistro2').textContent = registro;
+            document.getElementById('previewControle2').textContent = codigoControle;
+            document.getElementById('previewRevisao2').textContent = revisao;
+            document.getElementById('previewData2').textContent = formatarData(data);
+            document.getElementById('previewPlaca2').textContent = placa;
+            document.getElementById('previewResponsavel2').textContent = responsavel;
+            document.getElementById('previewDocFiscalLabel2').textContent = docFiscal.label;
+            document.getElementById('previewDocFiscal2').textContent = docFiscal.valor;
+            document.getElementById('previewRazaoFornecedor2').textContent = razaoFornecedorFiscal;
+            document.getElementById('previewCnpjFornecedor2').textContent = cnpjFornecedorFiscal;
+            document.getElementById('previewCodigoProduto2').textContent = codigoProdutoFiscal;
+            document.getElementById('previewDescricaoProduto2').textContent = descricaoProdutoFiscal;
+            document.getElementById('previewDestino2').textContent = destino;
+            document.getElementById('previewObs2').textContent = obs;
+            document.getElementById('previewDataReceb2').textContent = dataRecebimento;
+            document.getElementById('previewAuthCode2').textContent = auth.code;
+            document.getElementById('previewAuthMeta2').textContent = auth.meta;
+
+            const fornSelect = document.getElementById('fornecedor').value;
+            let fornTexto = 'Não informado';
+            let cnpjTexto = '';
+
+            if (fornSelect === 'custom') {
+                fornTexto = document.getElementById('origemPersonalizada').value || 'Não informado';
+            } else if (fornSelect) {
+                const fornObj = obterFornecedorSelecionado(fornSelect);
+                if (fornObj) {
+                    fornTexto = fornObj.nome + '\n' + (fornObj.local || 'Local não informado');
+                    cnpjTexto = 'CNPJ: ' + (fornObj.cnpj || 'Não informado');
+                }
+            }
+
+            // Atualizar fornecedor nas duas vias
+            document.getElementById('previewFornecedor1').textContent = fornTexto;
+            document.getElementById('previewCNPJ1').textContent = cnpjTexto;
+            document.getElementById('previewFornecedor2').textContent = fornTexto;
+            document.getElementById('previewCNPJ2').textContent = cnpjTexto;
+
+            let materiaisHTML = '';
+            const materiaisSelecionados = obterMateriaisSelecionados();
+            materiaisSelecionados.forEach(function(mat) {
+                materiaisHTML += '<tr>';
+                materiaisHTML += '<td><strong>' + mat.nome + '</strong></td>';
+                materiaisHTML += '<td style="text-align: center;">' + mat.qtd + '</td>';
+                materiaisHTML += '<td style="text-align: center;">' + mat.unidade + '</td>';
+                materiaisHTML += '</tr>';
+            });
+
+            if (!materiaisHTML) {
+                materiaisHTML = '<tr><td colspan="3" style="text-align: center;">Nenhum material marcado</td></tr>';
+            }
+
+            document.getElementById('previewMateriais1').innerHTML = materiaisHTML;
+            document.getElementById('previewMateriais2').innerHTML = materiaisHTML;
+
+            atualizarQrPrevia();
+            atualizarFotosNaPrevia();
+            
+            document.getElementById('preview').classList.add('active');
+            document.getElementById('preview').scrollIntoView({ behavior: 'smooth' });
+            registrarAuditoria('gerar_previa', 'Gerou prévia do romaneio');
+        }
+
+        function formatarData(data) {
+            if (!data) return 'Não informada';
+            const d = new Date(data + 'T00:00:00');
+            return d.toLocaleDateString('pt-BR');
+        }
+
+        function imprimirRomaneio() {
+            if (!validarCamposObrigatorios()) {
+                return;
+            }
+
+            gerarPrevia();
+            
+            const gerarSegundaVia = document.getElementById('gerarSegundaVia').checked;
+            
+            // Se não for gerar segunda via, ocultar temporariamente
+            if (!gerarSegundaVia) {
+                const via2 = document.querySelectorAll('.via')[1];
+                if (via2) {
+                    via2.style.display = 'none';
+                }
+            }
+            
+            setTimeout(function() {
+                window.print();
+                registrarAuditoria('imprimir', 'Impressão solicitada');
+                
+                // Restaurar segunda via após impressão
+                if (!gerarSegundaVia) {
+                    const via2 = document.querySelectorAll('.via')[1];
+                    if (via2) {
+                        via2.style.display = 'block';
+                    }
+                }
+            }, 500);
+        }
+
+        function criarDocumentoPDF(gerarSegundaVia) {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            
+            const numero = document.getElementById('numeroRomaneio').value || 'S/N';
+            const registro = document.getElementById('registroInterno').value || 'S/N';
+            const codigoControle = document.getElementById('codigoControle').value || 'Não gerado';
+            const revisaoValor = obterValorControle('revisaoDocumento', 0);
+            const revisao = revisaoValor === 'NA' ? 'R-NA' : 'R' + padNumero(Math.max(0, revisaoValor), 2);
+            const data = formatarData(document.getElementById('dataRomaneio').value);
+            const placa = document.getElementById('placaCaminhao').value.toUpperCase() || 'Não informada';
+            const responsavel = document.getElementById('responsavel').value || 'Não informado';
+            const docFiscal = obterDocumentoFiscalTexto();
+            const razaoFornecedorFiscal = document.getElementById('razaoSocialFornecedor').value || 'Não informado';
+            const cnpjFornecedorFiscal = document.getElementById('cnpjFornecedorFiscal').value || 'Não informado';
+            const codigoProdutoFiscal = document.getElementById('codigoProdutoFiscal').value || 'Não informado';
+            const descricaoProdutoFiscal = document.getElementById('descricaoProdutoFiscal').value || 'Não informada';
+            const contrato = document.getElementById('contrato').value;
+            const contratoTexto = contrato && contrato !== 'add_new_contract' ? contrato : 'Não informado';
+            const destinoBase = document.getElementById('destino').value || 'Não informado';
+            const destino = contratoTexto !== 'Não informado' ? contratoTexto + ' - ' + destinoBase : destinoBase;
+            const obs = document.getElementById('observacoes').value || 'Nenhuma observação';
+            const dataRecebimento = formatarData(document.getElementById('dataRecebimento').value);
+            const auth = gerarCodigoAutenticacao();
+            const qrDataUrl = gerarQrDataUrl();
+            const assinatura = assinaturaCurta(baseIntegridadeRomaneio());
+            const fotosCarga = atualizarFotosNaPrevia();
+
+            const fornSelect = document.getElementById('fornecedor').value;
+            let fornTexto = 'Não informado';
+            let cnpjTexto = '';
+
+            if (fornSelect === 'custom') {
+                fornTexto = document.getElementById('origemPersonalizada').value || 'Não informado';
+            } else if (fornSelect) {
+                const fornObj = obterFornecedorSelecionado(fornSelect);
+                if (fornObj) {
+                    fornTexto = fornObj.nome;
+                    cnpjTexto = 'CNPJ: ' + (fornObj.cnpj || 'Não informado');
+                }
+            }
+
+            let materiaisList = obterMateriaisSelecionados();
+
+            function criarVia(viaTexto, addPage) {
+                if (addPage) pdf.addPage();
+                
+                let y = 15;
+                
+                pdf.setDrawColor(0);
+                pdf.setLineWidth(0.5);
+                pdf.rect(10, 10, 190, 40);
+                
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text(viaTexto, 195, 15, { align: 'right' });
+                
+                pdf.setFontSize(14);
+                pdf.text('SUCENA EMPREENDIMENTOS LTDA', 105, 20, { align: 'center' });
+                
+                pdf.setFontSize(9);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text('CNPJ: 19.381.283/0001-97', 105, 26, { align: 'center' });
+                pdf.text('Rua São Francisco, 720 - Centro - Açailândia/MA - CEP: 65930-000', 105, 31, { align: 'center' });
+                
+                pdf.setFontSize(12);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('ROMANEIO DE MATERIAIS', 105, 40, { align: 'center' });
+                
+                y = 55;
+                
+                pdf.rect(10, y, 190, 28);
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Romaneio Nº: ', 12, y + 6);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(numero, 40, y + 6);
+                
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Registro Interno: ', 12, y + 12);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(registro, 48, y + 12);
+
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Código Controle: ', 12, y + 18);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(codigoControle, 45, y + 18);
+
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Revisão: ', 140, y + 18);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(revisao, 158, y + 18);
+                
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Data: ', 12, y + 24);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(data, 25, y + 24);
+
+                if (qrDataUrl) {
+                    pdf.rect(162, y + 2, 36, 24);
+                    pdf.setFontSize(7);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('QR CONTROLE', 180, y + 5, { align: 'center' });
+                    pdf.addImage(qrDataUrl, 'PNG', 171, y + 7, 18, 18);
+                    pdf.setFontSize(6);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text('HASH ' + assinatura, 180, y + 27, { align: 'center' });
+                }
+                
+                y += 33;
+                
+                pdf.rect(10, y, 92, 20);
+                pdf.rect(108, y, 92, 20);
+                
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('FORNECEDOR/ORIGEM:', 12, y + 6);
+                pdf.setFontSize(9);
+                pdf.setFont('helvetica', 'normal');
+                const fornLines = pdf.splitTextToSize(fornTexto, 88);
+                pdf.text(fornLines, 12, y + 11);
+                if (cnpjTexto) {
+                    pdf.text(cnpjTexto, 12, y + 11 + (fornLines.length * 4));
+                }
+                
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('DESTINO:', 110, y + 6);
+                pdf.setFont('helvetica', 'normal');
+                const destLines = pdf.splitTextToSize(destino, 88);
+                pdf.text(destLines, 110, y + 11);
+                
+                y += 25;
+                
+                pdf.rect(10, y, 190, 12);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('PLACA DO CAMINHÃO: ', 12, y + 6);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(placa, 55, y + 6);
+                
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('RESPONSÁVEL: ', 110, y + 6);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(responsavel, 145, y + 6);
+                
+                y += 17;
+
+                pdf.rect(10, y, 190, 32);
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text(docFiscal.label + ': ', 12, y + 6);
+                pdf.setFont('helvetica', 'normal');
+                const docLines = pdf.splitTextToSize(docFiscal.valor, 128);
+                pdf.text(docLines, 58, y + 6);
+
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Razão Social Fornecedor: ', 12, y + 12);
+                pdf.setFont('helvetica', 'normal');
+                const razaoLines = pdf.splitTextToSize(razaoFornecedorFiscal, 135);
+                pdf.text(razaoLines, 58, y + 12);
+
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('CNPJ Fornecedor: ', 12, y + 18);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(cnpjFornecedorFiscal, 42, y + 18);
+
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Código Produto: ', 12, y + 24);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(codigoProdutoFiscal, 40, y + 24);
+
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Descrição Produto: ', 12, y + 30);
+                pdf.setFont('helvetica', 'normal');
+                const descLines = pdf.splitTextToSize(descricaoProdutoFiscal, 140);
+                pdf.text(descLines, 45, y + 30);
+
+                y += 37;
+                
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('MATERIAIS TRANSPORTADOS:', 12, y);
+                y += 5;
+                
+                pdf.rect(10, y, 190, 8);
+                pdf.rect(10, y, 120, 8);
+                pdf.rect(130, y, 35, 8);
+                pdf.rect(165, y, 35, 8);
+                
+                pdf.setFontSize(9);
+                pdf.text('Material', 12, y + 5);
+                pdf.text('Quantidade', 132, y + 5);
+                pdf.text('Unidade', 167, y + 5);
+                
+                y += 8;
+                
+                if (materiaisList.length > 0) {
+                    materiaisList.forEach(function(mat) {
+                        pdf.rect(10, y, 120, 7);
+                        pdf.rect(130, y, 35, 7);
+                        pdf.rect(165, y, 35, 7);
+                        
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.text(mat.nome, 12, y + 5);
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.text(String(mat.qtd), 147, y + 5, { align: 'center' });
+                        pdf.text(mat.unidade, 182, y + 5, { align: 'center' });
+                        y += 7;
+                    });
+                } else {
+                    pdf.rect(10, y, 190, 7);
+                    pdf.text('Nenhum material marcado', 105, y + 5, { align: 'center' });
+                    y += 7;
+                }
+
+                y += 4;
+
+                pdf.setFont('helvetica', 'bold');
+                pdf.setFontSize(9);
+                pdf.text('REGISTRO FOTOGRÁFICO DA CARGA:', 12, y + 4);
+                y += 6;
+
+                pdf.rect(10, y, 92, 42);
+                pdf.rect(108, y, 92, 42);
+                pdf.setFontSize(8);
+                pdf.text('Foto 1', 12, y + 4);
+                pdf.text('Foto 2', 110, y + 4);
+
+                if (fotosCarga.foto1) {
+                    const formatoFoto1 = fotosCarga.foto1.indexOf('image/png') !== -1 ? 'PNG' : 'JPEG';
+                    pdf.addImage(fotosCarga.foto1, formatoFoto1, 12, y + 6, 88, 34);
+                } else {
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text('Sem foto anexada', 56, y + 24, { align: 'center' });
+                }
+
+                if (fotosCarga.foto2) {
+                    const formatoFoto2 = fotosCarga.foto2.indexOf('image/png') !== -1 ? 'PNG' : 'JPEG';
+                    pdf.addImage(fotosCarga.foto2, formatoFoto2, 110, y + 6, 88, 34);
+                } else {
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text('Sem foto anexada', 154, y + 24, { align: 'center' });
+                }
+
+                y += 47;
+                y += 5;
+                
+                pdf.rect(10, y, 190, 25);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('OBSERVAÇÕES:', 12, y + 6);
+                pdf.setFontSize(9);
+                pdf.setFont('helvetica', 'normal');
+                const obsLines = pdf.splitTextToSize(obs, 186);
+                pdf.text(obsLines, 12, y + 11);
+                
+                y += 30;
+
+                pdf.rect(10, y, 190, 14);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Data Receb.:', 12, y + 6);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(dataRecebimento, 34, y + 6);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Atesto Total:', 100, y + 6);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text('PREENCHIMENTO FÍSICO', 122, y + 6);
+
+                y += 19;
+                
+                if (y + 55 > 280) {
+                    pdf.addPage();
+                    y = 20;
+                }
+                
+                pdf.setLineWidth(0.5);
+                pdf.line(15, y + 30, 95, y + 30);
+                pdf.line(105, y + 30, 185, y + 30);
+                pdf.line(15, y + 50, 95, y + 50);
+                pdf.line(105, y + 50, 185, y + 50);
+                
+                pdf.setFontSize(9);
+                pdf.text('Almoxerifado', 55, y + 35, { align: 'center' });
+                pdf.text('Eng. Obra/Preposto', 145, y + 35, { align: 'center' });
+                pdf.text('Téc. Qualidade', 55, y + 55, { align: 'center' });
+                pdf.text('Fiscal de Qualidade', 145, y + 55, { align: 'center' });
+
+                pdf.setFontSize(7);
+                pdf.text('Autenticação: ' + auth.code + ' | ' + auth.meta, 10, 290);
+            }
+
+            criarVia('1ª VIA - CLIENTE', false);
+            if (gerarSegundaVia) {
+                criarVia('2ª VIA - EMPRESA', true);
+            }
+
+            return pdf;
+        }
+
+        function obterBase64PDF(gerarSegundaVia) {
+            return new Promise((resolve) => {
+                try {
+                    const pdf = criarDocumentoPDF(gerarSegundaVia);
+                    const pdfBlob = pdf.output('blob');
+                    const reader = new FileReader();
+                    reader.onloadend = function() {
+                        const base64data = reader.result.split(',')[1];
+                        resolve(base64data);
+                    };
+                    reader.readAsDataURL(pdfBlob);
+                } catch (e) {
+                    console.error("Erro ao gerar base64 do PDF:", e);
+                    resolve("");
+                }
+            });
+        }
+
+        function exportarPDF() {
+            if (!validarCamposObrigatorios()) {
+                return;
+            }
+
+            gerarPrevia();
+            setTimeout(function() {
+                const gerarSegundaVia = document.getElementById('gerarSegundaVia').checked;
+                const pdf = criarDocumentoPDF(gerarSegundaVia);
+                
+                const numero = document.getElementById('numeroRomaneio').value || 'S/N';
+                const data = formatarData(document.getElementById('dataRomaneio').value);
+                
+                const nomeArquivo = gerarSegundaVia ? 
+                    'Romaneio_' + numero + '_' + data + '_2vias.pdf' : 
+                    'Romaneio_' + numero + '_' + data + '.pdf';
+                pdf.save(nomeArquivo);
+                registrarAuditoria('export_pdf', 'Exportou PDF do romaneio');
+            }, 500);
+        }
+
+        function exportarExcel() {
+            if (!validarCamposObrigatorios()) {
+                return;
+            }
+
+            gerarCodigoControle();
+
+            const numero = document.getElementById('numeroRomaneio').value || 'S/N';
+            const registro = document.getElementById('registroInterno').value || 'S/N';
+            const codigoControle = document.getElementById('codigoControle').value || 'Não gerado';
+            const revisaoValor = obterValorControle('revisaoDocumento', 0);
+            const revisao = revisaoValor === 'NA' ? 'R-NA' : 'R' + padNumero(Math.max(0, revisaoValor), 2);
+            const data = document.getElementById('dataRomaneio').value;
+            const placa = document.getElementById('placaCaminhao').value.toUpperCase() || 'Não informada';
+            const responsavel = document.getElementById('responsavel').value || 'Não informado';
+            const docFiscal = obterDocumentoFiscalTexto();
+            const razaoFornecedorFiscal = document.getElementById('razaoSocialFornecedor').value || 'Não informado';
+            const cnpjFornecedorFiscal = document.getElementById('cnpjFornecedorFiscal').value || 'Não informado';
+            const codigoProdutoFiscal = document.getElementById('codigoProdutoFiscal').value || 'Não informado';
+            const descricaoProdutoFiscal = document.getElementById('descricaoProdutoFiscal').value || 'Não informada';
+            const contrato = document.getElementById('contrato').value;
+            const contratoTexto = contrato && contrato !== 'add_new_contract' ? contrato : 'Não informado';
+            const destinoBase = document.getElementById('destino').value || 'Não informado';
+            const destino = contratoTexto !== 'Não informado' ? contratoTexto + ' - ' + destinoBase : destinoBase;
+            const obs = document.getElementById('observacoes').value || '';
+            const dataRecebimento = formatarData(document.getElementById('dataRecebimento').value);
+            const auth = gerarCodigoAutenticacao();
+            const assinatura = assinaturaCurta(baseIntegridadeRomaneio());
+            const fotosCarga = atualizarFotosNaPrevia();
+
+            const fornSelect = document.getElementById('fornecedor').value;
+            let fornTexto = 'Não informado';
+            let cnpjTexto = '';
+
+            if (fornSelect === 'custom') {
+                fornTexto = document.getElementById('origemPersonalizada').value || 'Não informado';
+            } else if (fornSelect) {
+                const fornObj = obterFornecedorSelecionado(fornSelect);
+                if (fornObj) {
+                    fornTexto = fornObj.nome;
+                    cnpjTexto = fornObj.cnpj || 'Não informado';
+                }
+            }
+
+            const dados = [
+                ['SUCENA EMPREENDIMENTOS LTDA - ROMANEIO DE MATERIAIS'],
+                ['CNPJ: 19.381.283/0001-97'],
+                ['Rua São Francisco, 720 - Centro - Açailândia/MA - CEP: 65930-000'],
+                [],
+                ['Número do Romaneio:', numero],
+                ['Registro Interno Sucena:', registro],
+                ['Código de Controle:', codigoControle],
+                ['Revisão:', revisao],
+                ['Hash de Integridade:', assinatura],
+                ['Data:', formatarData(data)],
+                ['Placa do Caminhão:', placa],
+                ['Responsável:', responsavel],
+                [docFiscal.label + ':', docFiscal.valor],
+                ['Razão Social do Fornecedor:', razaoFornecedorFiscal],
+                ['CNPJ do Fornecedor:', cnpjFornecedorFiscal],
+                ['Código do Produto:', codigoProdutoFiscal],
+                ['Descrição do Produto:', descricaoProdutoFiscal],
+                ['Contrato:', contratoTexto],
+                [],
+                ['FORNECEDOR/ORIGEM:', fornTexto],
+                ['CNPJ:', cnpjTexto],
+                ['DESTINO:', destino],
+                ['Data de Recebimento:', dataRecebimento],
+                ['Atesto de Recebimento Total:', 'PREENCHIMENTO FÍSICO'],
+                ['Assinatura Almoxerifado:', 'PREENCHIMENTO FÍSICO'],
+                ['Assinatura Eng. Obra/Preposto:', 'PREENCHIMENTO FÍSICO'],
+                ['Assinatura Téc. Qualidade:', 'PREENCHIMENTO FÍSICO'],
+                ['Assinatura Fiscal de Qualidade:', 'PREENCHIMENTO FÍSICO'],
+                ['Código de Autenticação:', auth.code],
+                ['Contexto de Autenticação:', auth.meta],
+                [],
+                ['MATERIAIS TRANSPORTADOS'],
+                ['Material', 'Enviado', 'Quantidade', 'Unidade'],
+            ];
+
+            const materiais = [
+                { nome: 'AREIA LAVADA', check: 'areiaCheck', qtd: 'areiaQtd', unidade: 'areiaUnidade' },
+                { nome: 'BRITA - 1', check: 'britaCheck', qtd: 'britaQtd', unidade: 'britaUnidade' },
+                { nome: document.getElementById('cimentoTipo').value, check: 'cimentoCheck', qtd: 'cimentoQtd', unidade: 'cimentoUnidade' },
+                { nome: 'AÇO', check: 'acoCheck', qtd: 'acoQtd', unidade: 'acoUnidade' },
+                { nome: 'POSTE DE 11 METROS', check: 'poste11Check', qtd: 'poste11Qtd', unidade: 'poste11Unidade' },
+                { nome: 'POSTE DE 14 METROS', check: 'poste14Check', qtd: 'poste14Qtd', unidade: 'poste14Unidade' }
+            ];
+
+            materiais.forEach(function(mat) {
+                const checked = document.getElementById(mat.check).checked ? 'SIM' : 'NÃO';
+                const qtd = document.getElementById(mat.qtd).value || '-';
+                const unidade = document.getElementById(mat.unidade).value;
+                dados.push([mat.nome, checked, qtd, unidade]);
+            });
+
+            coletarMateriaisPersonalizados().forEach(function(mat) {
+                dados.push([mat.nome, mat.checked ? 'SIM' : 'NÃO', mat.qtd || '-', mat.unidade || '-']);
+            });
+
+            dados.push([]);
+            dados.push(['OBSERVAÇÕES:', obs]);
+
+            const ws = XLSX.utils.aoa_to_sheet(dados);
+
+            const fotosDados = [
+                ['REGISTRO FOTOGRÁFICO DA CARGA'],
+                ['Código de Controle', codigoControle],
+                ['Hash de Integridade', assinatura],
+                [],
+                ['Foto 1 (Data URL)', fotosCarga.foto1 || 'Sem foto anexada'],
+                ['Foto 2 (Data URL)', fotosCarga.foto2 || 'Sem foto anexada']
+            ];
+            const wsFotos = XLSX.utils.aoa_to_sheet(fotosDados);
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Romaneio');
+            XLSX.utils.book_append_sheet(wb, wsFotos, 'FotosCarga');
+            XLSX.writeFile(wb, 'Romaneio_' + numero + '_' + formatarData(data) + '.xlsx');
+            registrarAuditoria('export_excel', 'Exportou planilha do romaneio');
+        }
+
+        function compartilharWhatsApp() {
+            if (!validarCamposObrigatorios()) {
+                return;
+            }
+
+            gerarCodigoControle();
+            const numero = document.getElementById('numeroRomaneio').value || 'S/N';
+            const data = formatarData(document.getElementById('dataRomaneio').value);
+            const codigoControle = document.getElementById('codigoControle').value || 'Não gerado';
+            const gerarSegundaVia = document.getElementById('gerarSegundaVia').checked;
+            
+            // Gerar PDF primeiro
+            exportarPDF();
+            
+            // Após gerar, mostrar mensagem
+            setTimeout(function() {
+                const vias = gerarSegundaVia ? '2 vias' : '1 via';
+                const nomeArquivo = gerarSegundaVia ? 
+                    'Romaneio_' + numero + '_' + data + '_2vias.pdf' : 
+                    'Romaneio_' + numero + '_' + data + '.pdf';
+                
+                let mensagem = '*SUCENA EMPREENDIMENTOS LTDA*\n';
+                mensagem += '*ROMANEIO DE MATERIAIS*\n\n';
+                mensagem += '*Romaneio Nº:* ' + numero + '\n';
+                mensagem += '*Controle:* ' + codigoControle + '\n';
+                mensagem += '*Data:* ' + data + '\n\n';
+                mensagem += '📎 *PDF com ' + vias + ' foi gerado!*\n';
+                mensagem += 'Por favor, anexe o arquivo PDF ao enviar esta mensagem.\n\n';
+                mensagem += '_Arquivo: ' + nomeArquivo + '_';
+                
+                const url = 'https://wa.me/?text=' + encodeURIComponent(mensagem);
+                window.open(url, '_blank');
+                registrarAuditoria('whatsapp_pdf', 'Compartilhamento via WhatsApp iniciado');
+            }, 1000);
+        }
+
+        function enviarEmail() {
+            if (!validarCamposObrigatorios()) {
+                return;
+            }
+
+            gerarCodigoControle();
+            const numero = document.getElementById('numeroRomaneio').value || 'S/N';
+            const data = formatarData(document.getElementById('dataRomaneio').value);
+            const codigoControle = document.getElementById('codigoControle').value || 'Não gerado';
+            const gerarSegundaVia = document.getElementById('gerarSegundaVia').checked;
+            
+            // Gerar PDF primeiro
+            exportarPDF();
+            
+            // Após gerar, abrir cliente de email
+            setTimeout(function() {
+                const vias = gerarSegundaVia ? '2 vias' : '1 via';
+                const nomeArquivo = gerarSegundaVia ? 
+                    'Romaneio_' + numero + '_' + data + '_2vias.pdf' : 
+                    'Romaneio_' + numero + '_' + data + '.pdf';
+                
+                const assunto = 'Romaneio ' + numero + ' - ' + data + ' - Sucena Empreendimentos';
+                let corpo = 'Prezado(a),\n\n';
+                corpo += 'Segue em anexo o Romaneio de Materiais em PDF com ' + vias + '.\n\n';
+                corpo += 'DADOS DO ROMANEIO:\n';
+                corpo += '- Número: ' + numero + '\n';
+                corpo += '- Controle: ' + codigoControle + '\n';
+                corpo += '- Data: ' + data + '\n\n';
+                corpo += 'Por favor, anexe o arquivo PDF que foi gerado:\n';
+                corpo += nomeArquivo + '\n\n';
+                corpo += 'Atenciosamente,\n';
+                corpo += 'SUCENA EMPREENDIMENTOS LTDA\n';
+                corpo += 'CNPJ: 19.381.283/0001-97\n';
+                corpo += 'Rua São Francisco, 720 - Centro - Açailândia/MA';
+                
+                window.location.href = 'mailto:?subject=' + encodeURIComponent(assunto) + '&body=' + encodeURIComponent(corpo);
+                registrarAuditoria('email_pdf', 'Envio por e-mail iniciado');
+            }, 1000);
+        }
+
+        // Auto uppercase para placa
+        document.getElementById('placaCaminhao').addEventListener('input', function(e) {
+            e.target.value = e.target.value.toUpperCase();
+        });
+
+        document.getElementById('fotoCarga1').addEventListener('change', function() {
+            lerImagemArquivo('fotoCarga1', 'fotoCargaPreview1', function() {
+                atualizarFotosNaPrevia();
+                atualizarQrPrevia();
+            });
+        });
+
+        document.getElementById('fotoCarga2').addEventListener('change', function() {
+            lerImagemArquivo('fotoCarga2', 'fotoCargaPreview2', function() {
+                atualizarFotosNaPrevia();
+                atualizarQrPrevia();
+            });
+        });
+
+        document.getElementById('importarBaseJson').addEventListener('change', function(e) {
+            const arquivo = e.target.files && e.target.files[0] ? e.target.files[0] : null;
+            importarBaseDadosJson(arquivo);
+            e.target.value = '';
+        });
+
+        document.getElementById('loginUserSelect').addEventListener('change', function(e) {
+            atualizarResumoUsuarioSelecionado();
+            document.getElementById('loginSenha').focus();
+        });
+        document.getElementById('loginSenha').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                entrarSistema();
+            }
+        });
+        document.getElementById('loginSenha').addEventListener('focus', function(e) {
+            e.target.select();
+        });
+        document.getElementById('btnEntrarSistema').addEventListener('click', entrarSistema);
+        document.getElementById('btnSairSistema').addEventListener('click', sairSistema);
+        document.getElementById('btnAdminCriarUsuario').addEventListener('click', criarUsuarioAdmin);
+
+        ['tacNumero', 'pacoteNumero', 'sequenciaNumero', 'revisaoDocumento'].forEach(function(id) {
+            document.getElementById(id).addEventListener('change', function() {
+                gerarCodigoControle();
+                persistirSequenciaAtualNoBanco();
+                atualizarQrPrevia();
+            });
+        });
+
+        document.getElementById('dataRomaneio').addEventListener('change', function() {
+            aplicarProximaSequenciaBanco(false);
+            atualizarQrPrevia();
+        });
+
+        document.getElementById('numeroNotaFiscal').addEventListener('input', atualizarQrPrevia);
+        document.getElementById('ilsNumero').addEventListener('input', atualizarQrPrevia);
+        document.getElementById('controleConcretoNumero').addEventListener('input', atualizarQrPrevia);
+        document.getElementById('modoPlacasMuro').addEventListener('change', atualizarModoPlacasMuro);
+        document.getElementById('cnpjFornecedorFiscal').addEventListener('input', atualizarQrPrevia);
+        document.getElementById('codigoProdutoFiscal').addEventListener('input', atualizarQrPrevia);
+
+        function carregarDadosIniciais() {
+            try {
+                const seqRaw = localStorage.getItem('sucena_sequence_state_v1');
+                if (seqRaw) {
+                    sequenceState = JSON.parse(seqRaw);
+                } else {
+                    const oldDbRaw = localStorage.getItem(BASE_DADOS_STORAGE_KEY);
+                    if (oldDbRaw) {
+                        const oldDb = JSON.parse(oldDbRaw);
+                        if (oldDb && oldDb.sequenceState) {
+                            sequenceState = oldDb.sequenceState;
+                            localStorage.setItem('sucena_sequence_state_v1', JSON.stringify(sequenceState));
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("Erro ao carregar sequenceState:", e);
+            }
+
+            dbObterRomaneios().then(function(lista) {
+                cacheRomaneios = lista || [];
+                
+                if (cacheRomaneios.length === 0) {
+                    try {
+                        const oldDbRaw = localStorage.getItem(BASE_DADOS_STORAGE_KEY);
+                        if (oldDbRaw) {
+                            const oldDb = JSON.parse(oldDbRaw);
+                            if (oldDb && Array.isArray(oldDb.romaneios) && oldDb.romaneios.length > 0) {
+                                console.log("Migrando romaneios do localStorage para IndexedDB...");
+                                cacheRomaneios = oldDb.romaneios;
+                                Promise.all(cacheRomaneios.map(function(r) {
+                                    if (!r.syncStatus) r.syncStatus = 'pending';
+                                    return dbSalvarRomaneio(r);
+                                })).then(function() {
+                                    console.log("Migração concluída com sucesso.");
+                                    oldDb.romaneios = [];
+                                    localStorage.setItem(BASE_DADOS_STORAGE_KEY, JSON.stringify(oldDb));
+                                    
+                                    atualizarKpisAdmin();
+                                    atualizarStatusBaseDados();
+                                    atualizarTabelaPendentesSincronizacao();
+                                }).catch(function(err) {
+                                    console.error("Erro na migração:", err);
+                                });
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Erro ao migrar dados antigos:", e);
+                    }
+                }
+
+                atualizarKpisAdmin();
+                atualizarStatusBaseDados();
+                atualizarTabelaPendentesSincronizacao();
+                
+                const apiUrl = localStorage.getItem(GOOGLE_API_URL_STORAGE_KEY);
+                if (apiUrl && navigator.onLine) {
+                    setTimeout(sincronizarPendentesComNuvem, 2000); // Aguarda carregar para sincronizar
+                }
+            }).catch(function(err) {
+                console.error("Erro ao carregar romaneios do IndexedDB:", err);
+            });
+        }
+
+        usuariosSistema = getUsuariosSistema();
+        setUsuariosSistema(usuariosSistema);
+        renderLoginUsers();
+
+        contratosExtras = getContratosExtras();
+        inicializarContextoAutenticacao();
+        inicializarControlesDocumentais();
+        fornecedoresExtras = getFornecedoresExtras();
+        renderFornecedoresNoSelect();
+        renderContratosNoSelect();
+        atualizarContrato();
+        atualizarModoPlacasMuro();
+        adicionarMaterialPersonalizado();
+
+        gerarCodigoControle();
+        aplicarProximaSequenciaBanco(false);
+        
+        carregarConfiguracaoGoogle();
+        atualizarStatusConectividadeVisual();
+        carregarDadosIniciais();
+        atualizarStatusBaseDados();
+        atualizarKpisAdmin();
+    </script>
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('sw.js').then(function(registration) {
+                        console.log('ServiceWorker registrado com sucesso com o escopo: ', registration.scope);
+                    }, function(err) {
+                        console.log('Falha ao registrar o ServiceWorker: ', err);
+                    });
+                });
+            }
+        </script>
+</body>
+</html>

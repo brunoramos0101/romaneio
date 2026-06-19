@@ -1,0 +1,21 @@
+{
+  "name": "Sistema de Romaneio - Sucena",
+  "short_name": "Romaneio Sucena",
+  "description": "Sistema de Controle de Romaneio de Materiais e Qualidade",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8fbff",
+  "theme_color": "#1e3c72",
+  "icons": [
+    {
+      "src": "icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
