@@ -2368,7 +2368,24 @@
             .then(function(res) { return res.json(); })
             .then(function(data) {
                 if (data && data.status === "success" && Array.isArray(data.usuarios)) {
-                    usuariosSistema = data.usuarios;
+                    if (data.usuarios.length === 0) {
+                        usuariosSistema = criarUsuariosPadrao();
+                    } else {
+                        usuariosSistema = data.usuarios;
+                        const temAdminMaster = usuariosSistema.some(function(u) { return u.id === 'adm_master'; });
+                        if (!temAdminMaster) {
+                            usuariosSistema.unshift({
+                                id: 'adm_master',
+                                primeiroNome: 'ADMIN',
+                                segundoNome: 'MASTER',
+                                perfil: 'admin',
+                                local: 'FÁBRICA VERONA - AÇAILÂNDIA',
+                                campo: 'TODOS',
+                                pacotesPermitidos: [],
+                                senha: '1234'
+                            });
+                        }
+                    }
                     setUsuariosSistema(usuariosSistema);
                     renderLoginUsers();
                     renderTabelaUsuariosAdmin();
