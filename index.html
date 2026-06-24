@@ -2164,6 +2164,24 @@
             renderTabelaUsuariosAdmin();
             atualizarKpisAdmin();
 
+            const apiUrl = localStorage.getItem(GOOGLE_API_URL_STORAGE_KEY) || "";
+            if (apiUrl) {
+                fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain'
+                    },
+                    body: JSON.stringify({ action: "criar_usuario", user: novo })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    console.log("Novo usuário sincronizado com a nuvem:", data);
+                })
+                .catch(function(err) {
+                    console.warn("Erro ao salvar novo usuário na nuvem:", err);
+                });
+            }
+
             document.getElementById('adminPrimeiroNome').value = '';
             document.getElementById('adminSegundoNome').value = '';
             document.getElementById('adminCampo').value = '';
@@ -2192,6 +2210,33 @@
                     '<td>' + (user.campo || '-') + '</td>' +
                     '<td>' + pacotesTxt + '</td>';
                 tbody.appendChild(tr);
+            });
+        }
+
+        function sincronizarUsuariosComNuvem() {
+            const apiUrl = localStorage.getItem(GOOGLE_API_URL_STORAGE_KEY) || "";
+            if (!apiUrl) return;
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                body: JSON.stringify({ action: "obter_usuarios" })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data && data.status === "success" && Array.isArray(data.usuarios)) {
+                    usuariosSistema = data.usuarios;
+                    setUsuariosSistema(usuariosSistema);
+                    renderLoginUsers();
+                    renderTabelaUsuariosAdmin();
+                    atualizarKpisAdmin();
+                    console.log("Usuários sincronizados da nuvem com sucesso.");
+                }
+            })
+            .catch(function(err) {
+                console.warn("Erro ao carregar usuários da nuvem:", err);
             });
         }
 
@@ -4755,8 +4800,11 @@
                 atualizarTabelaRomaneiosUsuario();
                 
                 const apiUrl = localStorage.getItem(GOOGLE_API_URL_STORAGE_KEY);
-                if (apiUrl && navigator.onLine) {
-                    setTimeout(sincronizarPendentesComNuvem, 2000); // Aguarda carregar para sincronizar
+                if (apiUrl) {
+                    sincronizarUsuariosComNuvem();
+                    if (navigator.onLine) {
+                        setTimeout(sincronizarPendentesComNuvem, 2000); // Aguarda carregar para sincronizar
+                    }
                 }
             }).catch(function(err) {
                 console.error("Erro ao carregar romaneios do IndexedDB:", err);
