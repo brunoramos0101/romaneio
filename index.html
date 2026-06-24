@@ -1803,6 +1803,16 @@
         const AUDITORIA_LOG_STORAGE_KEY = 'sucena_auditoria_log_v1';
         const USERS_STORAGE_KEY = 'sucena_users_v1';
         const GOOGLE_API_URL_STORAGE_KEY = 'sucena_google_api_url_v1';
+        const DEFAULT_GOOGLE_API_URL = 'SUA_URL_DO_GOOGLE_APPS_SCRIPT_AQUI';
+
+        function obterGoogleApiUrl() {
+            const url = localStorage.getItem(GOOGLE_API_URL_STORAGE_KEY);
+            if (url) return url;
+            if (DEFAULT_GOOGLE_API_URL && !DEFAULT_GOOGLE_API_URL.includes("SUA_URL_DO_GOOGLE_APPS_SCRIPT")) {
+                return DEFAULT_GOOGLE_API_URL;
+            }
+            return "";
+        }
         
         let cacheRomaneios = [];
         let sequenceState = {};
@@ -2164,7 +2174,7 @@
             renderTabelaUsuariosAdmin();
             atualizarKpisAdmin();
 
-            const apiUrl = localStorage.getItem(GOOGLE_API_URL_STORAGE_KEY) || "";
+            const apiUrl = obterGoogleApiUrl();
             if (apiUrl) {
                 fetch(apiUrl, {
                     method: 'POST',
@@ -2214,7 +2224,7 @@
         }
 
         function sincronizarUsuariosComNuvem() {
-            const apiUrl = localStorage.getItem(GOOGLE_API_URL_STORAGE_KEY) || "";
+            const apiUrl = obterGoogleApiUrl();
             if (!apiUrl) return;
 
             fetch(apiUrl, {
@@ -3416,7 +3426,7 @@
         function carregarConfiguracaoGoogle() {
             const urlInput = document.getElementById('googleAppsScriptUrl');
             if (!urlInput) return;
-            const url = localStorage.getItem(GOOGLE_API_URL_STORAGE_KEY) || "";
+            const url = obterGoogleApiUrl();
             urlInput.value = url;
             
             const statusEl = document.getElementById('dbGoogleApiStatus');
@@ -3479,7 +3489,7 @@
         let isCurrentlySyncing = false;
 
         function sincronizarRomaneioComNuvem(registro) {
-            const apiUrl = localStorage.getItem(GOOGLE_API_URL_STORAGE_KEY) || "";
+            const apiUrl = obterGoogleApiUrl();
             if (!apiUrl) {
                 console.warn("API Google Sheets/Drive não configurada. Romaneio mantido como pendente.");
                 return Promise.resolve(false);
@@ -3580,7 +3590,7 @@
         function sincronizarPendentesComNuvem() {
             if (isCurrentlySyncing) return;
             
-            const apiUrl = localStorage.getItem(GOOGLE_API_URL_STORAGE_KEY) || "";
+            const apiUrl = obterGoogleApiUrl();
             if (!apiUrl) {
                 alert("Por favor, configure a URL do Google Apps Script nas configurações Admin primeiro.");
                 return;
@@ -4799,7 +4809,7 @@
                 atualizarTabelaPendentesSincronizacao();
                 atualizarTabelaRomaneiosUsuario();
                 
-                const apiUrl = localStorage.getItem(GOOGLE_API_URL_STORAGE_KEY);
+                const apiUrl = obterGoogleApiUrl();
                 if (apiUrl) {
                     sincronizarUsuariosComNuvem();
                     if (navigator.onLine) {
