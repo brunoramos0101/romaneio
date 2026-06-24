@@ -7,6 +7,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -15,46 +18,52 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(160deg, #0c1a3a 0%, #1e3c72 100%);
+            font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+            background: #f4f6fa;
+            color: #2c3e50;
             min-height: 100vh;
-            padding: 20px;
+            padding: 24px 12px;
+            line-height: 1.5;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1140px;
             margin: 0 auto;
-            background: white;
-            border-radius: 14px;
-            box-shadow: 0 28px 72px rgba(0,0,0,0.45);
+            background: #ffffff;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            border: 1px solid #dcdcdc;
             overflow: hidden;
         }
 
         .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 22px 30px 18px;
-            text-align: center;
-            border-bottom: 3px solid #F5B800;
+            background: #0f2646;
+            color: #ffffff;
+            padding: 24px 30px;
+            text-align: left;
+            border-bottom: 4px solid #005caa;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .header h1 {
-            font-size: 2em;
-            margin-bottom: 10px;
+            font-size: 1.8em;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
         .header p {
-            opacity: 0.9;
-            font-size: 0.9em;
-            margin: 5px 0;
+            opacity: 0.85;
+            font-size: 0.85em;
         }
 
         .content {
-            padding: 30px;
+            padding: 24px;
         }
 
         .app-hidden {
-            display: none;
+            display: none !important;
         }
 
         .access-screen {
@@ -64,69 +73,66 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(155deg, #0c1a3a 0%, #142954 55%, #1e3c72 100%);
+            background: #0a192f;
             padding: 20px;
-        }
-
-        .access-screen.app-hidden {
-            display: none !important;
         }
 
         .login-card {
             background: #ffffff;
-            border-radius: 24px;
-            padding: 44px 42px 38px;
+            border-radius: 4px;
+            padding: 36px 32px;
             width: 100%;
-            max-width: 420px;
-            box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
+            max-width: 380px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            border: 1px solid #ced4da;
             text-align: center;
         }
 
         .login-logo-area {
-            margin-bottom: 4px;
+            margin-bottom: 8px;
         }
 
         .login-brand-title {
-            font-size: 2.4em;
-            font-weight: 900;
-            letter-spacing: 4px;
-            color: #1a2f5e;
+            font-size: 2.1em;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #005caa;
             text-transform: uppercase;
             line-height: 1;
         }
 
         .login-brand-sub {
-            font-size: 0.85em;
-            font-weight: 500;
-            letter-spacing: 3px;
-            color: #64748b;
+            font-size: 0.8em;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: #7f8c8d;
             text-transform: uppercase;
             margin-top: 4px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         .header-brand-title {
-            font-size: 1.9em;
-            font-weight: 900;
-            letter-spacing: 4px;
+            font-size: 1.6em;
+            font-weight: 800;
+            letter-spacing: 2px;
             color: #ffffff;
             text-transform: uppercase;
         }
 
         .login-sys-label {
             display: block;
-            font-size: 0.68em;
+            font-size: 0.7em;
             font-weight: 700;
-            letter-spacing: 3.5px;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            color: #94a3b8;
-            margin-bottom: 22px;
+            color: #95a5a6;
+            margin-bottom: 20px;
         }
 
         .login-divider {
             height: 1px;
-            background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
-            margin-bottom: 26px;
+            background: #e2e8f0;
+            margin-bottom: 24px;
         }
 
         .login-field {
@@ -136,327 +142,355 @@
 
         .login-field label {
             display: block;
-            font-size: 0.73em;
+            font-size: 0.75em;
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
-            color: #64748b;
-            margin-bottom: 8px;
+            color: #4a5568;
+            margin-bottom: 6px;
         }
 
         .login-field select,
         .login-field input[type="password"] {
             width: 100%;
-            padding: 13px 16px;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 0.97em;
-            background: #f8fafc;
-            color: #1e293b;
-            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 0.9em;
+            background: #ffffff;
+            color: #2d3748;
+            transition: border-color 0.15s, box-shadow 0.15s;
             outline: none;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
         }
 
         .login-field select:focus,
         .login-field input[type="password"]:focus {
-            border-color: #F5B800;
-            background: #fffef5;
-            box-shadow: 0 0 0 3px rgba(245,184,0,0.16);
+            border-color: #005caa;
+            box-shadow: 0 0 0 3px rgba(0,92,170,0.15);
         }
 
         .login-btn {
             width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #F5B800 0%, #d9a400 100%);
-            color: #1a1a00;
-            font-size: 0.92em;
-            font-weight: 800;
-            letter-spacing: 1.5px;
+            padding: 12px;
+            background: #005caa;
+            color: #ffffff;
+            font-size: 0.9em;
+            font-weight: 700;
+            letter-spacing: 1px;
             text-transform: uppercase;
             border: none;
-            border-radius: 10px;
+            border-radius: 4px;
             cursor: pointer;
             margin-top: 8px;
-            transition: transform 0.15s, box-shadow 0.15s;
-            box-shadow: 0 6px 24px rgba(245,184,0,0.4);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background 0.15s;
         }
 
         .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 32px rgba(245,184,0,0.55);
+            background: #004b8c;
         }
 
         .login-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 4px 14px rgba(245,184,0,0.3);
+            background: #003c70;
         }
 
         .login-user-info {
-            margin-top: 18px;
-            padding: 11px 15px;
-            border-radius: 10px;
-            background: #f1f5f9;
-            border-left: 3px solid #F5B800;
-            font-size: 0.84em;
-            color: #334155;
+            margin-top: 16px;
+            padding: 10px 12px;
+            border-radius: 4px;
+            background: #f8fafc;
+            border-left: 4px solid #005caa;
+            font-size: 0.8em;
+            color: #64748b;
             text-align: left;
-            min-height: 42px;
-            display: flex;
-            align-items: center;
-            line-height: 1.55;
+            line-height: 1.5;
         }
 
         .login-footer-note {
-            margin-top: 18px;
+            margin-top: 16px;
             font-size: 0.7em;
             color: #94a3b8;
-            line-height: 1.6;
+            line-height: 1.5;
         }
-
-        .access-title { display: none; }
-        .access-note  { display: none; }
-        .user-summary-box { display: none; }
 
         .session-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 15px;
-            padding: 10px 20px;
-            background: #0c1424;
-            color: #e2e8f0;
-            font-size: 0.88em;
-            border-bottom: 2px solid #F5B800;
+            padding: 10px 24px;
+            background: #0a192f;
+            color: #cbd5e1;
+            font-size: 0.82em;
+            border-bottom: 2px solid #005caa;
         }
 
         .session-bar strong {
-            color: #fff;
+            color: #ffffff;
         }
 
         .admin-panel {
-            margin-bottom: 20px;
-            border: 1px solid #e2e8f0;
-            border-left: 4px solid #F5B800;
-            border-radius: 10px;
+            margin-bottom: 24px;
+            border: 1px solid #ced4da;
+            border-left: 4px solid #005caa;
+            border-radius: 4px;
             background: #f8fafc;
-            padding: 16px;
+            padding: 20px;
         }
 
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(5, minmax(120px, 1fr));
-            gap: 10px;
-            margin-bottom: 14px;
+            gap: 12px;
+            margin-bottom: 18px;
         }
 
         .kpi-card {
-            border: 1px solid #e2e8f0;
-            border-top: 3px solid #F5B800;
-            border-radius: 10px;
-            background: #fff;
+            border: 1px solid #ced4da;
+            border-top: 3px solid #005caa;
+            border-radius: 4px;
+            background: #ffffff;
             padding: 12px;
         }
 
         .kpi-label {
-            font-size: 0.75em;
+            font-size: 0.7em;
             text-transform: uppercase;
-            color: #64748b;
+            color: #7f8c8d;
             font-weight: 700;
             letter-spacing: 0.3px;
         }
 
         .kpi-value {
-            margin-top: 5px;
-            font-size: 1.3em;
+            margin-top: 4px;
+            font-size: 1.2em;
             font-weight: 700;
-            color: #1e3c72;
+            color: #0f2646;
         }
 
         .admin-users-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
-            background: #fff;
+            margin-top: 12px;
+            background: #ffffff;
         }
 
         .admin-users-table th,
         .admin-users-table td {
-            border: 1px solid #dbe3f4;
-            padding: 8px;
+            border: 1px solid #dcdcdc;
+            padding: 10px 12px;
             text-align: left;
-            font-size: 0.88em;
+            font-size: 0.85em;
         }
 
         .admin-users-table th {
-            background: #f1f5f9;
-            color: #1a2f5e;
+            background: #f2f4f7;
+            color: #2c3e50;
             font-weight: 700;
         }
 
+        .admin-users-table tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 600;
-            color: #333;
+            font-size: 0.85em;
+            color: #2c3e50;
         }
 
         input, select, textarea {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: border-color 0.3s;
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #2d3748;
+            background: #ffffff;
+            transition: border-color 0.15s, box-shadow 0.15s;
         }
 
         input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: #F5B800;
-            box-shadow: 0 0 0 3px rgba(245,184,0,0.12);
+            border-color: #005caa;
+            box-shadow: 0 0 0 3px rgba(0,92,170,0.15);
+        }
+
+        input[readonly] {
+            background: #e9ecef;
+            cursor: not-allowed;
         }
 
         .row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 16px;
         }
 
         .row-3 {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 20px;
+            gap: 16px;
         }
 
         .row-4 {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 20px;
+            gap: 16px;
+        }
+
+        .row-5 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            gap: 16px;
         }
 
         .control-box {
             background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-left: 3px solid #1a2f5e;
-            border-radius: 10px;
+            border: 1px solid #ced4da;
+            border-left: 4px solid #0f2646;
+            border-radius: 4px;
             padding: 16px;
             margin-top: 12px;
+            margin-bottom: 16px;
         }
 
         .section-title {
-            background: #1a2f5e;
-            color: white;
-            padding: 11px 18px;
-            border-radius: 8px;
-            margin: 28px 0 18px 0;
-            font-size: 0.95em;
+            background: #f2f4f7;
+            color: #0f2646;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin: 24px 0 16px 0;
+            font-size: 0.9em;
             font-weight: 700;
-            border-left: 4px solid #F5B800;
-            letter-spacing: 0.4px;
+            border-left: 4px solid #005caa;
+            letter-spacing: 0.5px;
         }
 
         .fornecedor-box {
             background: #f8fafc;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            border-left: 4px solid #F5B800;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            border-left: 4px solid #ffb900;
+            border: 1px solid #ced4da;
+            border-left-width: 4px;
         }
 
         .fornecedor-box p {
-            margin: 5px 0;
-            color: #555;
-            font-size: 0.9em;
+            margin: 4px 0;
+            color: #4a5568;
+            font-size: 0.85em;
         }
 
         .fornecedor-box strong {
-            color: #333;
+            color: #2d3748;
         }
 
         .materials-section {
-            margin: 30px 0;
+            margin: 16px 0;
         }
 
         .material-item {
             display: grid;
-            grid-template-columns: 50px 2fr 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 12px;
-            padding: 14px;
-            background: #f8fafc;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
+            grid-template-columns: 40px 2fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 8px;
+            padding: 12px;
+            background: #ffffff;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            border-left: 4px solid #bdc3c7;
             align-items: center;
+            transition: all 0.2s;
+        }
+
+        .material-item:has(input[type="checkbox"]:checked) {
+            border-left-color: #005caa;
+            background: #f4f8fc;
         }
 
         .material-item input[type="checkbox"] {
-            width: 25px;
-            height: 25px;
+            width: 20px;
+            height: 20px;
             cursor: pointer;
+            accent-color: #005caa;
         }
 
         .material-item label {
             margin: 0;
+            font-size: 0.9em;
+            font-weight: 700;
         }
 
         .btn-group {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
-            margin-top: 30px;
+            margin-top: 24px;
         }
 
         button {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
+            padding: 10px 16px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            font-size: 0.85em;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: background 0.15s, border-color 0.15s;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
+            background: #005caa;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: #004b8c;
         }
 
         .btn-success {
-            background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
-            color: white;
+            background: #107c41;
+            color: #ffffff;
+        }
+
+        .btn-success:hover {
+            background: #0b592e;
         }
 
         .btn-info {
-            background: linear-gradient(135deg, #0093E9 0%, #80D0C7 100%);
-            color: white;
+            background: #0078d4;
+            color: #ffffff;
+        }
+
+        .btn-info:hover {
+            background: #005a9e;
         }
 
         .btn-warning {
-            background: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
-            color: white;
+            background: #ffb900;
+            color: #111111;
         }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        .btn-warning:hover {
+            background: #d99e00;
         }
 
         .preview {
-            margin-top: 30px;
-            padding: 30px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+            margin-top: 24px;
+            padding: 24px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
             display: none;
-            background: white;
+            background: #ffffff;
         }
 
         .preview.active {
@@ -466,8 +500,8 @@
         .via {
             page-break-after: always;
             padding: 20px;
-            border: 2px solid #000;
-            margin-bottom: 20px;
+            border: 2px solid #000000;
+            margin-bottom: 24px;
         }
 
         .via:last-child {
@@ -476,117 +510,117 @@
 
         .preview-header {
             text-align: center;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid #000;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #000000;
         }
 
         .preview-header h2 {
-            font-size: 1.4em;
-            margin-bottom: 5px;
+            font-size: 1.25em;
+            margin-bottom: 4px;
         }
 
         .preview-header h3 {
-            font-size: 1.1em;
-            margin-top: 10px;
+            font-size: 1.05em;
+            margin-top: 8px;
         }
 
         .preview-header p {
-            font-size: 0.85em;
-            margin: 3px 0;
+            font-size: 0.8em;
+            margin: 2px 0;
         }
 
         .via-label {
             text-align: right;
             font-weight: bold;
-            font-size: 1.1em;
-            margin-bottom: 10px;
-            padding: 5px 10px;
-            background: #f0f0f0;
-            border: 2px solid #000;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+            padding: 4px 8px;
+            background: #e9ecef;
+            border: 2px solid #000000;
             display: inline-block;
             float: right;
         }
 
         .preview-content {
-            margin: 15px 0;
-            font-size: 0.9em;
+            margin: 12px 0;
+            font-size: 0.85em;
         }
 
         .preview-item {
             display: flex;
             justify-content: space-between;
-            padding: 8px;
-            border-bottom: 1px solid #ccc;
+            padding: 6px;
+            border-bottom: 1px solid #dcdcdc;
         }
 
         .preview-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 15px 0;
-            font-size: 0.9em;
+            gap: 12px;
+            margin: 12px 0;
+            font-size: 0.85em;
         }
 
         .fiscal-grid {
             display: grid;
             grid-template-columns: 1fr 2fr 1fr;
-            gap: 15px;
-            margin: 15px 0;
+            gap: 12px;
+            margin: 12px 0;
         }
 
         .identificacao-box {
-            margin: 15px 0;
-            border: 1px solid #000;
-            padding: 10px;
+            margin: 12px 0;
+            border: 1px solid #000000;
+            padding: 8px;
             display: grid;
-            grid-template-columns: 1fr 130px;
-            gap: 12px;
+            grid-template-columns: 1fr 120px;
+            gap: 10px;
             align-items: start;
         }
 
         .qr-preview-box {
-            border: 1px solid #000;
-            padding: 8px;
+            border: 1px solid #000000;
+            padding: 6px;
             text-align: center;
         }
 
         .qr-preview-box p {
             margin: 0;
-            font-size: 0.75em;
+            font-size: 0.7em;
             font-weight: 700;
             letter-spacing: 0.3px;
         }
 
         .qr-preview-box img {
-            width: 92px;
-            height: 92px;
-            margin-top: 6px;
-            border: 1px solid #ddd;
+            width: 80px;
+            height: 80px;
+            margin-top: 4px;
+            border: 1px solid #dcdcdc;
             object-fit: contain;
-            background: #fff;
+            background: #ffffff;
         }
 
         .qr-preview-box small {
             display: block;
-            margin-top: 6px;
-            font-size: 0.68em;
-            line-height: 1.2;
+            margin-top: 4px;
+            font-size: 0.6em;
+            line-height: 1.1;
         }
 
         .danfe-box {
-            margin: 15px 0;
-            border: 1px solid #000;
-            background: #fff;
+            margin: 12px 0;
+            border: 1px solid #000000;
+            background: #ffffff;
         }
 
         .danfe-title {
-            background: #ececec;
-            border-bottom: 1px solid #000;
-            padding: 6px 8px;
-            font-size: 0.78em;
+            background: #f2f4f7;
+            border-bottom: 1px solid #000000;
+            padding: 4px 6px;
+            font-size: 0.72em;
             font-weight: 700;
-            letter-spacing: 0.4px;
+            letter-spacing: 0.3px;
             text-transform: uppercase;
         }
 
@@ -596,10 +630,10 @@
         }
 
         .danfe-cell {
-            padding: 8px;
-            border-right: 1px solid #000;
-            border-bottom: 1px solid #000;
-            min-height: 45px;
+            padding: 6px;
+            border-right: 1px solid #000000;
+            border-bottom: 1px solid #000000;
+            min-height: 40px;
         }
 
         .danfe-cell:nth-child(2n) {
@@ -618,33 +652,34 @@
         .fotos-upload-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 10px;
+            gap: 16px;
+            margin-top: 8px;
         }
 
         .foto-upload-box {
-            border: 1px dashed #6b7280;
-            border-radius: 8px;
+            border: 1px dashed #ced4da;
+            border-radius: 4px;
             padding: 12px;
-            background: #fafafa;
+            background: #ffffff;
         }
 
         .foto-upload-box input[type="file"] {
-            margin-top: 8px;
-            border: 1px solid #d1d5db;
-            background: #fff;
-            padding: 8px;
+            margin-top: 6px;
+            border: 1px solid #ced4da;
+            background: #ffffff;
+            padding: 6px;
+            font-size: 0.8em;
         }
 
         .foto-preview {
-            margin-top: 10px;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
+            margin-top: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
             width: 100%;
             aspect-ratio: 1 / 1;
             object-fit: cover;
             display: none;
-            background: #fff;
+            background: #ffffff;
         }
 
         .foto-preview.active {
@@ -654,32 +689,32 @@
         .fotos-via-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 8px;
             margin-top: 8px;
         }
 
         .foto-via-box {
-            border: 1px solid #000;
-            min-height: 210px;
-            padding: 6px;
+            border: 1px solid #000000;
+            min-height: 180px;
+            padding: 4px;
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 4px;
             align-items: center;
         }
 
         .foto-via-label {
-            font-size: 0.72em;
+            font-size: 0.65em;
             font-weight: 700;
             text-transform: uppercase;
         }
 
         .foto-via-img {
-            width: 170px;
-            height: 170px;
+            width: 140px;
+            height: 140px;
             object-fit: cover;
-            border: 1px solid #d1d5db;
-            background: #fff;
+            border: 1px solid #ced4da;
+            background: #ffffff;
             display: none;
         }
 
@@ -688,77 +723,77 @@
         }
 
         .foto-via-empty {
-            width: 170px;
-            height: 170px;
-            border: 1px dashed #d1d5db;
-            color: #777;
-            font-size: 0.76em;
+            width: 140px;
+            height: 140px;
+            border: 1px dashed #ced4da;
+            color: #7f8c8d;
+            font-size: 0.7em;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 6px;
+            padding: 4px;
         }
 
         .auth-footer {
-            margin-top: 12px;
-            border-top: 1px dashed #000;
-            padding-top: 8px;
-            font-size: 0.75em;
-            line-height: 1.4;
+            margin-top: 10px;
+            border-top: 1px dashed #000000;
+            padding-top: 6px;
+            font-size: 0.7em;
+            line-height: 1.3;
         }
 
         .database-panel {
-            margin-top: 24px;
-            border: 1px solid #e2e8f0;
-            border-left: 4px solid #1a2f5e;
+            margin-top: 20px;
+            border: 1px solid #ced4da;
+            border-left: 4px solid #0f2646;
             background: #f8fafc;
-            border-radius: 10px;
+            border-radius: 4px;
             padding: 16px;
         }
 
         .database-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px 20px;
-            margin-top: 10px;
+            gap: 8px 16px;
+            margin-top: 8px;
         }
 
         .database-info {
-            font-size: 0.9em;
-            color: #334155;
+            font-size: 0.85em;
+            color: #4a5568;
         }
 
         .database-actions {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
-            margin-top: 14px;
+            margin-top: 12px;
         }
 
         .database-actions button {
-            padding: 10px 14px;
-            font-size: 0.9em;
+            padding: 8px 12px;
+            font-size: 0.8em;
         }
 
         .custom-materials-box {
-            margin-top: 15px;
-            border: 1px dashed #94a3b8;
-            border-radius: 8px;
+            margin-top: 16px;
+            border: 1px dashed #7f8c8d;
+            border-radius: 4px;
             padding: 12px;
             background: #f8fafc;
         }
 
         .custom-material-row {
             display: grid;
-            grid-template-columns: 60px 2fr 1fr 1fr auto;
-            gap: 10px;
+            grid-template-columns: 40px 2fr 1fr 1fr auto;
+            gap: 8px;
             align-items: center;
-            margin-bottom: 10px;
-            padding: 10px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            background: #fff;
+            margin-bottom: 8px;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            background: #ffffff;
         }
 
         .custom-material-row:last-child {
@@ -766,16 +801,16 @@
         }
 
         .custom-material-row input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             justify-self: center;
         }
 
         .fornecedor-novo-box,
         .contrato-novo-box {
-            margin-top: 12px;
-            border: 1px dashed #94a3b8;
-            border-radius: 8px;
+            margin-top: 8px;
+            border: 1px dashed #7f8c8d;
+            border-radius: 4px;
             padding: 12px;
             background: #f8fafc;
             display: none;
@@ -783,52 +818,53 @@
 
         .danfe-label {
             display: block;
-            font-size: 0.68em;
+            font-size: 0.65em;
             font-weight: 700;
-            color: #444;
+            color: #555555;
             text-transform: uppercase;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .danfe-value {
-            font-size: 0.88em;
+            font-size: 0.8em;
             font-weight: 600;
-            word-break: break-word;
+            word-break: break-all;
         }
 
         .info-box {
-            border: 1px solid #000;
-            padding: 10px;
+            border: 1px solid #000000;
+            padding: 8px;
             background: #f9f9f9;
         }
 
         .info-box p {
-            margin: 5px 0;
+            margin: 4px 0;
         }
 
         .materiais-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 15px 0;
+            margin: 12px 0;
         }
 
         .materiais-table th,
         .materiais-table td {
-            border: 1px solid #000;
-            padding: 8px;
+            border: 1px solid #000000;
+            padding: 6px 8px;
             text-align: left;
+            font-size: 0.85em;
         }
 
         .materiais-table th {
-            background: #e0e0e0;
+            background: #ececec;
             font-weight: bold;
         }
 
         .assinaturas {
-            margin-top: 30px;
+            margin-top: 24px;
             display: flex;
             justify-content: space-between;
-            gap: 20px;
+            gap: 16px;
         }
 
         .assinatura-box {
@@ -837,15 +873,15 @@
         }
 
         .assinatura-linha {
-            border-top: 2px solid #000;
-            margin-top: 50px;
-            padding-top: 5px;
-            font-size: 0.9em;
+            border-top: 1px solid #000000;
+            margin-top: 36px;
+            padding-top: 4px;
+            font-size: 0.8em;
         }
 
         @media print {
             body {
-                background: white;
+                background: #ffffff;
                 padding: 0;
                 margin: 0;
             }
@@ -853,11 +889,13 @@
             .container {
                 box-shadow: none;
                 max-width: 100%;
+                border: none;
             }
             
             .btn-group, 
             .access-screen,
             .session-bar,
+            #syncBar,
             .admin-panel,
             .content > .section-title,
             .content > .form-group,
@@ -865,6 +903,9 @@
             .content > .row-3,
             .content > .fornecedor-box,
             .content > #origemCustom,
+            .content > #fornecedorNovoBox,
+            .content > #contratoNovoBox,
+            .content > .custom-materials-box,
             .content > .materials-section,
             .content > .database-panel {
                 display: none !important;
@@ -883,13 +924,14 @@
 
             .via {
                 page-break-after: always;
-                padding: 15mm;
+                padding: 10mm;
                 border: none;
-                margin: 0;
+                margin: 0 0 20mm 0;
             }
 
             .via:last-child {
                 page-break-after: auto;
+                margin-bottom: 0;
             }
 
             @page {
@@ -903,7 +945,6 @@
                 margin: 10mm;
             }
             
-            /* Remove cabeçalho e rodapé padrão do navegador */
             body::before,
             body::after {
                 display: none !important;
@@ -911,7 +952,7 @@
         }
 
         @media (max-width: 768px) {
-            .row, .row-3, .row-4, .material-item, .preview-grid, .fiscal-grid, .identificacao-box, .danfe-grid, .database-grid, .custom-material-row, .kpi-grid {
+            .row, .row-3, .row-4, .row-5, .material-item, .preview-grid, .fiscal-grid, .identificacao-box, .danfe-grid, .database-grid, .custom-material-row, .kpi-grid {
                 grid-template-columns: 1fr;
             }
             .btn-group {
@@ -974,13 +1015,13 @@
             <button class="btn-warning" type="button" id="btnSairSistema">Sair</button>
         </div>
 
-        <div id="syncBar" class="session-bar app-hidden" style="background: #141c2d; border-top: 1px solid #334155; border-bottom: 2px solid #56ab2f; font-size: 0.85em; display: flex; align-items: center; justify-content: space-between; padding: 8px 20px;">
+        <div id="syncBar" class="session-bar app-hidden" style="background: #141c2d; border-top: 1px solid #334155; border-bottom: 2px solid #107c41; font-size: 0.85em; display: flex; align-items: center; justify-content: space-between; padding: 8px 20px;">
             <div style="display: flex; align-items: center; gap: 15px;">
                 <span id="syncStatusBadge" style="padding: 3px 8px; border-radius: 20px; font-weight: bold; background: #64748b; color: white;">Detectando...</span>
                 <span>Pendentes de Envio: <strong id="syncPendingCount" style="color: #f2c94c; font-size: 1.1em;">0</strong></span>
             </div>
             <div style="display: flex; align-items: center; gap: 10px;">
-                <button class="btn-success" type="button" id="btnSyncPendentes" onclick="sincronizarPendentesComNuvem()" style="padding: 6px 12px; font-size: 0.85em; background: linear-gradient(135deg, #56ab2f 0%, #3d7e22 100%); line-height: 1.2;">🔄 Sincronizar Nuvem</button>
+                <button class="btn-success" type="button" id="btnSyncPendentes" onclick="sincronizarPendentesComNuvem()" style="padding: 6px 12px; font-size: 0.85em; line-height: 1.2;">🔄 Sincronizar Nuvem</button>
             </div>
         </div>
 
@@ -1100,7 +1141,7 @@
 
             <div class="control-box">
                 <div class="section-title" style="margin: 0 0 15px 0;">🔐 CONTROLE DOCUMENTAL (ISO 9001 / PBQP-H)</div>
-                <div class="row-4">
+                <div class="row-5">
                     <div class="form-group">
                         <label>TAC</label>
                         <select id="tacNumero"></select>
@@ -1108,6 +1149,10 @@
                     <div class="form-group">
                         <label>Pacote</label>
                         <select id="pacoteNumero"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>KM</label>
+                        <select id="kmNumero" onchange="atualizarKm()"></select>
                     </div>
                     <div class="form-group">
                         <label>Sequência</label>
@@ -1118,7 +1163,18 @@
                         <select id="revisaoDocumento"></select>
                     </div>
                 </div>
-                <div class="form-group" style="margin-bottom: 0;">
+                <div id="kmNovoBox" class="fornecedor-novo-box" style="display: none; margin-top: 15px;">
+                    <div class="row" style="align-items: end;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>Novo KM</label>
+                            <input type="text" id="novoKmNome" placeholder="Ex: KM 600">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0; text-align: right;">
+                            <button class="btn-primary" type="button" onclick="adicionarKmPersonalizado()">Adicionar KM</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 0; margin-top: 15px;">
                     <label>Código de Controle</label>
                     <input type="text" id="codigoControle" readonly>
                 </div>
@@ -1445,6 +1501,28 @@
                         </thead>
                         <tbody id="dbSyncTableBody">
                             <tr><td colspan="4" style="text-align: center; color: #64748b;">Nenhum registro pendente</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Painel de Romaneios do Usuário -->
+            <div class="database-panel" id="userRomaneiosPanel" style="margin-top: 24px;">
+                <div class="section-title" style="margin: 0 0 15px 0;">📋 ROMANEIOS EMITIDOS POR VOCÊ</div>
+                <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; overflow-x: auto;">
+                    <table class="admin-users-table" style="margin-top: 5px;">
+                        <thead>
+                            <tr>
+                                <th>Cód. Controle</th>
+                                <th>Data</th>
+                                <th>Contrato</th>
+                                <th>Placa</th>
+                                <th>Status</th>
+                                <th style="text-align: center; width: 180px;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userRomaneiosTableBody">
+                            <tr><td colspan="6" style="text-align: center; color: #64748b; padding: 12px;">Nenhum romaneio emitido</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -1950,7 +2028,7 @@
             aplicarRestricaoPacotesUsuario();
 
             const responsavel = document.getElementById('responsavel');
-            if (responsavel && !responsavel.value) {
+            if (responsavel) {
                 responsavel.value = obterNomeUsuario(usuarioAtual);
             }
 
@@ -2000,6 +2078,7 @@
 
             document.getElementById('loginSenha').value = '';
             aplicarPermissoesPorPerfil();
+            atualizarTabelaRomaneiosUsuario();
             registrarAuditoria('login', 'Entrada no sistema: ' + obterNomeUsuario(user));
         }
 
@@ -2260,7 +2339,7 @@
 
         function inicializarControlesDocumentais() {
             popularSelectNumericoComNa('tacNumero', 1, 30, 2);
-            popularSelectNumericoComNa('pacoteNumero', 1, 30, 5, false);
+            popularSelectNumericoComNa('pacoteNumero', 1, 30, 5, true);
             popularSelectNumericoComNa('sequenciaNumero', 1, 500, 1);
             popularSelectNumericoComNa('revisaoDocumento', 0, 30, 0);
         }
@@ -2336,17 +2415,18 @@
         }
 
         function atualizarRegistroInternoAutomatico() {
-            const pacote = parseInt(document.getElementById('pacoteNumero').value, 10);
+            const pacoteRaw = document.getElementById('pacoteNumero').value;
             const sequencia = obterValorControle('sequenciaNumero', 1);
             const ano = obterAnoSequencia();
 
-            if (!Number.isFinite(pacote)) {
-                document.getElementById('registroInterno').value = '';
-                return;
-            }
+            const seqTexto = sequencia === 'NA' ? '000' : padNumero(Math.max(1, sequencia), 3);
 
-            const seqTexto = sequencia === 'NA' ? '0000' : padNumero(Math.max(1, sequencia), 4);
-            document.getElementById('registroInterno').value = 'SUC-P' + padNumero(pacote, 2) + '-' + ano + '-' + seqTexto;
+            if (pacoteRaw === 'NA') {
+                document.getElementById('registroInterno').value = 'SUC-' + ano + '-' + seqTexto;
+            } else {
+                const pacote = parseInt(pacoteRaw, 10) || 0;
+                document.getElementById('registroInterno').value = 'SUC-P' + padNumero(pacote, 2) + '-' + ano + '-' + seqTexto;
+            }
         }
 
         function getBaseDadosLocal() {
@@ -2385,20 +2465,22 @@
             const contrato = document.getElementById('contrato').value;
             const pacoteNumero = parseInt(pacote, 10);
 
-            if (!pacote || pacote === 'NA') {
+            if (!pacote) {
                 alert('Pacote é obrigatório no controle documental.');
                 return false;
             }
 
-            if (
-                usuarioAtual &&
-                usuarioAtual.perfil === 'operador' &&
-                Array.isArray(usuarioAtual.pacotesPermitidos) &&
-                usuarioAtual.pacotesPermitidos.length > 0 &&
-                (!Number.isFinite(pacoteNumero) || usuarioAtual.pacotesPermitidos.indexOf(pacoteNumero) === -1)
-            ) {
-                alert('Este usuário não possui permissão para o pacote selecionado.');
-                return false;
+            if (pacote !== 'NA') {
+                if (
+                    usuarioAtual &&
+                    usuarioAtual.perfil === 'operador' &&
+                    Array.isArray(usuarioAtual.pacotesPermitidos) &&
+                    usuarioAtual.pacotesPermitidos.length > 0 &&
+                    (!Number.isFinite(pacoteNumero) || usuarioAtual.pacotesPermitidos.indexOf(pacoteNumero) === -1)
+                ) {
+                    alert('Este usuário não possui permissão para o pacote selecionado.');
+                    return false;
+                }
             }
 
             if (!contrato || contrato === 'add_new_contract') {
@@ -2445,7 +2527,7 @@
 
             const materiais = obterMateriaisSelecionados();
             const data = formatarData(document.getElementById('dataRomaneio').value);
-            const dataReceb = formatarData(document.getElementById('dataRecebimento').value);
+            const dataReceb = document.getElementById('dataRecebimento').value ? formatarData(document.getElementById('dataRecebimento').value) : '';
             const origem = obterOrigemTextoMapa();
             const destinoFinal = document.getElementById('destino').value || 'Não informado';
             const placa = document.getElementById('placaCaminhao').value.toUpperCase() || 'Não informada';
@@ -2454,21 +2536,86 @@
             const pacote = document.getElementById('pacoteNumero').value || 'Não informado';
             const docRef = obterDocumentoRastreio();
 
+            // Novos campos para a rastreabilidade completa
+            const numeroRomaneio = document.getElementById('numeroRomaneio').value || 'Não informado';
+            const registroInterno = document.getElementById('registroInterno').value || 'Não informado';
+            const tacNumero = document.getElementById('tacNumero').value || 'Não informado';
+            const kmNumero = document.getElementById('kmNumero').value || 'NA';
+            const sequenciaNumero = document.getElementById('sequenciaNumero').value || 'Não informado';
+            const revisaoDocumento = document.getElementById('revisaoDocumento').value || 'Não informado';
+            const observacoes = document.getElementById('observacoes').value || '';
+
+            // Fornecedor/Origem detalhado
+            const fornecedorSelect = document.getElementById('fornecedor').value || '';
+            let fornecedorNome = '';
+            let fornecedorCNPJ = '';
+            let fornecedorLocal = origem;
+
+            if (fornecedorSelect === 'custom') {
+                fornecedorNome = 'Personalizado';
+                fornecedorCNPJ = '';
+            } else {
+                const fornObj = obterFornecedorSelecionado(fornecedorSelect);
+                if (fornObj) {
+                    fornecedorNome = fornObj.nome || '';
+                    fornecedorCNPJ = fornObj.cnpj || '';
+                    fornecedorLocal = fornObj.local || origem;
+                } else {
+                    fornecedorNome = document.getElementById('razaoSocialFornecedor').value || fornecedorSelect;
+                    fornecedorCNPJ = document.getElementById('cnpjFornecedorFiscal').value || '';
+                }
+            }
+
+            // Dados Fiscais e Produto
+            const modoMuro = document.getElementById('modoPlacasMuro').checked ? 'Sim' : 'Não';
+            const numeroNotaFiscal = document.getElementById('numeroNotaFiscal').value || '';
+            const ilsNumero = document.getElementById('ilsNumero').value || '';
+            const controleConcretoNumero = document.getElementById('controleConcretoNumero').value || '';
+            const razaoSocialFornecedorFiscal = document.getElementById('razaoSocialFornecedor').value || '';
+            const cnpjFornecedorFiscal = document.getElementById('cnpjFornecedorFiscal').value || '';
+            const codigoProdutoFiscal = document.getElementById('codigoProdutoFiscal').value || '';
+            const descricaoProdutoFiscal = document.getElementById('descricaoProdutoFiscal').value || '';
+
+            // Segurança e Controle
+            const hashIntegridade = assinaturaCurta(baseIntegridadeRomaneio()) || '';
+
             materiais.forEach(function(mat) {
                 mapa.itens.push({
+                    numeroRomaneio: numeroRomaneio,
+                    registroInterno: registroInterno,
                     dataRomaneio: data,
-                    dataRecebimento: dataReceb,
-                    origem: origem,
+                    codigoControle: codigoControle,
+                    tacNumero: tacNumero,
+                    pacote: pacote,
+                    kmNumero: kmNumero,
+                    sequenciaNumero: sequenciaNumero,
+                    revisaoDocumento: revisaoDocumento,
+                    placa: placa,
+                    motorista: motorista,
+                    contrato: contrato,
                     destinoFinal: destinoFinal,
+                    dataRecebimento: dataReceb,
+                    observacoes: observacoes,
+
+                    fornecedorNome: fornecedorNome,
+                    fornecedorCNPJ: fornecedorCNPJ,
+                    fornecedorLocal: fornecedorLocal,
+
+                    modoMuro: modoMuro,
+                    numeroNotaFiscal: numeroNotaFiscal,
+                    ilsNumero: ilsNumero,
+                    controleConcretoNumero: controleConcretoNumero,
+                    razaoSocialFornecedorFiscal: razaoSocialFornecedorFiscal,
+                    cnpjFornecedorFiscal: cnpjFornecedorFiscal,
+                    codigoProdutoFiscal: codigoProdutoFiscal,
+                    descricaoProdutoFiscal: descricaoProdutoFiscal,
+
                     material: mat.nome,
                     quantidade: String(mat.qtd),
                     unidade: mat.unidade,
-                    placa: placa,
-                    motorista: motorista,
-                    codigoControle: codigoControle,
-                    documentoRef: docRef,
-                    pacote: pacote,
-                    contrato: contrato
+
+                    hashIntegridade: hashIntegridade,
+                    sincronizadoEm: ''
                 });
             });
 
@@ -2495,13 +2642,25 @@
             const codigoRastreio = 'MRR-' + padNumero(mapa.itens.length, 2);
 
             const dados = [
-                ['MAPA DE RASTREABILIDADE DE REGISTROS', '', '', '', '', '', '', '', '', '', '', '', ''],
-                ['Nº FORMULÁRIO', '', 'ELABORADO:', '', 'APROVADO:', '', 'SETOR:', '', 'REVISÃO:', '', 'DATA:', '', ''],
-                ['MRR-01-VALE-001', '', 'BRUNO RAMOS', '', 'DIRETORIA', '', 'QUALIDADE', '', revisaoMapa, '', dataCabecalho, '', ''],
-                ['PACOTE ' + pacoteAtual + ' - ' + contratoAtual, '', '', '', '', '', '', '', 'DATA DE ATUALIZAÇÃO:', '', dataCabecalho, '', ''],
-                ['RELATÓRIO DE INSPEÇÃO E LIBERAÇÃO DE SERVIÇOS - ILS', '', '', '', '', '', '', '', 'CÓD DO REGISTRO:', '', 'Nº ILS', '', 'CÓD. RAST.: ' + codigoRastreio],
-                [],
-                ['Data', 'Data Receb.', 'Origem', 'Destino Final', 'Material', 'Quantidade', 'Unidade', 'Placa Caminhão', 'Motorista/Responsável', 'Código Controle', 'NF ou FVS/ILS', 'Pacote', 'Contrato']
+                ['MAPA DE RASTREABILIDADE DE REGISTROS', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+                ['Nº FORMULÁRIO', '', 'ELABORADO:', '', 'APROVADO:', '', 'SETOR:', '', 'REVISÃO:', '', 'DATA:', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+                ['MRR-01-VALE-001', '', 'BRUNO RAMOS', '', 'DIRETORIA', '', 'QUALIDADE', '', revisaoMapa, '', dataCabecalho, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+                ['PACOTE ' + pacoteAtual + ' - ' + contratoAtual, '', '', '', '', '', '', '', 'DATA DE ATUALIZAÇÃO:', '', dataCabecalho, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+                ['RELATÓRIO DE INSPEÇÃO E LIBERAÇÃO DE SERVIÇOS - ILS', '', '', '', '', '', '', '', 'CÓD DO REGISTRO:', '', 'Nº ILS', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'CÓD. RAST.: ' + codigoRastreio, '', '', ''],
+                [
+                    'IDENTIFICAÇÃO DO ROMANEIO', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
+                    'FORNECEDOR / ORIGEM', '', '',
+                    'DADOS FISCAIS E PRODUTO', '', '', '', '', '', '', '',
+                    'MATERIAIS TRANSPORTADOS', '', '',
+                    'SEGURANÇA / CONTROLE', ''
+                ],
+                [
+                    'Nº Romaneio', 'Registro Interno', 'Data Emissão', 'Código de Controle', 'TAC', 'Pacote', 'KM', 'Sequência', 'Revisão', 'Placa Caminhão', 'Responsável/Motorista', 'Contrato', 'Destino Final', 'Data Recebimento', 'Observações',
+                    'Fornecedor', 'CNPJ Fornecedor', 'Local de Origem',
+                    'Modo Muro?', 'Nota Fiscal', 'Nº ILS', 'Nº Controle Concreto', 'Razão Social (Fiscal)', 'CNPJ (Fiscal)', 'Código Produto', 'Descrição Produto',
+                    'Material', 'Quantidade', 'Unidade',
+                    'Código Autenticação', 'Sincronizado Em'
+                ]
             ];
 
             mapa.itens
@@ -2513,51 +2672,85 @@
                 })
                 .forEach(function(item) {
                     dados.push([
-                        item.dataRomaneio,
-                        item.dataRecebimento,
-                        item.origem,
-                        item.destinoFinal,
-                        item.material,
-                        item.quantidade,
-                        item.unidade,
-                        item.placa,
-                        item.motorista,
-                        item.codigoControle,
-                        item.documentoRef,
-                        item.pacote,
-                        item.contrato
+                        item.numeroRomaneio || '',
+                        item.registroInterno || '',
+                        item.dataRomaneio || '',
+                        item.codigoControle || '',
+                        item.tacNumero || '',
+                        item.pacote || '',
+                        item.kmNumero || 'NA',
+                        item.sequenciaNumero || '',
+                        item.revisaoDocumento || '',
+                        item.placa || '',
+                        item.motorista || '',
+                        item.contrato || '',
+                        item.destinoFinal || '',
+                        item.dataRecebimento || '',
+                        item.observacoes || '',
+                        
+                        item.fornecedorNome || '',
+                        item.fornecedorCNPJ || '',
+                        item.fornecedorLocal || item.origem || '',
+                        
+                        item.modoMuro || '',
+                        item.numeroNotaFiscal || '',
+                        item.ilsNumero || '',
+                        item.controleConcretoNumero || '',
+                        item.razaoSocialFornecedorFiscal || '',
+                        item.cnpjFornecedorFiscal || '',
+                        item.codigoProdutoFiscal || '',
+                        item.descricaoProdutoFiscal || '',
+                        
+                        item.material || '',
+                        item.quantidade || '',
+                        item.unidade || '',
+                        
+                        item.hashIntegridade || '',
+                        item.sincronizadoEm || 'Pendente'
                     ]);
                 });
 
             const ws = XLSX.utils.aoa_to_sheet(dados);
             ws['!merges'] = [
-                { s: { r: 0, c: 0 }, e: { r: 0, c: 12 } },
-                { s: { r: 1, c: 0 }, e: { r: 1, c: 1 } },
-                { s: { r: 1, c: 2 }, e: { r: 1, c: 3 } },
-                { s: { r: 1, c: 4 }, e: { r: 1, c: 5 } },
-                { s: { r: 1, c: 6 }, e: { r: 1, c: 7 } },
-                { s: { r: 1, c: 8 }, e: { r: 1, c: 9 } },
-                { s: { r: 1, c: 10 }, e: { r: 1, c: 12 } },
-                { s: { r: 2, c: 0 }, e: { r: 2, c: 1 } },
-                { s: { r: 2, c: 2 }, e: { r: 2, c: 3 } },
-                { s: { r: 2, c: 4 }, e: { r: 2, c: 5 } },
-                { s: { r: 2, c: 6 }, e: { r: 2, c: 7 } },
-                { s: { r: 2, c: 8 }, e: { r: 2, c: 9 } },
-                { s: { r: 2, c: 10 }, e: { r: 2, c: 12 } },
-                { s: { r: 3, c: 0 }, e: { r: 3, c: 7 } },
-                { s: { r: 3, c: 8 }, e: { r: 3, c: 9 } },
-                { s: { r: 3, c: 10 }, e: { r: 3, c: 12 } },
-                { s: { r: 4, c: 0 }, e: { r: 4, c: 7 } },
-                { s: { r: 4, c: 8 }, e: { r: 4, c: 9 } },
-                { s: { r: 4, c: 11 }, e: { r: 4, c: 12 } }
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 30 } }, // Linha 0: A1:AE1
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 1 } },  // Linha 1: A2:B2
+                { s: { r: 1, c: 2 }, e: { r: 1, c: 3 } },  // Linha 1: C2:D2
+                { s: { r: 1, c: 4 }, e: { r: 1, c: 5 } },  // Linha 1: E2:F2
+                { s: { r: 1, c: 6 }, e: { r: 1, c: 7 } },  // Linha 1: G2:H2
+                { s: { r: 1, c: 8 }, e: { r: 1, c: 9 } },  // Linha 1: I2:J2
+                { s: { r: 1, c: 10 }, e: { r: 1, c: 12 } }, // Linha 1: K2:M2
+                
+                { s: { r: 2, c: 0 }, e: { r: 2, c: 1 } },  // Linha 2: A3:B3
+                { s: { r: 2, c: 2 }, e: { r: 2, c: 3 } },  // Linha 2: C3:D3
+                { s: { r: 2, c: 4 }, e: { r: 2, c: 5 } },  // Linha 2: E3:F3
+                { s: { r: 2, c: 6 }, e: { r: 2, c: 7 } },  // Linha 2: G3:H3
+                { s: { r: 2, c: 8 }, e: { r: 2, c: 9 } },  // Linha 2: I3:J3
+                { s: { r: 2, c: 10 }, e: { r: 2, c: 12 } }, // Linha 2: K3:M3
+                
+                { s: { r: 3, c: 0 }, e: { r: 3, c: 14 } }, // Linha 3: A4:O4
+                { s: { r: 3, c: 15 }, e: { r: 3, c: 16 } }, // Linha 3: P4:Q4
+                { s: { r: 3, c: 17 }, e: { r: 3, c: 19 } }, // Linha 3: R4:T4
+                
+                { s: { r: 4, c: 0 }, e: { r: 4, c: 14 } }, // Linha 4: A5:O5
+                { s: { r: 4, c: 15 }, e: { r: 4, c: 16 } }, // Linha 4: P5:Q5
+                { s: { r: 4, c: 17 }, e: { r: 4, c: 19 } }, // Linha 4: R5:T5
+                { s: { r: 4, c: 20 }, e: { r: 4, c: 22 } }, // Linha 4: U5:W5
+                
+                { s: { r: 5, c: 0 }, e: { r: 5, c: 14 } }, // Linha 5: A6:O6
+                { s: { r: 5, c: 15 }, e: { r: 5, c: 17 } }, // Linha 5: P6:R6
+                { s: { r: 5, c: 18 }, e: { r: 5, c: 25 } }, // Linha 5: S6:Z6
+                { s: { r: 5, c: 26 }, e: { r: 5, c: 28 } }, // Linha 5: AA6:AC6
+                { s: { r: 5, c: 29 }, e: { r: 5, c: 30 } }  // Linha 5: AD6:AE6
             ];
             ws['!cols'] = [
-                { wch: 12 }, { wch: 12 }, { wch: 18 }, { wch: 16 }, { wch: 18 },
-                { wch: 15 }, { wch: 14 }, { wch: 16 }, { wch: 14 }, { wch: 22 },
-                { wch: 24 }, { wch: 10 }, { wch: 18 }
+                { wch: 14 }, { wch: 16 }, { wch: 12 }, { wch: 22 }, { wch: 8 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 8 }, { wch: 14 }, { wch: 22 }, { wch: 14 }, { wch: 20 }, { wch: 14 }, { wch: 25 },
+                { wch: 22 }, { wch: 18 }, { wch: 20 },
+                { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 18 }, { wch: 22 }, { wch: 18 }, { wch: 14 }, { wch: 22 },
+                { wch: 20 }, { wch: 12 }, { wch: 10 },
+                { wch: 18 }, { wch: 18 }
             ];
             ws['!autofilter'] = {
-                ref: 'A7:M' + String(dados.length)
+                ref: 'A7:AE' + String(dados.length)
             };
 
             const wb = XLSX.utils.book_new();
@@ -2923,12 +3116,14 @@
                 hashIntegridade: assinaturaCurta(baseIntegridadeRomaneio()),
                 chaveSequencia: chave,
                 sequencia: sequencia,
+                usuarioId: usuarioAtual ? usuarioAtual.id : 'desconhecido',
                 campos: {
                     numeroRomaneio: document.getElementById('numeroRomaneio').value,
                     registroInterno: document.getElementById('registroInterno').value,
                     dataRomaneio: document.getElementById('dataRomaneio').value,
                     tacNumero: document.getElementById('tacNumero').value,
                     pacoteNumero: document.getElementById('pacoteNumero').value,
+                    kmNumero: document.getElementById('kmNumero').value,
                     sequenciaNumero: document.getElementById('sequenciaNumero').value,
                     revisaoDocumento: document.getElementById('revisaoDocumento').value,
                     placaCaminhao: document.getElementById('placaCaminhao').value,
@@ -2985,6 +3180,7 @@
             dbSalvarRomaneio(registro).then(function() {
                 atualizarKpisAdmin();
                 atualizarTabelaPendentesSincronizacao();
+                atualizarTabelaRomaneiosUsuario();
                 registrarAuditoria('salvar_romaneio', 'Registro salvo no IndexedDB local');
 
                 if (sequenciaRaw === 'NA') {
@@ -3251,25 +3447,26 @@
             }
 
             // Mapeia materiais
-            const materiaisBase = [
-                { nome: 'AREIA LAVADA', check: 'areiaCheck', qtd: registro.campos.areiaQtd, unidade: registro.campos.areiaUnidade, checked: registro.materiais.find(m => m.check === 'areiaCheck').checked },
-                { nome: 'BRITA - 1', check: 'britaCheck', qtd: registro.campos.britaQtd, unidade: registro.campos.britaUnidade, checked: registro.materiais.find(m => m.check === 'britaCheck').checked },
-                { nome: registro.campos.cimentoTipo || 'CIMENTO', check: 'cimentoCheck', qtd: registro.campos.cimentoQtd, unidade: registro.campos.cimentoUnidade, checked: registro.materiais.find(m => m.check === 'cimentoCheck').checked },
-                { nome: 'AÇO', check: 'acoCheck', qtd: registro.campos.acoQtd, unidade: registro.campos.acoUnidade, checked: registro.materiais.find(m => m.check === 'acoCheck').checked },
-                { nome: 'POSTE DE 11 METROS', check: 'poste11Check', qtd: registro.campos.poste11Qtd, unidade: registro.campos.poste11Unidade, checked: registro.materiais.find(m => m.check === 'poste11Check').checked },
-                { nome: 'POSTE DE 14 METROS', check: 'poste14Check', qtd: registro.campos.poste14Qtd, unidade: registro.campos.poste14Unidade, checked: registro.materiais.find(m => m.check === 'poste14Check').checked }
-            ];
-
             const materiaisSelecionados = [];
-            materiaisBase.forEach(function(mat) {
-                if (mat.checked) {
-                    materiaisSelecionados.push({
-                        nome: mat.nome,
-                        qtd: mat.qtd && parseFloat(mat.qtd) > 0 ? mat.qtd : '-',
-                        unidade: mat.unidade
-                    });
-                }
-            });
+            if (Array.isArray(registro.materiais)) {
+                registro.materiais.forEach(function(mat) {
+                    if (mat.checked) {
+                        let nome = '';
+                        if (mat.check === 'areiaCheck') nome = 'AREIA LAVADA';
+                        else if (mat.check === 'britaCheck') nome = 'BRITA - 1';
+                        else if (mat.check === 'cimentoCheck') nome = mat.tipoValor || 'CIMENTO';
+                        else if (mat.check === 'acoCheck') nome = 'AÇO';
+                        else if (mat.check === 'poste11Check') nome = 'POSTE DE 11 METROS';
+                        else if (mat.check === 'poste14Check') nome = 'POSTE DE 14 METROS';
+                        
+                        materiaisSelecionados.push({
+                            nome: nome,
+                            qtd: mat.qtdValor && parseFloat(mat.qtdValor) > 0 ? mat.qtdValor : '-',
+                            unidade: mat.unidadeValor || '-'
+                        });
+                    }
+                });
+            }
 
             if (Array.isArray(registro.materiaisPersonalizados)) {
                 registro.materiaisPersonalizados.forEach(function(mat) {
@@ -3277,7 +3474,7 @@
                         materiaisSelecionados.push({
                             nome: mat.nome,
                             qtd: mat.qtd && parseFloat(mat.qtd) > 0 ? mat.qtd : '-',
-                            unidade: mat.unidade
+                            unidade: mat.unidade || '-'
                         });
                     }
                 });
@@ -3286,9 +3483,11 @@
             return obterBase64PDF(registro.campos.gerarSegundaVia).then(function(pdfBase64) {
                 const payload = {
                     codigoControle: registro.codigoControle,
+                    hashIntegridade: registro.hashIntegridade || '',
                     campos: registro.campos,
                     materiaisSelecionados: materiaisSelecionados,
-                    pdfBase64: pdfBase64
+                    pdfBase64: pdfBase64,
+                    fotos: registro.fotos || null
                 };
 
                 return fetch(apiUrl, {
@@ -3301,6 +3500,24 @@
                     body: JSON.stringify(payload)
                 }).then(function() {
                     registro.syncStatus = 'synced';
+
+                    // Atualiza a data de sincronização no mapa local
+                    try {
+                        const mapa = getMapaRastreabilidade();
+                        let alterado = false;
+                        mapa.itens.forEach(function(item) {
+                            if (item.codigoControle === registro.codigoControle && !item.sincronizadoEm) {
+                                item.sincronizadoEm = new Date().toLocaleString('pt-BR');
+                                alterado = true;
+                            }
+                        });
+                        if (alterado) {
+                            setMapaRastreabilidade(mapa);
+                        }
+                    } catch (e) {
+                        console.error("Erro ao atualizar data de sincronização local:", e);
+                    }
+
                     return dbSalvarRomaneio(registro).then(function() {
                         atualizarTabelaPendentesSincronizacao();
                         atualizarStatusConectividadeVisual();
@@ -3390,6 +3607,9 @@
             const pacoteRaw = obterValorControle('pacoteNumero', 1);
             const sequenciaRaw = obterValorControle('sequenciaNumero', 1);
             const revisaoRaw = obterValorControle('revisaoDocumento', 0);
+            
+            const kmEl = document.getElementById('kmNumero');
+            const kmRaw = kmEl ? kmEl.value : 'NA';
 
             const tac = tacRaw === 'NA' ? 'NA' : Math.max(1, tacRaw);
             const pacote = pacoteRaw === 'NA' ? 'NA' : Math.max(1, pacoteRaw);
@@ -3397,19 +3617,28 @@
             const revisao = revisaoRaw === 'NA' ? 'NA' : Math.max(0, revisaoRaw);
             const ano = new Date().getFullYear();
 
+            // Formatação do KM para o código (ex: "KM 599" -> "K599")
+            let kmClean = 'NA';
+            if (kmRaw && kmRaw !== 'NA' && kmRaw !== 'add_new_km') {
+                kmClean = kmRaw.replace(/KM\s*/i, 'K').replace(/\s+/g, '');
+            }
+
             const partesCodigo = ['RM'];
             if (tac !== 'NA') {
-                partesCodigo.push('TAC' + padNumero(tac, 2));
+                partesCodigo.push('T' + padNumero(tac, 2));
             }
             if (pacote !== 'NA') {
                 partesCodigo.push('P' + padNumero(pacote, 2));
             }
-            partesCodigo.push(String(ano));
+            if (kmClean !== 'NA') {
+                partesCodigo.push(kmClean);
+            }
+            partesCodigo.push(String(ano).slice(-2)); // Ano com 2 dígitos
             if (sequencia !== 'NA') {
-                partesCodigo.push(padNumero(sequencia, 4));
+                partesCodigo.push(padNumero(sequencia, 3)); // Sequência com 3 dígitos
             }
             if (revisao !== 'NA') {
-                partesCodigo.push('R' + padNumero(revisao, 2));
+                partesCodigo.push('R' + padNumero(revisao, 1)); // Revisão sem padding extra (R0, R1)
             }
 
             const codigo = partesCodigo.join('-');
@@ -3418,16 +3647,20 @@
             const numeroInput = document.getElementById('numeroRomaneio');
             const partesNumero = ['RM'];
             if (tac !== 'NA') {
-                partesNumero.push('TAC' + padNumero(tac, 2));
+                partesNumero.push('T' + padNumero(tac, 2));
             }
             if (pacote !== 'NA') {
                 partesNumero.push('P' + padNumero(pacote, 2));
             }
-            partesNumero.push(String(ano));
+            if (kmClean !== 'NA') {
+                partesNumero.push(kmClean);
+            }
+            partesNumero.push(String(ano).slice(-2));
             if (sequencia !== 'NA') {
-                partesNumero.push(padNumero(sequencia, 4));
+                partesNumero.push(padNumero(sequencia, 3));
             }
             numeroInput.value = partesNumero.join('-');
+            
             atualizarRegistroInternoAutomatico();
         }
 
@@ -3709,6 +3942,11 @@
                 infoBox.style.display = 'block';
                 customBox.style.display = 'none';
                 novoFornecedorBox.style.display = 'none';
+
+                // Preencher automaticamente os dados fiscais
+                document.getElementById('razaoSocialFornecedor').value = forn.nome || '';
+                document.getElementById('cnpjFornecedorFiscal').value = forn.cnpj || '';
+                atualizarQrPrevia();
             } else {
                 infoBox.style.display = 'none';
                 customBox.style.display = 'none';
@@ -3741,7 +3979,7 @@
             const destinoBase = document.getElementById('destino').value || 'Não informado';
             const destino = contratoTexto !== 'Não informado' ? contratoTexto + ' - ' + destinoBase : destinoBase;
             const obs = document.getElementById('observacoes').value || 'Nenhuma observação';
-            const dataRecebimento = formatarData(document.getElementById('dataRecebimento').value);
+            const dataRecebimento = document.getElementById('dataRecebimento').value ? formatarData(document.getElementById('dataRecebimento').value) : '____/____/______';
             const auth = gerarCodigoAutenticacao();
 
             // Atualizar VIA 1
@@ -3888,7 +4126,7 @@
             const destinoBase = document.getElementById('destino').value || 'Não informado';
             const destino = contratoTexto !== 'Não informado' ? contratoTexto + ' - ' + destinoBase : destinoBase;
             const obs = document.getElementById('observacoes').value || 'Nenhuma observação';
-            const dataRecebimento = formatarData(document.getElementById('dataRecebimento').value);
+            const dataRecebimento = document.getElementById('dataRecebimento').value ? formatarData(document.getElementById('dataRecebimento').value) : '____/____/______';
             const auth = gerarCodigoAutenticacao();
             const qrDataUrl = gerarQrDataUrl();
             const assinatura = assinaturaCurta(baseIntegridadeRomaneio());
@@ -4226,7 +4464,7 @@
             const destinoBase = document.getElementById('destino').value || 'Não informado';
             const destino = contratoTexto !== 'Não informado' ? contratoTexto + ' - ' + destinoBase : destinoBase;
             const obs = document.getElementById('observacoes').value || '';
-            const dataRecebimento = formatarData(document.getElementById('dataRecebimento').value);
+            const dataRecebimento = document.getElementById('dataRecebimento').value ? formatarData(document.getElementById('dataRecebimento').value) : '____/____/______';
             const auth = gerarCodigoAutenticacao();
             const assinatura = assinaturaCurta(baseIntegridadeRomaneio());
             const fotosCarga = atualizarFotosNaPrevia();
@@ -4440,7 +4678,7 @@
         document.getElementById('btnSairSistema').addEventListener('click', sairSistema);
         document.getElementById('btnAdminCriarUsuario').addEventListener('click', criarUsuarioAdmin);
 
-        ['tacNumero', 'pacoteNumero', 'sequenciaNumero', 'revisaoDocumento'].forEach(function(id) {
+        ['tacNumero', 'pacoteNumero', 'kmNumero', 'sequenciaNumero', 'revisaoDocumento'].forEach(function(id) {
             document.getElementById(id).addEventListener('change', function() {
                 gerarCodigoControle();
                 persistirSequenciaAtualNoBanco();
@@ -4514,6 +4752,7 @@
                 atualizarKpisAdmin();
                 atualizarStatusBaseDados();
                 atualizarTabelaPendentesSincronizacao();
+                atualizarTabelaRomaneiosUsuario();
                 
                 const apiUrl = localStorage.getItem(GOOGLE_API_URL_STORAGE_KEY);
                 if (apiUrl && navigator.onLine) {
@@ -4524,6 +4763,171 @@
             });
         }
 
+        const KMS_EXTRA_STORAGE_KEY = 'sucena_kms_extra_v1';
+        let kmsExtras = [];
+
+        function carregarKmsExtras() {
+            try {
+                const bruto = localStorage.getItem(KMS_EXTRA_STORAGE_KEY);
+                kmsExtras = bruto ? JSON.parse(bruto) : [];
+                if (!Array.isArray(kmsExtras)) kmsExtras = [];
+            } catch (e) {
+                kmsExtras = [];
+            }
+        }
+
+        function setKmsExtras(lista) {
+            localStorage.setItem(KMS_EXTRA_STORAGE_KEY, JSON.stringify(lista));
+        }
+
+        function renderKmsNoSelect() {
+            const select = document.getElementById('kmNumero');
+            if (!select) return;
+            const valorAtual = select.value;
+
+            while (select.options.length > 0) {
+                select.remove(0);
+            }
+
+            const opcoesBase = [
+                { value: 'NA', text: 'N/A' },
+                { value: 'KM 599', text: 'KM 599' },
+                { value: 'KM 636', text: 'KM 636' },
+                { value: 'KM 278', text: 'KM 278' },
+                { value: 'KM 294', text: 'KM 294' },
+                { value: 'KM 335', text: 'KM 335' },
+                { value: 'KM 344', text: 'KM 344' },
+                { value: 'KM 358', text: 'KM 358' }
+            ];
+
+            opcoesBase.forEach(function(op) {
+                const option = document.createElement('option');
+                option.value = op.value;
+                option.textContent = op.text;
+                select.appendChild(option);
+            });
+
+            kmsExtras.forEach(function(kmVal) {
+                const option = document.createElement('option');
+                option.value = kmVal;
+                option.textContent = kmVal;
+                select.appendChild(option);
+            });
+
+            const addOption = document.createElement('option');
+            addOption.value = 'add_new_km';
+            addOption.textContent = '+ Adicionar novo KM';
+            select.appendChild(addOption);
+
+            if ([...select.options].some(function(opt) { return opt.value === valorAtual; })) {
+                select.value = valorAtual;
+            } else {
+                select.value = 'NA';
+            }
+        }
+
+        function atualizarKm() {
+            const kmSelecionado = document.getElementById('kmNumero').value;
+            const boxNovo = document.getElementById('kmNovoBox');
+            if (boxNovo) {
+                boxNovo.style.display = kmSelecionado === 'add_new_km' ? 'block' : 'none';
+            }
+        }
+
+        function adicionarKmPersonalizado() {
+            const input = document.getElementById('novoKmNome');
+            let nome = input.value.trim();
+            if (!nome) {
+                alert('Informe o valor do novo KM.');
+                return;
+            }
+            if (!nome.toUpperCase().startsWith('KM')) {
+                nome = 'KM ' + nome;
+            }
+            nome = nome.toUpperCase();
+
+            if (kmsExtras.indexOf(nome) === -1) {
+                kmsExtras.push(nome);
+                setKmsExtras(kmsExtras);
+            }
+
+            renderKmsNoSelect();
+            document.getElementById('kmNumero').value = nome;
+            atualizarKm();
+            input.value = '';
+            
+            gerarCodigoControle();
+            persistirSequenciaAtualNoBanco();
+            atualizarQrPrevia();
+            alert('KM adicionado com sucesso.');
+        }
+
+        function atualizarTabelaRomaneiosUsuario() {
+            const tbody = document.getElementById('userRomaneiosTableBody');
+            if (!tbody) return;
+
+            if (!usuarioAtual) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748b; padding: 12px;">Faça login para ver seus romaneios.</td></tr>';
+                return;
+            }
+
+            const filtrados = cacheRomaneios.filter(function(r) {
+                if (usuarioAtual.perfil === 'admin') return true;
+                return r.usuarioId === usuarioAtual.id;
+            });
+
+            filtrados.sort(function(a, b) {
+                return new Date(b.savedAt || 0) - new Date(a.savedAt || 0);
+            });
+
+            tbody.innerHTML = '';
+            if (filtrados.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748b; padding: 12px;">Nenhum romaneio emitido.</td></tr>';
+                return;
+            }
+
+            filtrados.forEach(function(r) {
+                const tr = document.createElement('tr');
+                const data = formatarData(r.campos.dataRomaneio);
+                const placa = (r.campos.placaCaminhao || 'S/N').toUpperCase();
+                const contrato = r.campos.contrato || 'S/N';
+                
+                let statusBadge = '';
+                if (r.syncStatus === 'synced') {
+                    statusBadge = '<span style="color: #16a34a; font-weight: bold;">Sincronizado</span>';
+                } else {
+                    statusBadge = '<span style="color: #d97706; font-weight: bold;">Pendente</span>';
+                }
+
+                tr.innerHTML = '' +
+                    '<td><strong>' + r.codigoControle + '</strong></td>' +
+                    '<td>' + data + '</td>' +
+                    '<td>' + contrato + '</td>' +
+                    '<td>' + placa + '</td>' +
+                    '<td>' + statusBadge + '</td>' +
+                    '<td style="text-align: center;">' +
+                        '<button class="btn-primary" style="padding: 4px 8px; font-size: 0.75em; display: inline-flex;" onclick="gerarNovamenteRomaneio(\'' + r.codigoControle + '\')">🔄 Gerar Novamente</button>' +
+                    '</td>';
+                tbody.appendChild(tr);
+            });
+        }
+
+        function gerarNovamenteRomaneio(codigoControle) {
+            const registro = cacheRomaneios.find(function(r) {
+                return r.codigoControle === codigoControle;
+            });
+
+            if (!registro) {
+                alert('Romaneio não encontrado.');
+                return;
+            }
+
+            aplicarRegistroNoFormulario(registro);
+            
+            document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
+            alert('Romaneio carregado no formulário com sucesso!');
+        }
+
         usuariosSistema = getUsuariosSistema();
         setUsuariosSistema(usuariosSistema);
         renderLoginUsers();
@@ -4531,6 +4935,9 @@
         contratosExtras = getContratosExtras();
         inicializarContextoAutenticacao();
         inicializarControlesDocumentais();
+        carregarKmsExtras();
+        renderKmsNoSelect();
+        atualizarKm();
         fornecedoresExtras = getFornecedoresExtras();
         renderFornecedoresNoSelect();
         renderContratosNoSelect();
