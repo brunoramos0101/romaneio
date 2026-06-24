@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sucena-romaneio-v4';
+const CACHE_NAME = 'sucena-romaneio-v5';
 const urlsToCache = [
   './',
   './index.html',
@@ -8,8 +8,9 @@ const urlsToCache = [
   'https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js'
 ];
 
-// Instala o Service Worker e salva os arquivos no cache do celular
+// Instala o Service Worker e salva os arquivos no cache
 self.addEventListener('install', event => {
+  self.skipWaiting(); // Força a ativação imediata do novo Service Worker
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -34,14 +35,17 @@ self.addEventListener('fetch', event => {
 self.addEventListener('activate', event => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    Promise.all([
+      self.clients.claim(), // Permite ao SW ativo controlar as abas imediatamente
+      caches.keys().then(cacheNames => {
+        return Promise.all(
+          cacheNames.map(cacheName => {
+            if (cacheWhitelist.indexOf(cacheName) === -1) {
+              return caches.delete(cacheName);
+            }
+          })
+        );
+      })
+    ])
   );
 });

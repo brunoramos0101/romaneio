@@ -5011,6 +5011,15 @@
                         console.log('Falha ao registrar o ServiceWorker: ', err);
                     });
                 });
+
+                // Recarrega a página automaticamente quando um novo Service Worker assume o controle
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener('controllerchange', function() {
+                    if (!refreshing) {
+                        refreshing = true;
+                        window.location.reload();
+                    }
+                });
             }
         </script>
 </body>
