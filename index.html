@@ -1106,6 +1106,7 @@
                             <th>Local</th>
                             <th>Campo</th>
                             <th>Pacotes</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody id="adminUsersTableBody"></tbody>
@@ -1880,6 +1881,7 @@
         let contratosExtras = [];
         let usuariosSistema = [];
         let usuarioAtual = null;
+        let usuarioSendoEditadoId = null;
         let customMaterialCounter = 0;
         let authContext = {
             device: 'DESKTOP',
@@ -2115,7 +2117,7 @@
 
         function criarUsuarioAdmin() {
             if (!usuarioAtual || usuarioAtual.perfil !== 'admin') {
-                alert('Somente Admin pode criar usuários.');
+                alert('Somente Admin pode criar ou editar usuários.');
                 return;
             }
 
@@ -2134,7 +2136,7 @@
             }
 
             if (!senha) {
-                alert('Informe a senha do novo usuário.');
+                alert('Informe a senha do usuário.');
                 return;
             }
 
@@ -2148,6 +2150,63 @@
                 return;
             }
 
+            if (usuarioSendoEditadoId) {
+                // Modo Edição
+                const user = usuariosSistema.find(function(u) { return u.id === usuarioSendoEditadoId; });
+                if (!user) {
+                    alert('Usuário não encontrado para edição.');
+                    usuarioSendoEditadoId = null;
+                    document.getElementById('btnAdminCriarUsuario').textContent = 'Criar usuário';
+                    return;
+                }
+
+                user.primeiroNome = primeiroNome;
+                user.segundoNome = segundoNome;
+                user.perfil = perfil;
+                user.local = local;
+                user.campo = campo;
+                user.pacotesPermitidos = perfil === 'operador' ? pacotes : [];
+                user.senha = senha;
+
+                setUsuariosSistema(usuariosSistema);
+                renderLoginUsers();
+                renderTabelaUsuariosAdmin();
+                atualizarKpisAdmin();
+
+                const apiUrl = obterGoogleApiUrl();
+                if (apiUrl) {
+                    fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'text/plain'
+                        },
+                        body: JSON.stringify({ action: "editar_usuario", user: user })
+                    })
+                    .then(function(res) { return res.json(); })
+                    .then(function(data) {
+                        console.log("Usuário editado na nuvem:", data);
+                    })
+                    .catch(function(err) {
+                        console.warn("Erro ao editar usuário na nuvem:", err);
+                    });
+                }
+
+                usuarioSendoEditadoId = null;
+                document.getElementById('btnAdminCriarUsuario').textContent = 'Criar usuário';
+                
+                document.getElementById('adminPrimeiroNome').value = '';
+                document.getElementById('adminSegundoNome').value = '';
+                document.getElementById('adminCampo').value = '';
+                document.getElementById('adminPacotesPermitidos').value = '';
+                document.getElementById('adminSenha').value = '';
+                document.getElementById('adminSenhaConfirma').value = '';
+
+                registrarAuditoria('admin_editar_usuario', 'Usuário editado: ' + obterNomeUsuario(user) + ' (' + user.perfil + ')');
+                alert('Usuário editado com sucesso!');
+                return;
+            }
+
+            // Modo Criação
             const jaExiste = usuariosSistema.some(function(user) {
                 return user.primeiroNome === primeiroNome && user.segundoNome === segundoNome;
             });
@@ -2213,14 +2272,86 @@
                 const pacotesTxt = user.pacotesPermitidos && user.pacotesPermitidos.length
                     ? user.pacotesPermitidos.join(', ')
                     : 'TODOS';
+                
+                let botoes = '';
+                if (user.id !== 'adm_master') {
+                    botoes = '<button type="button" class="btn-edit-user" onclick="iniciarEditarUsuario(\'' + user.id + '\')" style="padding: 4px 8px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px; font-size: 0.9em;" title="Editar usuário">📝 Editar</button>' +
+                             '<button type="button" class="btn-delete-user" onclick="iniciarExcluirUsuario(\'' + user.id + '\')" style="padding: 4px 8px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em;" title="Excluir usuário">❌ Excluir</button>';
+                } else {
+                    botoes = '<button type="button" class="btn-edit-user" onclick="iniciarEditarUsuario(\'' + user.id + '\')" style="padding: 4px 8px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em;" title="Editar usuário">📝 Editar</button>';
+                }
+
                 tr.innerHTML = '' +
                     '<td>' + obterNomeUsuario(user) + '</td>' +
                     '<td>' + user.perfil.toUpperCase() + '</td>' +
                     '<td>' + (user.local || '-') + '</td>' +
                     '<td>' + (user.campo || '-') + '</td>' +
-                    '<td>' + pacotesTxt + '</td>';
+                    '<td>' + pacotesTxt + '</td>' +
+                    '<td>' + botoes + '</td>';
                 tbody.appendChild(tr);
             });
+        }
+
+        function iniciarEditarUsuario(id) {
+            const user = usuariosSistema.find(function(u) { return u.id === id; });
+            if (!user) return;
+
+            usuarioSendoEditadoId = user.id;
+            
+            document.getElementById('adminPrimeiroNome').value = user.primeiroNome || '';
+            document.getElementById('adminSegundoNome').value = user.segundoNome || '';
+            document.getElementById('adminPerfil').value = user.perfil || 'operador';
+            document.getElementById('adminLocal').value = user.local || 'FÁBRICA VERONA - AÇAILÂNDIA';
+            document.getElementById('adminCampo').value = user.campo || '';
+            document.getElementById('adminPacotesPermitidos').value = user.pacotesPermitidos ? user.pacotesPermitidos.join(',') : '';
+            document.getElementById('adminSenha').value = user.senha || '';
+            document.getElementById('adminSenhaConfirma').value = user.senha || '';
+
+            document.getElementById('btnAdminCriarUsuario').textContent = 'Salvar Alterações';
+            
+            document.getElementById('adminPrimeiroNome').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('adminPrimeiroNome').focus();
+        }
+
+        function iniciarExcluirUsuario(id) {
+            const user = usuariosSistema.find(function(u) { return u.id === id; });
+            if (!user) return;
+
+            if (id === 'adm_master') {
+                alert('Não é possível excluir o Administrador Master.');
+                return;
+            }
+
+            if (!confirm('Deseja realmente excluir o usuário ' + obterNomeUsuario(user) + '?')) {
+                return;
+            }
+
+            usuariosSistema = usuariosSistema.filter(function(u) { return u.id !== id; });
+            setUsuariosSistema(usuariosSistema);
+            renderLoginUsers();
+            renderTabelaUsuariosAdmin();
+            atualizarKpisAdmin();
+
+            const apiUrl = obterGoogleApiUrl();
+            if (apiUrl) {
+                fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain'
+                    },
+                    body: JSON.stringify({ action: "excluir_usuario", id: id })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    console.log("Usuário excluído da nuvem:", data);
+                })
+                .catch(function(err) {
+                    console.warn("Erro ao excluir usuário na nuvem:", err);
+                });
+            }
+
+            registrarAuditoria('admin_excluir_usuario', 'Usuário excluído: ' + obterNomeUsuario(user) + ' (' + user.perfil + ')');
+            alert('Usuário excluído com sucesso!');
         }
 
         function sincronizarUsuariosComNuvem() {
