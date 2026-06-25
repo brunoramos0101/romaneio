@@ -1218,8 +1218,8 @@
                     </div>
                     <div class="form-group">
                         <label>Produto Carregado</label>
-                        <select id="produtoCarregado" onchange="atualizarVisibilidadeLotes()" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1;">
-                            <option value="">Selecione...</option>
+                        <select id="produtoCarregado" onchange="atualizarVisibilidadeLotes(); atualizarProdutoPersonalizado(); gerarCodigoControle();" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1;">
+                            <option value="N/A">N/A</option>
                             <option value="PLACA (PL)">PLACA (PL)</option>
                             <option value="ADUELA SIMPLES (ADS)">ADUELA SIMPLES (ADS)</option>
                             <option value="ADUELA DUPLA (ADD)">ADUELA DUPLA (ADD)</option>
@@ -1228,7 +1228,20 @@
                             <option value="TUBO 1200 (T12)">TUBO 1200 (T12)</option>
                             <option value="MEIO FIO (MF)">MEIO FIO (MF)</option>
                             <option value="PISO INTERTRAVADO (PI)">PISO INTERTRAVADO (PI)</option>
+                            <option value="add_new_product">+ Adicionar outro produto</option>
                         </select>
+                    </div>
+                </div>
+
+                <div id="novoProdutoBox" style="display: none; align-items: center; gap: 10px; background-color: #f1f5f9; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; margin-top: 10px;">
+                    <div style="flex: 2;">
+                        <input type="text" id="novoProdutoNome" placeholder="Nome do Produto (ex: BLOQUETE)" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1;">
+                    </div>
+                    <div style="flex: 1;">
+                        <input type="text" id="novoProdutoSigla" placeholder="Sigla (ex: BLQ)" maxlength="3" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1; text-transform: uppercase;">
+                    </div>
+                    <div>
+                        <button type="button" class="btn-primary" onclick="adicionarProdutoPersonalizado()" style="margin: 0; padding: 8px 16px;">Adicionar</button>
                     </div>
                 </div>
                 <div id="kmNovoBox" class="fornecedor-novo-box" style="display: none; margin-top: 15px;">
@@ -3273,6 +3286,18 @@
                                 console.warn("Erro ao fazer parse dos tipos de placas extras:", e);
                             }
                         }
+                        if (cfg.produtos_extra) {
+                            try {
+                                const list = JSON.parse(cfg.produtos_extra);
+                                if (Array.isArray(list)) {
+                                    produtosExtras = list;
+                                    localStorage.setItem('sucena_produtos_extra_v1', JSON.stringify(produtosExtras));
+                                    renderProdutosNoSelect();
+                                }
+                            } catch (e) {
+                                console.warn("Erro ao fazer parse dos produtos extras:", e);
+                            }
+                        }
                     }
                     console.log("Configurações globais sincronizadas da nuvem com sucesso.");
                 }
@@ -4119,7 +4144,13 @@
                 kmClean = kmRaw.replace(/KM\s*/i, 'K').replace(/\s+/g, '');
             }
 
+            const produtoCarregado = document.getElementById('produtoCarregado') ? document.getElementById('produtoCarregado').value : 'N/A';
+            const sigla = obterSiglaProduto(produtoCarregado);
+
             const partesCodigo = ['RM'];
+            if (sigla) {
+                partesCodigo.push(sigla);
+            }
             if (tac !== 'NA') {
                 partesCodigo.push('T' + padNumero(tac, 2));
             }
@@ -4142,6 +4173,9 @@
 
             const numeroInput = document.getElementById('numeroRomaneio');
             const partesNumero = ['RM'];
+            if (sigla) {
+                partesNumero.push(sigla);
+            }
             if (tac !== 'NA') {
                 partesNumero.push('T' + padNumero(tac, 2));
             }
@@ -5646,6 +5680,147 @@
             atualizarQrPrevia();
         }
 
+        // --- GESTÃO DE PRODUTOS CARREGADOS ---
+        let produtosExtras = [];
+
+        function carregarProdutosExtras() {
+            try {
+                const bruto = localStorage.getItem('sucena_produtos_extra_v1');
+                produtosExtras = bruto ? JSON.parse(bruto) : [];
+                if (!Array.isArray(produtosExtras)) produtosExtras = [];
+            } catch (e) {
+                produtosExtras = [];
+            }
+        }
+
+        function renderProdutosNoSelect() {
+            const select = document.getElementById('produtoCarregado');
+            if (!select) return;
+            const valorAtual = select.value;
+
+            while (select.options.length > 0) {
+                select.remove(0);
+            }
+
+            const opcoesBase = [
+                { value: 'N/A', text: 'N/A' },
+                { value: 'PLACA (PL)', text: 'PLACA (PL)' },
+                { value: 'ADUELA SIMPLES (ADS)', text: 'ADUELA SIMPLES (ADS)' },
+                { value: 'ADUELA DUPLA (ADD)', text: 'ADUELA DUPLA (ADD)' },
+                { value: 'TUBO 800 (T8)', text: 'TUBO 800 (T8)' },
+                { value: 'TUBO 100 (T1)', text: 'TUBO 100 (T1)' },
+                { value: 'TUBO 1200 (T12)', text: 'TUBO 1200 (T12)' },
+                { value: 'MEIO FIO (MF)', text: 'MEIO FIO (MF)' },
+                { value: 'PISO INTERTRAVADO (PI)', text: 'PISO INTERTRAVADO (PI)' }
+            ];
+
+            opcoesBase.forEach(function(op) {
+                const option = document.createElement('option');
+                option.value = op.value;
+                option.textContent = op.text;
+                select.appendChild(option);
+            });
+
+            produtosExtras.forEach(function(prod) {
+                const option = document.createElement('option');
+                option.value = prod;
+                option.textContent = prod;
+                select.appendChild(option);
+            });
+
+            const addOption = document.createElement('option');
+            addOption.value = 'add_new_product';
+            addOption.textContent = '+ Adicionar outro produto';
+            select.appendChild(addOption);
+
+            if ([...select.options].some(function(opt) { return opt.value === valorAtual; })) {
+                select.value = valorAtual;
+            } else {
+                select.value = 'N/A';
+            }
+        }
+
+        function atualizarProdutoPersonalizado() {
+            const select = document.getElementById('produtoCarregado');
+            const box = document.getElementById('novoProdutoBox');
+            if (select && box) {
+                box.style.display = select.value === 'add_new_product' ? 'flex' : 'none';
+            }
+        }
+
+        function adicionarProdutoPersonalizado() {
+            const inputNome = document.getElementById('novoProdutoNome');
+            const inputSigla = document.getElementById('novoProdutoSigla');
+            const nome = inputNome.value.trim().toUpperCase();
+            const sigla = inputSigla.value.trim().toUpperCase();
+
+            if (!nome || !sigla) {
+                alert('Informe o nome e a sigla do novo produto.');
+                return;
+            }
+
+            if (sigla.length > 3) {
+                alert('A sigla deve conter no máximo 3 caracteres.');
+                return;
+            }
+
+            const formatado = nome + ' (' + sigla + ')';
+            
+            const jaExisteBase = [
+                'N/A', 'PLACA (PL)', 'ADUELA SIMPLES (ADS)', 'ADUELA DUPLA (ADD)',
+                'TUBO 800 (T8)', 'TUBO 100 (T1)', 'TUBO 1200 (T12)',
+                'MEIO FIO (MF)', 'PISO INTERTRAVADO (PI)'
+            ].includes(formatado);
+
+            const jaExisteExtra = produtosExtras.includes(formatado);
+
+            if (jaExisteBase || jaExisteExtra) {
+                alert('Este produto já existe.');
+                return;
+            }
+
+            produtosExtras.push(formatado);
+            localStorage.setItem('sucena_produtos_extra_v1', JSON.stringify(produtosExtras));
+            renderProdutosNoSelect();
+            document.getElementById('produtoCarregado').value = formatado;
+            inputNome.value = '';
+            inputSigla.value = '';
+            atualizarProdutoPersonalizado();
+            atualizarVisibilidadeLotes();
+            gerarCodigoControle();
+
+            const apiUrl = obterGoogleApiUrl();
+            if (apiUrl) {
+                fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: "salvar_configuracoes",
+                        configuracoes: {
+                            produtos_extra: JSON.stringify(produtosExtras)
+                        }
+                    })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data && data.status === "success") {
+                        console.log("Produtos extras salvos na nuvem.");
+                    }
+                })
+                .catch(function(err) {
+                    console.warn("Erro ao salvar produto na nuvem:", err);
+                });
+            }
+
+            alert('Produto adicionado com sucesso.');
+        }
+
+        function obterSiglaProduto(produtoTexto) {
+            if (!produtoTexto || produtoTexto === 'N/A' || produtoTexto === 'add_new_product') return '';
+            const match = produtoTexto.match(/\(([^)]+)\)/);
+            return match ? match[1].trim().toUpperCase() : '';
+        }
+
         // --- GESTÃO DE TIPOS DE PLACA (PLACAS MURO VEDAÇÃO) ---
         let tiposPlacasExtras = [];
 
@@ -5948,6 +6123,9 @@
         
         carregarTiposPlacasExtras();
         renderTiposPlacasNoSelect();
+        
+        carregarProdutosExtras();
+        renderProdutosNoSelect();
 
         carregarMateriaisExtras();
         atualizarDatalistMateriais();
