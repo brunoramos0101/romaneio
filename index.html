@@ -1469,6 +1469,37 @@
                         </select>
                     </div>
                 </div>
+
+                <div class="material-item">
+                    <input type="checkbox" id="placasMuroCheck" onchange="atualizarVisibilidadeTipoPlaca()">
+                    <div>
+                        <label>PLACAS MURO VEDAÇÃO</label>
+                    </div>
+                    <div>
+                        <input type="number" id="placasMuroQtd" placeholder="Quantidade" step="1">
+                    </div>
+                    <div>
+                        <select id="placasMuroUnidade">
+                            <option value="un">Unidades</option>
+                            <option value="m²">m²</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="material-item" id="placasMuroTipoBox" style="display: none; grid-column: 1 / -1; background-color: #f1f5f9; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; margin-top: -5px; margin-bottom: 10px;">
+                    <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
+                        <label style="font-weight: bold; min-width: 100px;">Tipo de Placa:</label>
+                        <select id="placasMuroTipo" onchange="atualizarTipoPlacaPersonalizado()" style="flex: 1; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1;">
+                            <option value="TIPO 1-D">TIPO 1-D</option>
+                            <option value="TIPO- 1C">TIPO- 1C</option>
+                            <option value="add_new_type">+ Adicionar outro tipo</option>
+                        </select>
+                        <div id="novoTipoPlacaBox" style="display: none; flex: 2; align-items: center; gap: 8px;">
+                            <input type="text" id="novoTipoPlacaNome" placeholder="Digite o novo tipo (ex: TIPO-2A)" style="padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1; width: 100%;">
+                            <button type="button" class="btn-primary" onclick="adicionarTipoPlacaPersonalizado()" style="margin: 0; padding: 8px 16px;">Adicionar</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="custom-materials-box">
@@ -3064,7 +3095,8 @@
                 { check: 'cimentoCheck', qtd: 'cimentoQtd', unidade: 'cimentoUnidade', tipo: 'cimentoTipo' },
                 { check: 'acoCheck', qtd: 'acoQtd', unidade: 'acoUnidade' },
                 { check: 'poste11Check', qtd: 'poste11Qtd', unidade: 'poste11Unidade' },
-                { check: 'poste14Check', qtd: 'poste14Qtd', unidade: 'poste14Unidade' }
+                { check: 'poste14Check', qtd: 'poste14Qtd', unidade: 'poste14Unidade' },
+                { check: 'placasMuroCheck', qtd: 'placasMuroQtd', unidade: 'placasMuroUnidade', tipo: 'placasMuroTipo' }
             ].map(function(m) {
                 return {
                     check: m.check,
@@ -3205,6 +3237,18 @@
                             }
                             const container = document.getElementById('cfgLogoPreviewContainer');
                             if (container) container.style.display = 'none';
+                        }
+                        if (cfg.tipos_placas_extra) {
+                            try {
+                                const list = JSON.parse(cfg.tipos_placas_extra);
+                                if (Array.isArray(list)) {
+                                    tiposPlacasExtras = list;
+                                    localStorage.setItem('sucena_tipos_placas_extra_v1', JSON.stringify(tiposPlacasExtras));
+                                    renderTiposPlacasNoSelect();
+                                }
+                            } catch (e) {
+                                console.warn("Erro ao fazer parse dos tipos de placas extras:", e);
+                            }
                         }
                     }
                     console.log("Configurações globais sincronizadas da nuvem com sucesso.");
@@ -3454,13 +3498,15 @@
         }
 
         function obterMateriaisSelecionados() {
+            const placasMuroTipoVal = document.getElementById('placasMuroTipo') ? document.getElementById('placasMuroTipo').value : 'TIPO 1-D';
             const materiaisBase = [
                 { nome: 'AREIA LAVADA', check: 'areiaCheck', qtd: 'areiaQtd', unidade: 'areiaUnidade' },
                 { nome: 'BRITA - 1', check: 'britaCheck', qtd: 'britaQtd', unidade: 'britaUnidade' },
                 { nome: document.getElementById('cimentoTipo').value, check: 'cimentoCheck', qtd: 'cimentoQtd', unidade: 'cimentoUnidade' },
                 { nome: 'AÇO', check: 'acoCheck', qtd: 'acoQtd', unidade: 'acoUnidade' },
                 { nome: 'POSTE DE 11 METROS', check: 'poste11Check', qtd: 'poste11Qtd', unidade: 'poste11Unidade' },
-                { nome: 'POSTE DE 14 METROS', check: 'poste14Check', qtd: 'poste14Qtd', unidade: 'poste14Unidade' }
+                { nome: 'POSTE DE 14 METROS', check: 'poste14Check', qtd: 'poste14Qtd', unidade: 'poste14Unidade' },
+                { nome: 'PLACAS MURO VEDAÇÃO (' + placasMuroTipoVal + ')', check: 'placasMuroCheck', qtd: 'placasMuroQtd', unidade: 'placasMuroUnidade' }
             ];
 
             const selecionados = [];
@@ -3627,7 +3673,10 @@
                     if (check) check.checked = !!m.checked;
                     if (qtd) qtd.value = m.qtdValor || '';
                     if (unidade) unidade.value = m.unidadeValor || unidade.value;
-                    if (tipo && m.tipoValor) tipo.value = m.tipoValor;
+                    if (tipo && m.tipoValor) {
+                        garantirOpcaoNoSelect(m.tipo, m.tipoValor);
+                        tipo.value = m.tipoValor;
+                    }
                 });
             }
 
@@ -3640,6 +3689,8 @@
             }
 
             atualizarFornecedor();
+            atualizarVisibilidadeTipoPlaca();
+            atualizarTipoPlacaPersonalizado();
 
             const foto1 = registro.fotos && registro.fotos.foto1 ? registro.fotos.foto1 : '';
             const foto2 = registro.fotos && registro.fotos.foto2 ? registro.fotos.foto2 : '';
@@ -5452,6 +5503,123 @@
             }
         }
 
+        // --- GESTÃO DE TIPOS DE PLACA (PLACAS MURO VEDAÇÃO) ---
+        let tiposPlacasExtras = [];
+
+        function carregarTiposPlacasExtras() {
+            try {
+                const bruto = localStorage.getItem('sucena_tipos_placas_extra_v1');
+                tiposPlacasExtras = bruto ? JSON.parse(bruto) : [];
+                if (!Array.isArray(tiposPlacasExtras)) tiposPlacasExtras = [];
+            } catch (e) {
+                tiposPlacasExtras = [];
+            }
+        }
+
+        function renderTiposPlacasNoSelect() {
+            const select = document.getElementById('placasMuroTipo');
+            if (!select) return;
+            const valorAtual = select.value;
+
+            while (select.options.length > 0) {
+                select.remove(0);
+            }
+
+            const opcoesBase = [
+                { value: 'TIPO 1-D', text: 'TIPO 1-D' },
+                { value: 'TIPO- 1C', text: 'TIPO- 1C' }
+            ];
+
+            opcoesBase.forEach(function(op) {
+                const option = document.createElement('option');
+                option.value = op.value;
+                option.textContent = op.text;
+                select.appendChild(option);
+            });
+
+            tiposPlacasExtras.forEach(function(tipo) {
+                const option = document.createElement('option');
+                option.value = tipo;
+                option.textContent = tipo;
+                select.appendChild(option);
+            });
+
+            const addOption = document.createElement('option');
+            addOption.value = 'add_new_type';
+            addOption.textContent = '+ Adicionar outro tipo';
+            select.appendChild(addOption);
+
+            if ([...select.options].some(function(opt) { return opt.value === valorAtual; })) {
+                select.value = valorAtual;
+            }
+        }
+
+        function atualizarTipoPlacaPersonalizado() {
+            const select = document.getElementById('placasMuroTipo');
+            const boxNovo = document.getElementById('novoTipoPlacaBox');
+            if (select && boxNovo) {
+                boxNovo.style.display = select.value === 'add_new_type' ? 'flex' : 'none';
+            }
+        }
+
+        function atualizarVisibilidadeTipoPlaca() {
+            const check = document.getElementById('placasMuroCheck');
+            const box = document.getElementById('placasMuroTipoBox');
+            if (check && box) {
+                box.style.display = check.checked ? 'block' : 'none';
+            }
+        }
+
+        function adicionarTipoPlacaPersonalizado() {
+            const input = document.getElementById('novoTipoPlacaNome');
+            const nome = input.value.trim().toUpperCase();
+
+            if (!nome) {
+                alert('Informe o nome do novo tipo de placa.');
+                return;
+            }
+
+            const jaExisteBase = ['TIPO 1-D', 'TIPO- 1C'].includes(nome);
+            const jaExisteExtra = tiposPlacasExtras.includes(nome);
+
+            if (jaExisteBase || jaExisteExtra) {
+                alert('Este tipo de placa já existe.');
+                return;
+            }
+
+            tiposPlacasExtras.push(nome);
+            localStorage.setItem('sucena_tipos_placas_extra_v1', JSON.stringify(tiposPlacasExtras));
+            renderTiposPlacasNoSelect();
+            document.getElementById('placasMuroTipo').value = nome;
+            input.value = '';
+            atualizarTipoPlacaPersonalizado();
+
+            const apiUrl = obterGoogleApiUrl();
+            if (apiUrl) {
+                fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: "salvar_configuracoes",
+                        configuracoes: {
+                            tipos_placas_extra: JSON.stringify(tiposPlacasExtras)
+                        }
+                    })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data && data.status === "success") {
+                        console.log("Tipos de placas extras salvos na nuvem.");
+                    }
+                })
+                .catch(function(err) {
+                    console.warn("Erro ao salvar tipo de placa na nuvem:", err);
+                });
+            }
+
+            alert('Tipo de placa adicionado com sucesso.');
+        }
+
         const KMS_EXTRA_STORAGE_KEY = 'sucena_kms_extra_v1';
         let kmsExtras = [];
 
@@ -5634,6 +5802,9 @@
         atualizarModoPlacasMuro();
 
         carregarConfiguracoesCabecalhoLocal();
+        
+        carregarTiposPlacasExtras();
+        renderTiposPlacasNoSelect();
 
         carregarMateriaisExtras();
         atualizarDatalistMateriais();
