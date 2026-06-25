@@ -1112,6 +1112,47 @@
                     <tbody id="adminUsersTableBody"></tbody>
                 </table>
 
+                <div class="section-title" style="margin-top: 25px;">📄 CONFIGURAÇÃO DO CABEÇALHO DO ROMANEIO (PDF)</div>
+                <div class="row-3">
+                    <div class="form-group">
+                        <label>Nº Formulário</label>
+                        <input type="text" id="cfgFormNumero" placeholder="Ex: MRR-01-VALE-001">
+                    </div>
+                    <div class="form-group">
+                        <label>Elaborado Por</label>
+                        <input type="text" id="cfgFormElaborado" placeholder="Ex: BRUNO RAMOS">
+                    </div>
+                    <div class="form-group">
+                        <label>Aprovado Por</label>
+                        <input type="text" id="cfgFormAprovado" placeholder="Ex: DIRETORIA">
+                    </div>
+                </div>
+                <div class="row-3">
+                    <div class="form-group">
+                        <label>Setor</label>
+                        <input type="text" id="cfgFormSetor" placeholder="Ex: QUALIDADE">
+                    </div>
+                    <div class="form-group">
+                        <label>Revisão</label>
+                        <input type="text" id="cfgFormRevisao" placeholder="Ex: 01">
+                    </div>
+                    <div class="form-group">
+                        <label>Data do Formulário</label>
+                        <input type="text" id="cfgFormData" placeholder="Ex: 13/11/2026">
+                    </div>
+                </div>
+                <div class="row" style="margin-top: 10px; margin-bottom: 10px;">
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label>Logomarca (PDF - Canto Superior Esquerdo e Marca d'Água)</label>
+                        <input type="file" id="cfgLogoInput" accept="image/png, image/jpeg, image/jpg">
+                        <div id="cfgLogoPreviewContainer" style="margin-top: 10px; display: none; align-items: center; gap: 15px;">
+                            <img id="cfgLogoPreview" src="" alt="Previa Logo" style="max-height: 50px; border: 1px solid #ddd; border-radius: 4px; padding: 4px;">
+                            <button class="btn-warning" type="button" id="cfgBtnLimparLogo" onclick="limparLogomarcaConfig()" style="margin: 0; padding: 6px 12px; font-size: 0.85em;">Remover Logomarca</button>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-primary" type="button" id="btnSalvarConfigCabecalho" onclick="salvarConfiguracaoCabecalho()" style="margin-bottom: 25px;">Salvar Configurações de Cabeçalho</button>
+
                 <div class="section-title" style="margin-top: 25px;">🔗 INTEGRAÇÃO GOOGLE (PLANILHA E DRIVE)</div>
                 <div class="row">
                     <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 10px;">
@@ -3128,6 +3169,44 @@
                         localStorage.setItem('sucena_materiais_extra_v1', JSON.stringify(materiaisExtras));
                         atualizarDatalistMateriais();
                     }
+                    if (data.configuracoes) {
+                        const cfg = data.configuracoes;
+                        const keys = [
+                            { key: 'form_numero', storage: 'sucena_cfg_form_numero', id: 'cfgFormNumero' },
+                            { key: 'form_elaborado', storage: 'sucena_cfg_form_elaborado', id: 'cfgFormElaborado' },
+                            { key: 'form_aprovado', storage: 'sucena_cfg_form_aprovado', id: 'cfgFormAprovado' },
+                            { key: 'form_setor', storage: 'sucena_cfg_form_setor', id: 'cfgFormSetor' },
+                            { key: 'form_revisao', storage: 'sucena_cfg_form_revisao', id: 'cfgFormRevisao' },
+                            { key: 'form_data', storage: 'sucena_cfg_form_data', id: 'cfgFormData' }
+                        ];
+                        keys.forEach(function(item) {
+                            if (cfg[item.key] !== undefined) {
+                                localStorage.setItem(item.storage, cfg[item.key]);
+                                const el = document.getElementById(item.id);
+                                if (el) el.value = cfg[item.key];
+                            }
+                        });
+                        
+                        if (cfg.logo_base64) {
+                            localStorage.setItem('sucena_cfg_logo_base64', cfg.logo_base64);
+                            const img = document.getElementById('cfgLogoPreview');
+                            if (img) {
+                                img.src = cfg.logo_base64;
+                                img.setAttribute('data-base64', cfg.logo_base64);
+                            }
+                            const container = document.getElementById('cfgLogoPreviewContainer');
+                            if (container) container.style.display = 'flex';
+                        } else {
+                            localStorage.removeItem('sucena_cfg_logo_base64');
+                            const img = document.getElementById('cfgLogoPreview');
+                            if (img) {
+                                img.src = '';
+                                img.removeAttribute('data-base64');
+                            }
+                            const container = document.getElementById('cfgLogoPreviewContainer');
+                            if (container) container.style.display = 'none';
+                        }
+                    }
                     console.log("Configurações globais sincronizadas da nuvem com sucesso.");
                 }
             })
@@ -4449,7 +4528,17 @@
         }
 
         function criarDocumentoPDF(gerarSegundaVia) {
-            const { jsPDF } = window.jspdf;
+            const { jsPDF, GState } = window.jspdf;
+            
+            // Obter configurações do cabeçalho
+            const cfgFormNumero = localStorage.getItem('sucena_cfg_form_numero') || 'MRR-01-VALE-001';
+            const cfgFormElaborado = localStorage.getItem('sucena_cfg_form_elaborado') || 'BRUNO RAMOS';
+            const cfgFormAprovado = localStorage.getItem('sucena_cfg_form_aprovado') || 'DIRETORIA';
+            const cfgFormSetor = localStorage.getItem('sucena_cfg_form_setor') || 'QUALIDADE';
+            const cfgFormRevisao = localStorage.getItem('sucena_cfg_form_revisao') || '01';
+            const cfgFormData = localStorage.getItem('sucena_cfg_form_data') || '13/11/2026';
+            const cfgLogoBase64 = localStorage.getItem('sucena_cfg_logo_base64') || null;
+            
             const pdf = new jsPDF('p', 'mm', 'a4');
             
             const numero = document.getElementById('numeroRomaneio').value || 'S/N';
@@ -4495,6 +4584,18 @@
             function criarVia(viaTexto, addPage) {
                 if (addPage) pdf.addPage();
                 
+                // Marca d'água de papel timbrado (desenhada primeiro)
+                if (cfgLogoBase64) {
+                    try {
+                        pdf.saveGraphicsState();
+                        pdf.setGState(new GState({ opacity: 0.07 }));
+                        pdf.addImage(cfgLogoBase64, 'PNG', 45, 88.5, 120, 120);
+                        pdf.restoreGraphicsState();
+                    } catch (watermarkErr) {
+                        console.warn("Erro ao desenhar marca d'água:", watermarkErr);
+                    }
+                }
+                
                 let y = 15;
                 
                 pdf.setDrawColor(0);
@@ -4507,44 +4608,77 @@
                 pdf.setFont('helvetica', 'bold');
                 pdf.text(viaTexto, 195, 14, { align: 'right' });
                 
-                pdf.setFontSize(12);
-                pdf.text('SUCENA EMPREENDIMENTOS LTDA', 105, 16, { align: 'center' });
-                
-                pdf.setFontSize(8);
-                pdf.setFont('helvetica', 'normal');
-                pdf.text('CNPJ: 19.381.283/0001-97', 105, 21, { align: 'center' });
-                pdf.text('Rua São Francisco, 720 - Centro - Açailândia/MA - CEP: 65930-000', 105, 25, { align: 'center' });
-                
-                pdf.setFontSize(10);
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('ROMANEIO DE MATERIAIS', 105, 31, { align: 'center' });
+                // Desenhar a logomarca no canto superior esquerdo se configurada
+                if (cfgLogoBase64) {
+                    try {
+                        pdf.addImage(cfgLogoBase64, 'PNG', 12, 12, 30, 19);
+                    } catch (logoErr) {
+                        console.warn("Erro ao desenhar logomarca no cabeçalho:", logoErr);
+                    }
+                    // Detalhes da empresa centralizados no espaço restante (X=120)
+                    pdf.setFontSize(12);
+                    pdf.text('SUCENA EMPREENDIMENTOS LTDA', 120, 16, { align: 'center' });
+                    
+                    pdf.setFontSize(8);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text('CNPJ: 19.381.283/0001-97', 120, 21, { align: 'center' });
+                    pdf.text('Rua São Francisco, 720 - Centro - Açailândia/MA - CEP: 65930-000', 120, 25, { align: 'center' });
+                    
+                    pdf.setFontSize(10);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('ROMANEIO DE MATERIAIS', 120, 31, { align: 'center' });
+                } else {
+                    // Sem logomarca: Detalhes da empresa centralizados na página (X=105)
+                    pdf.setFontSize(12);
+                    pdf.text('SUCENA EMPREENDIMENTOS LTDA', 105, 16, { align: 'center' });
+                    
+                    pdf.setFontSize(8);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text('CNPJ: 19.381.283/0001-97', 105, 21, { align: 'center' });
+                    pdf.text('Rua São Francisco, 720 - Centro - Açailândia/MA - CEP: 65930-000', 105, 25, { align: 'center' });
+                    
+                    pdf.setFontSize(10);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('ROMANEIO DE MATERIAIS', 105, 31, { align: 'center' });
+                }
                 
                 // Tabela de controle de qualidade (Y=33 até Y=45)
+                // Desenhar fundos cinzas
+                pdf.setFillColor(230);
+                pdf.rect(10, 33, 190, 6, 'F');
+                pdf.setFillColor(245);
+                pdf.rect(10, 39, 190, 6, 'F');
+
+                pdf.setDrawColor(0);
                 pdf.rect(10, 33, 190, 12);
                 // Linha divisória horizontal (Y=39)
                 pdf.line(10, 39, 200, 39);
                 
-                // Linhas verticais do primeiro nível (Y=33 a Y=39)
-                pdf.line(57.5, 33, 57.5, 39);
-                pdf.line(105, 33, 105, 39);
-                pdf.line(152.5, 33, 152.5, 39);
+                // Linhas verticais do primeiro nível e segundo nível (X = 50, 85, 120, 150, 170)
+                pdf.line(50, 33, 50, 45);
+                pdf.line(85, 33, 85, 45);
+                pdf.line(120, 33, 120, 45);
+                pdf.line(150, 33, 150, 45);
+                pdf.line(170, 33, 170, 45);
                 
-                // Linhas verticais do segundo nível (Y=39 a Y=45)
-                pdf.line(73.3, 39, 73.3, 45);
-                pdf.line(136.6, 39, 136.6, 45);
-                
-                pdf.setFontSize(8);
-                // Texto do primeiro nível
+                pdf.setFontSize(7.5);
+                // Cabeçalhos (Y=37)
                 pdf.setFont('helvetica', 'bold');
-                pdf.text('RDM01-VALE-00010', 33.75, 37, { align: 'center' });
-                pdf.text('DATA: 24/06/2026', 81.25, 37, { align: 'center' });
-                pdf.text('REVISÃO: 00', 128.75, 37, { align: 'center' });
-                pdf.text('PÁG. 1 de 1', 176.25, 37, { align: 'center' });
+                pdf.text('Nº FORMULÁRIO', 30, 37, { align: 'center' });
+                pdf.text('ELABORADO:', 67.5, 37, { align: 'center' });
+                pdf.text('APROVADO:', 102.5, 37, { align: 'center' });
+                pdf.text('SETOR:', 135, 37, { align: 'center' });
+                pdf.text('REVISÃO:', 160, 37, { align: 'center' });
+                pdf.text('DATA:', 185, 37, { align: 'center' });
                 
-                // Texto do segundo nível
-                pdf.text('ELABORADO: BRUNO RAMOS', 41.65, 43, { align: 'center' });
-                pdf.text('APROVADO: ERICA', 104.95, 43, { align: 'center' });
-                pdf.text('SETOR: QUALIDADE', 168.3, 43, { align: 'center' });
+                // Valores (Y=43)
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(cfgFormNumero, 30, 43, { align: 'center' });
+                pdf.text(cfgFormElaborado, 67.5, 43, { align: 'center' });
+                pdf.text(cfgFormAprovado, 102.5, 43, { align: 'center' });
+                pdf.text(cfgFormSetor, 135, 43, { align: 'center' });
+                pdf.text(cfgFormRevisao, 160, 43, { align: 'center' });
+                pdf.text(cfgFormData, 185, 43, { align: 'center' });
                 
                 y = 50;
                 
@@ -5170,6 +5304,156 @@
             });
         }
 
+        }
+
+        function carregarConfiguracoesCabecalhoLocal() {
+            const formNumero = localStorage.getItem('sucena_cfg_form_numero') || 'MRR-01-VALE-001';
+            const formElaborado = localStorage.getItem('sucena_cfg_form_elaborado') || 'BRUNO RAMOS';
+            const formAprovado = localStorage.getItem('sucena_cfg_form_aprovado') || 'DIRETORIA';
+            const formSetor = localStorage.getItem('sucena_cfg_form_setor') || 'QUALIDADE';
+            const formRevisao = localStorage.getItem('sucena_cfg_form_revisao') || '01';
+            const formData = localStorage.getItem('sucena_cfg_form_data') || '13/11/2026';
+            
+            const elNumero = document.getElementById('cfgFormNumero');
+            if (elNumero) elNumero.value = formNumero;
+            
+            const elElaborado = document.getElementById('cfgFormElaborado');
+            if (elElaborado) elElaborado.value = formElaborado;
+            
+            const elAprovado = document.getElementById('cfgFormAprovado');
+            if (elAprovado) elAprovado.value = formAprovado;
+            
+            const elSetor = document.getElementById('cfgFormSetor');
+            if (elSetor) elSetor.value = formSetor;
+            
+            const elRevisao = document.getElementById('cfgFormRevisao');
+            if (elRevisao) elRevisao.value = formRevisao;
+            
+            const elData = document.getElementById('cfgFormData');
+            if (elData) elData.value = formData;
+
+            const logo = localStorage.getItem('sucena_cfg_logo_base64');
+            const img = document.getElementById('cfgLogoPreview');
+            const container = document.getElementById('cfgLogoPreviewContainer');
+            if (logo && img && container) {
+                img.src = logo;
+                img.setAttribute('data-base64', logo);
+                container.style.display = 'flex';
+            } else if (img && container) {
+                img.src = '';
+                img.removeAttribute('data-base64');
+                container.style.display = 'none';
+            }
+
+            // Registrar listener de upload apenas uma vez
+            const fileInput = document.getElementById('cfgLogoInput');
+            if (fileInput && !fileInput.getAttribute('data-listener-registered')) {
+                fileInput.setAttribute('data-listener-registered', 'true');
+                fileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    if (file.size > 100 * 1024) {
+                        alert('A imagem da logomarca deve ter no máximo 100KB.');
+                        e.target.value = '';
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        const base64 = evt.target.result;
+                        const previewImg = document.getElementById('cfgLogoPreview');
+                        const previewContainer = document.getElementById('cfgLogoPreviewContainer');
+                        if (previewImg && previewContainer) {
+                            previewImg.src = base64;
+                            previewImg.setAttribute('data-base64', base64);
+                            previewContainer.style.display = 'flex';
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        function limparLogomarcaConfig() {
+            const input = document.getElementById('cfgLogoInput');
+            if (input) input.value = '';
+            const img = document.getElementById('cfgLogoPreview');
+            if (img) {
+                img.src = '';
+                img.removeAttribute('data-base64');
+            }
+            const container = document.getElementById('cfgLogoPreviewContainer');
+            if (container) container.style.display = 'none';
+        }
+
+        function salvarConfiguracaoCabecalho() {
+            if (!usuarioAtual || usuarioAtual.perfil !== 'admin') {
+                alert('Somente Administradores podem alterar as configurações do cabeçalho.');
+                return;
+            }
+
+            const formNumero = document.getElementById('cfgFormNumero').value.trim();
+            const formElaborado = document.getElementById('cfgFormElaborado').value.trim();
+            const formAprovado = document.getElementById('cfgFormAprovado').value.trim();
+            const formSetor = document.getElementById('cfgFormSetor').value.trim();
+            const formRevisao = document.getElementById('cfgFormRevisao').value.trim();
+            const formData = document.getElementById('cfgFormData').value.trim();
+            const img = document.getElementById('cfgLogoPreview');
+            const logo = img ? (img.getAttribute('data-base64') || '') : '';
+
+            // Salvar localmente
+            localStorage.setItem('sucena_cfg_form_numero', formNumero);
+            localStorage.setItem('sucena_cfg_form_elaborado', formElaborado);
+            localStorage.setItem('sucena_cfg_form_aprovado', formAprovado);
+            localStorage.setItem('sucena_cfg_form_setor', formSetor);
+            localStorage.setItem('sucena_cfg_form_revisao', formRevisao);
+            localStorage.setItem('sucena_cfg_form_data', formData);
+            if (logo) {
+                localStorage.setItem('sucena_cfg_logo_base64', logo);
+            } else {
+                localStorage.removeItem('sucena_cfg_logo_base64');
+            }
+
+            // Salvar na nuvem
+            const apiUrl = obterGoogleApiUrl();
+            if (apiUrl) {
+                mostrarIndicadorSincronizacao(true);
+                fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: "salvar_configuracoes",
+                        configuracoes: {
+                            form_numero: formNumero,
+                            form_elaborado: formElaborado,
+                            form_aprovado: formAprovado,
+                            form_setor: formSetor,
+                            form_revisao: formRevisao,
+                            form_data: formData,
+                            logo_base64: logo
+                        }
+                    })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    mostrarIndicadorSincronizacao(false);
+                    if (data && data.status === "success") {
+                        alert('Configurações de cabeçalho salvas na nuvem com sucesso!');
+                    } else {
+                        alert('Erro ao salvar na nuvem: ' + (data.message || 'Erro desconhecido'));
+                    }
+                })
+                .catch(function(err) {
+                    mostrarIndicadorSincronizacao(false);
+                    console.error("Erro ao salvar configurações de cabeçalho na nuvem:", err);
+                    alert('Salvo apenas localmente (sem conexão de rede).');
+                });
+            } else {
+                alert('Salvo localmente com sucesso (API do Google não configurada).');
+            }
+        }
+
         const KMS_EXTRA_STORAGE_KEY = 'sucena_kms_extra_v1';
         let kmsExtras = [];
 
@@ -5350,6 +5634,8 @@
         renderContratosNoSelect();
         atualizarContrato();
         atualizarModoPlacasMuro();
+
+        carregarConfiguracoesCabecalhoLocal();
 
         carregarMateriaisExtras();
         atualizarDatalistMateriais();
