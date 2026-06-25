@@ -1129,6 +1129,12 @@
                 <div class="form-group">
                     <label>Número do Romaneio</label>
                     <input type="text" id="numeroRomaneio" placeholder="Gerado automaticamente" readonly>
+                    <div id="containerContinuarSeqPacote6" style="display: none; align-items: center; gap: 8px; margin-top: 5px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; font-size: 0.9em; cursor: pointer; color: #1e3c72; margin-bottom: 0;">
+                            <input type="checkbox" id="chkContinuarSeqPacote6" style="width: 16px; height: 16px;">
+                            Continuar, nº romaneio =
+                        </label>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Registro Interno Sucena</label>
@@ -1188,7 +1194,7 @@
                 </div>
                 <div class="form-group">
                     <label>Responsável</label>
-                    <input type="text" id="responsavel" placeholder="Nome do responsável">
+                    <input type="text" id="responsavel" placeholder="Nome do responsável" readonly>
                 </div>
             </div>
 
@@ -1239,7 +1245,7 @@
             <div class="form-group">
                 <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
                     <input type="checkbox" id="modoPlacasMuro" style="width: 20px; height: 20px;">
-                    <span>Ponto de placas para muro de vedação (substitui NF por ILS/Controle de Concreto)</span>
+                    <span>Controle de Pré Moldados (Fábrica Própria) (substitui NF por ILS/Controle de Concreto)</span>
                 </label>
             </div>
 
@@ -1249,8 +1255,8 @@
                     <input type="text" id="numeroNotaFiscal" placeholder="Ex: 000123">
                 </div>
                 <div class="form-group" id="ilsGroup" style="display: none;">
-                    <label>ILS: Nº</label>
-                    <input type="text" id="ilsNumero" placeholder="Ex: ILS-001">
+                    <label>ILS/FVS: Nº</label>
+                    <input type="text" id="ilsNumero" placeholder="Ex: ILS/FVS-001">
                 </div>
                 <div class="form-group" id="controleConcretoGroup" style="display: none;">
                     <label>Controle de Concreto: Nº</label>
@@ -1879,6 +1885,7 @@
 
         let fornecedoresExtras = [];
         let contratosExtras = [];
+        let materiaisExtras = [];
         let usuariosSistema = [];
         let usuarioAtual = null;
         let usuarioSendoEditadoId = null;
@@ -2712,7 +2719,7 @@
             if (isModoPlacasMuro()) {
                 const ils = document.getElementById('ilsNumero').value || 'Não informado';
                 const concreto = document.getElementById('controleConcretoNumero').value || 'Não informado';
-                return 'FVS/ILS: ILS ' + ils + ' | CC ' + concreto;
+                return 'ILS/FVS: ' + ils + ' | CC ' + concreto;
             }
             return 'NF: ' + (document.getElementById('numeroNotaFiscal').value || 'Não informado');
         }
@@ -3061,6 +3068,74 @@
             localStorage.setItem(CONTRATOS_EXTRA_STORAGE_KEY, JSON.stringify(lista));
         }
 
+        function carregarMateriaisExtras() {
+            try {
+                const bruto = localStorage.getItem('sucena_materiais_extra_v1');
+                materiaisExtras = bruto ? JSON.parse(bruto) : [];
+                if (!Array.isArray(materiaisExtras)) materiaisExtras = [];
+            } catch (e) {
+                materiaisExtras = [];
+            }
+        }
+
+        function atualizarDatalistMateriais() {
+            let datalist = document.getElementById('listaMateriaisExtras');
+            if (!datalist) {
+                datalist = document.createElement('datalist');
+                datalist.id = 'listaMateriaisExtras';
+                document.body.appendChild(datalist);
+            }
+            datalist.innerHTML = '';
+            const materiaisUnicos = new Set();
+            if (Array.isArray(materiaisExtras)) {
+                materiaisExtras.forEach(function(m) {
+                    if (m && m.nome && !materiaisUnicos.has(m.nome.toUpperCase())) {
+                        materiaisUnicos.add(m.nome.toUpperCase());
+                        const option = document.createElement('option');
+                        option.value = m.nome;
+                        datalist.appendChild(option);
+                    }
+                });
+            }
+        }
+
+        function sincronizarConfiguracoesGlobais() {
+            const apiUrl = obterGoogleApiUrl();
+            if (!apiUrl) return;
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                body: JSON.stringify({ action: "obter_configuracoes_globais" })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data && data.status === "success") {
+                    if (Array.isArray(data.contratos)) {
+                        contratosExtras = data.contratos;
+                        setContratosExtras(contratosExtras);
+                        renderContratosNoSelect();
+                    }
+                    if (Array.isArray(data.fornecedores)) {
+                        fornecedoresExtras = data.fornecedores;
+                        setFornecedoresExtras(fornecedoresExtras);
+                        renderFornecedoresNoSelect();
+                    }
+                    if (Array.isArray(data.materiais)) {
+                        materiaisExtras = data.materiais;
+                        localStorage.setItem('sucena_materiais_extra_v1', JSON.stringify(materiaisExtras));
+                        atualizarDatalistMateriais();
+                    }
+                    console.log("Configurações globais sincronizadas da nuvem com sucesso.");
+                }
+            })
+            .catch(function(err) {
+                console.warn("Erro ao sincronizar configurações globais:", err);
+            });
+        }
+
         function renderContratosNoSelect() {
             const select = document.getElementById('contrato');
             const valorAtual = select.value;
@@ -3128,6 +3203,27 @@
             document.getElementById('contrato').value = nome;
             input.value = '';
             atualizarContrato();
+
+            const apiUrl = obterGoogleApiUrl();
+            if (apiUrl) {
+                fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({ action: "salvar_contrato", contrato: nome })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data && data.status === "success") {
+                        console.log("Contrato salvo na nuvem com sucesso.");
+                    } else {
+                        console.warn("Erro ao salvar contrato na nuvem:", data);
+                    }
+                })
+                .catch(function(err) {
+                    console.warn("Erro de rede ao salvar contrato na nuvem:", err);
+                });
+            }
+
             alert('Contrato adicionado com sucesso.');
         }
 
@@ -3204,6 +3300,27 @@
             document.getElementById('novoFornecedorLocal').value = '';
 
             atualizarFornecedor();
+
+            const apiUrl = obterGoogleApiUrl();
+            if (apiUrl) {
+                fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({ action: "salvar_fornecedor", fornecedor: novo })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data && data.status === "success") {
+                        console.log("Fornecedor salvo na nuvem com sucesso.");
+                    } else {
+                        console.warn("Erro ao salvar fornecedor na nuvem:", data);
+                    }
+                })
+                .catch(function(err) {
+                    console.warn("Erro de rede ao salvar fornecedor na nuvem:", err);
+                });
+            }
+
             alert('Fornecedor adicionado com sucesso.');
         }
 
@@ -3223,7 +3340,7 @@
 
             row.innerHTML = '' +
                 '<input type="checkbox" class="custom-mat-check" ' + ((material && material.checked) ? 'checked' : '') + '>' +
-                '<input type="text" class="custom-mat-nome" placeholder="Nome do material" value="' + ((material && material.nome) ? material.nome.replace(/"/g, '&quot;') : '') + '">' +
+                '<input type="text" class="custom-mat-nome" list="listaMateriaisExtras" placeholder="Nome do material" value="' + ((material && material.nome) ? material.nome.replace(/"/g, '&quot;') : '') + '">' +
                 '<input type="number" class="custom-mat-qtd" placeholder="Qtd" step="0.01" value="' + ((material && material.qtd) ? material.qtd : '') + '">' +
                 '<input type="text" class="custom-mat-unidade" placeholder="Unidade" value="' + ((material && material.unidade) ? material.unidade.replace(/"/g, '&quot;') : '') + '">' +
                 '<button type="button" class="btn-warning">Remover</button>';
@@ -3471,6 +3588,7 @@
             atualizarFotosNaPrevia();
             atualizarContrato();
             atualizarModoPlacasMuro();
+            atualizarVisibilidadePacote6();
             gerarPrevia();
             atualizarStatusBaseDados();
         }
@@ -3862,7 +3980,11 @@
             if (sequencia !== 'NA') {
                 partesNumero.push(padNumero(sequencia, 3));
             }
-            numeroInput.value = partesNumero.join('-');
+            
+            const chkContinuar = document.getElementById('chkContinuarSeqPacote6');
+            if (!chkContinuar || !chkContinuar.checked) {
+                numeroInput.value = partesNumero.join('-');
+            }
             
             atualizarRegistroInternoAutomatico();
         }
@@ -3877,17 +3999,36 @@
             document.getElementById('ilsGroup').style.display = modo ? 'block' : 'none';
             document.getElementById('controleConcretoGroup').style.display = modo ? 'block' : 'none';
             document.getElementById('tituloDadosFiscais').textContent = modo
-                ? '🧾 CONTROLE DE PLACAS (MURO DE VEDAÇÃO)'
+                ? '🧾 CONTROLE DE PRÉ MOLDADOS (FÁBRICA PRÓPRIA)'
                 : '🧾 DADOS FISCAIS E PRODUTO';
 
             if (modo) {
                 document.getElementById('numeroNotaFiscal').value = '';
+                document.getElementById('cnpjFornecedorFiscal').value = 'FÁBRICA PRÓPRIA VERONA';
+                document.getElementById('razaoSocialFornecedor').value = 'FÁBRICA PRÓPRIA VERONA';
             } else {
                 document.getElementById('ilsNumero').value = '';
                 document.getElementById('controleConcretoNumero').value = '';
+                document.getElementById('cnpjFornecedorFiscal').value = '';
+                document.getElementById('razaoSocialFornecedor').value = '';
             }
 
             atualizarQrPrevia();
+        }
+
+        function atualizarVisibilidadePacote6() {
+            const pacote = document.getElementById('pacoteNumero').value;
+            const container = document.getElementById('containerContinuarSeqPacote6');
+            if (container) {
+                if (pacote === '6') {
+                    container.style.display = 'flex';
+                } else {
+                    container.style.display = 'none';
+                    const chk = document.getElementById('chkContinuarSeqPacote6');
+                    if (chk) chk.checked = false;
+                    document.getElementById('numeroRomaneio').readOnly = true;
+                }
+            }
         }
 
         function obterDocumentoFiscalTexto() {
@@ -3895,8 +4036,8 @@
                 const ils = document.getElementById('ilsNumero').value || 'Não informado';
                 const concreto = document.getElementById('controleConcretoNumero').value || 'Não informado';
                 return {
-                    label: 'ILS / Controle de Concreto',
-                    valor: 'ILS: ' + ils + ' | CC: ' + concreto,
+                    label: 'ILS/FVS / Controle de Concreto',
+                    valor: 'ILS/FVS: ' + ils + ' | CC: ' + concreto,
                     payload: 'ILS=' + ils + ';CC=' + concreto
                 };
             }
@@ -4358,25 +4499,54 @@
                 
                 pdf.setDrawColor(0);
                 pdf.setLineWidth(0.5);
-                pdf.rect(10, 10, 190, 40);
+                
+                // Retângulo principal do cabeçalho da empresa (altura reduzida)
+                pdf.rect(10, 10, 190, 23);
                 
                 pdf.setFontSize(10);
                 pdf.setFont('helvetica', 'bold');
-                pdf.text(viaTexto, 195, 15, { align: 'right' });
-                
-                pdf.setFontSize(14);
-                pdf.text('SUCENA EMPREENDIMENTOS LTDA', 105, 20, { align: 'center' });
-                
-                pdf.setFontSize(9);
-                pdf.setFont('helvetica', 'normal');
-                pdf.text('CNPJ: 19.381.283/0001-97', 105, 26, { align: 'center' });
-                pdf.text('Rua São Francisco, 720 - Centro - Açailândia/MA - CEP: 65930-000', 105, 31, { align: 'center' });
+                pdf.text(viaTexto, 195, 14, { align: 'right' });
                 
                 pdf.setFontSize(12);
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('ROMANEIO DE MATERIAIS', 105, 40, { align: 'center' });
+                pdf.text('SUCENA EMPREENDIMENTOS LTDA', 105, 16, { align: 'center' });
                 
-                y = 55;
+                pdf.setFontSize(8);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text('CNPJ: 19.381.283/0001-97', 105, 21, { align: 'center' });
+                pdf.text('Rua São Francisco, 720 - Centro - Açailândia/MA - CEP: 65930-000', 105, 25, { align: 'center' });
+                
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('ROMANEIO DE MATERIAIS', 105, 31, { align: 'center' });
+                
+                // Tabela de controle de qualidade (Y=33 até Y=45)
+                pdf.rect(10, 33, 190, 12);
+                // Linha divisória horizontal (Y=39)
+                pdf.line(10, 39, 200, 39);
+                
+                // Linhas verticais do primeiro nível (Y=33 a Y=39)
+                pdf.line(57.5, 33, 57.5, 39);
+                pdf.line(105, 33, 105, 39);
+                pdf.line(152.5, 33, 152.5, 39);
+                
+                // Linhas verticais do segundo nível (Y=39 a Y=45)
+                pdf.line(73.3, 39, 73.3, 45);
+                pdf.line(136.6, 39, 136.6, 45);
+                
+                pdf.setFontSize(8);
+                // Texto do primeiro nível
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('RDM01-VALE-00010', 33.75, 37, { align: 'center' });
+                pdf.text('DATA: 24/06/2026', 81.25, 37, { align: 'center' });
+                pdf.text('REVISÃO: 00', 128.75, 37, { align: 'center' });
+                pdf.text('PÁG. 1 de 1', 176.25, 37, { align: 'center' });
+                
+                // Texto do segundo nível
+                pdf.text('ELABORADO: BRUNO RAMOS', 41.65, 43, { align: 'center' });
+                pdf.text('APROVADO: ERICA', 104.95, 43, { align: 'center' });
+                pdf.text('SETOR: QUALIDADE', 168.3, 43, { align: 'center' });
+                
+                y = 50;
                 
                 pdf.rect(10, y, 190, 28);
                 pdf.setFontSize(10);
@@ -4883,10 +5053,40 @@
 
         ['tacNumero', 'pacoteNumero', 'kmNumero', 'sequenciaNumero', 'revisaoDocumento'].forEach(function(id) {
             document.getElementById(id).addEventListener('change', function() {
+                if (id === 'pacoteNumero') {
+                    atualizarVisibilidadePacote6();
+                }
                 gerarCodigoControle();
                 persistirSequenciaAtualNoBanco();
                 atualizarQrPrevia();
             });
+        });
+
+        document.getElementById('chkContinuarSeqPacote6').addEventListener('change', function(e) {
+            const numeroInput = document.getElementById('numeroRomaneio');
+            if (e.target.checked) {
+                numeroInput.readOnly = false;
+                numeroInput.focus();
+            } else {
+                numeroInput.readOnly = true;
+                gerarCodigoControle();
+            }
+        });
+
+        document.getElementById('numeroRomaneio').addEventListener('input', function(e) {
+            const chk = document.getElementById('chkContinuarSeqPacote6');
+            if (chk && chk.checked) {
+                const val = e.target.value;
+                const match = val.match(/-(\d+)$/);
+                if (match) {
+                    const seqVal = parseInt(match[1], 10);
+                    if (!isNaN(seqVal) && seqVal >= 1 && seqVal <= 1000) {
+                        garantirOpcaoNoSelect('sequenciaNumero', seqVal);
+                        document.getElementById('sequenciaNumero').value = String(seqVal);
+                        gerarCodigoControle();
+                    }
+                }
+            }
         });
 
         document.getElementById('dataRomaneio').addEventListener('change', function() {
@@ -4960,6 +5160,7 @@
                 const apiUrl = obterGoogleApiUrl();
                 if (apiUrl) {
                     sincronizarUsuariosComNuvem();
+                    sincronizarConfiguracoesGlobais();
                     if (navigator.onLine) {
                         setTimeout(sincronizarPendentesComNuvem, 2000); // Aguarda carregar para sincronizar
                     }
@@ -5149,7 +5350,12 @@
         renderContratosNoSelect();
         atualizarContrato();
         atualizarModoPlacasMuro();
+
+        carregarMateriaisExtras();
+        atualizarDatalistMateriais();
+
         adicionarMaterialPersonalizado();
+        atualizarVisibilidadePacote6();
 
         gerarCodigoControle();
         aplicarProximaSequenciaBanco(false);

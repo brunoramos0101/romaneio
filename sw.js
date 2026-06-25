@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sucena-romaneio-v9';
+const CACHE_NAME = 'sucena-romaneio-v10';
 const urlsToCache = [
   './',
   './index.html',
