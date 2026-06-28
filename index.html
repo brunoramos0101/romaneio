@@ -1322,7 +1322,7 @@
                     </div>
                     <div class="form-group">
                         <label>Produto Carregado</label>
-                        <select id="produtoCarregado" onchange="atualizarVisibilidadeLotes(); atualizarProdutoPersonalizado(); gerarCodigoControle();" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1;">
+                        <select id="produtoCarregado" onchange="atualizarVisibilidadeLotes(); atualizarProdutoPersonalizado(); aplicarProximaSequenciaBanco(true); gerarCodigoControle();" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1;">
                             <option value="N/A">N/A</option>
                             <option value="PLACA (PL)">PLACA (PL)</option>
                             <option value="ADUELA SIMPLES (ADS)">ADUELA SIMPLES (ADS)</option>
@@ -2958,6 +2958,8 @@
         function chaveSequenciaAtual() {
             const tacValor = obterValorControle('tacNumero', 1);
             const pacoteValor = obterValorControle('pacoteNumero', 1);
+            const produtoCarregado = document.getElementById('produtoCarregado').value;
+            const sigla = obterSiglaProduto(produtoCarregado) || 'NA';
             const ano = obterAnoSequencia();
             const partes = [];
             if (tacValor !== 'NA') {
@@ -2966,6 +2968,7 @@
             if (pacoteValor !== 'NA') {
                 partes.push('P' + padNumero(Math.max(1, pacoteValor), 2));
             }
+            partes.push(sigla);
             partes.push(ano);
             return partes.join('-');
         }
@@ -4330,40 +4333,53 @@
 
                 return fetch(apiUrl, {
                     method: 'POST',
-                    mode: 'no-cors',
                     cache: 'no-cache',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'text/plain'
                     },
                     body: JSON.stringify(payload)
-                }).then(function() {
-                    registro.syncStatus = 'synced';
-
-                    // Atualiza a data de sincronização no mapa local
-                    try {
-                        const mapa = getMapaRastreabilidade();
-                        let alterado = false;
-                        mapa.itens.forEach(function(item) {
-                            if (item.codigoControle === registro.codigoControle && !item.sincronizadoEm) {
-                                item.sincronizadoEm = new Date().toLocaleString('pt-BR');
-                                alterado = true;
-                            }
-                        });
-                        if (alterado) {
-                            setMapaRastreabilidade(mapa);
+                })
+                .then(function(res) {
+                    if (!res.ok) throw new Error("Erro na rede: " + res.status);
+                    return res.json();
+                })
+                .then(function(data) {
+                    if (data && data.status === 'success') {
+                        registro.syncStatus = 'synced';
+                        if (data.pdfUrl) {
+                            registro.pdfUrl = data.pdfUrl;
                         }
-                    } catch (e) {
-                        console.error("Erro ao atualizar data de sincronização local:", e);
-                    }
 
-                    return dbSalvarRomaneio(registro).then(function() {
-                        atualizarTabelaPendentesSincronizacao();
-                        atualizarStatusConectividadeVisual();
-                        console.log("Romaneio " + registro.codigoControle + " sincronizado na nuvem.");
-                        return true;
-                    });
-                }).catch(function(err) {
-                    console.error("Erro no fetch de sincronização:", err);
+                        // Atualiza a data de sincronização no mapa local
+                        try {
+                            const mapa = getMapaRastreabilidade();
+                            let alterado = false;
+                            mapa.itens.forEach(function(item) {
+                                if (item.codigoControle === registro.codigoControle && !item.sincronizadoEm) {
+                                    item.sincronizadoEm = new Date().toLocaleString('pt-BR');
+                                    alterado = true;
+                                }
+                            });
+                            if (alterado) {
+                                setMapaRastreabilidade(mapa);
+                            }
+                        } catch (e) {
+                            console.error("Erro ao atualizar data de sincronização local:", e);
+                        }
+
+                        return dbSalvarRomaneio(registro).then(function() {
+                            atualizarTabelaRomaneiosUsuario();
+                            atualizarTabelaPendentesSincronizacao();
+                            atualizarStatusConectividadeVisual();
+                            console.log("Romaneio " + registro.codigoControle + " sincronizado na nuvem. URL PDF: " + registro.pdfUrl);
+                            return true;
+                        });
+                    } else {
+                        throw new Error((data && data.message) || "Erro no processamento do Apps Script.");
+                    }
+                })
+                .catch(function(err) {
+                    console.error("Erro na requisição de sincronização:", err);
                     atualizarStatusConectividadeVisual();
                     return false;
                 });
@@ -6726,14 +6742,21 @@
                     statusBadge = '<span style="color: #d97706; font-weight: bold;">Pendente</span>';
                 }
 
+                let driveBtn = '';
+                if (r.pdfUrl) {
+                    driveBtn = '<a href="' + r.pdfUrl + '" target="_blank" class="btn-success" style="padding: 4px 8px; font-size: 0.75em; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: linear-gradient(135deg, #0284c7, #0ea5e9); box-shadow: 0 2px 4px rgba(14, 165, 233, 0.2);">📁 Ver no Drive</a>';
+                }
+
                 tr.innerHTML = '' +
                     '<td><strong>' + r.codigoControle + '</strong></td>' +
                     '<td>' + data + '</td>' +
                     '<td>' + contrato + '</td>' +
                     '<td>' + placa + '</td>' +
                     '<td>' + statusBadge + '</td>' +
-                    '<td style="text-align: center;">' +
-                        '<button class="btn-primary" style="padding: 4px 8px; font-size: 0.75em; display: inline-flex;" onclick="gerarNovamenteRomaneio(\'' + r.codigoControle + '\')">🔄 Gerar Novamente</button>' +
+                    '<td style="text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap;">' +
+                        '<button class="btn-primary" style="padding: 4px 8px; font-size: 0.75em; margin: 0;" onclick="gerarNovamenteRomaneio(\'' + r.codigoControle + '\')">🔄 Editar</button>' +
+                        '<button class="btn-success" style="padding: 4px 8px; font-size: 0.75em; margin: 0; background: linear-gradient(135deg, #059669, #10b981);" onclick="baixarPdfRegistro(\'' + r.codigoControle + '\')">📄 Baixar PDF</button>' +
+                        driveBtn +
                     '</td>';
                 tbody.appendChild(tr);
             });
@@ -6753,6 +6776,99 @@
             
             document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
             alert('Romaneio carregado no formulário com sucesso!');
+        }
+
+        function coletarSnapshotFormularioAtual() {
+            const campos = {};
+            const inputs = document.querySelectorAll('.form-group input, .form-group select, .form-group textarea');
+            inputs.forEach(function(input) {
+                if (input.id) {
+                    if (input.type === 'checkbox') {
+                        campos[input.id] = input.checked;
+                    } else {
+                        campos[input.id] = input.value;
+                    }
+                }
+            });
+
+            const placasRows = [];
+            const rows = document.querySelectorAll('#placasMuroItensContainer .placa-tipo-row');
+            rows.forEach(function(row) {
+                const tipo = row.querySelector('.placas-muro-tipo-nome').value;
+                const qtd = row.querySelector('.placas-muro-tipo-qtd').value;
+                placasRows.push({ tipo: tipo, qtd: qtd });
+            });
+
+            const materiaisSnapshot = coletarSnapshotMateriais();
+
+            return {
+                campos: campos,
+                placasRows: placasRows,
+                materiaisSnapshot: materiaisSnapshot
+            };
+        }
+
+        function restaurarSnapshotFormulario(snapshot) {
+            if (!snapshot) return;
+            
+            Object.keys(snapshot.campos).forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (el.type === 'checkbox') {
+                        el.checked = snapshot.campos[id];
+                    } else {
+                        el.value = snapshot.campos[id];
+                    }
+                }
+            });
+
+            const containerPlacas = document.getElementById('placasMuroItensContainer');
+            if (containerPlacas) {
+                containerPlacas.innerHTML = '';
+                snapshot.placasRows.forEach(function(item) {
+                    adicionarLinhaTipoPlaca(item.tipo, item.qtd);
+                });
+                atualizarSomaPlacasMuro();
+            }
+
+            if (Array.isArray(snapshot.materiaisSnapshot)) {
+                snapshot.materiaisSnapshot.forEach(function(m) {
+                    const check = document.getElementById(m.check);
+                    const qtd = document.getElementById(m.qtd);
+                    const unidade = document.getElementById(m.unidade);
+                    if (check) check.checked = m.checked;
+                    if (qtd) qtd.value = m.qtdValor;
+                    if (unidade) unidade.value = m.unidadeValor;
+                });
+            }
+        }
+
+        function baixarPdfRegistro(codigoControle) {
+            const registro = cacheRomaneios.find(function(r) {
+                return r.codigoControle === codigoControle;
+            });
+
+            if (!registro) {
+                alert('Romaneio não encontrado.');
+                return;
+            }
+
+            const formSnapshot = coletarSnapshotFormularioAtual();
+            
+            aplicarRegistroNoFormulario(registro);
+            
+            setTimeout(function() {
+                try {
+                    const pdfDoc = criarDocumentoPDF(registro.campos.gerarSegundaVia);
+                    pdfDoc.save("Romaneio_" + registro.codigoControle + ".pdf");
+                } catch (e) {
+                    console.error("Erro ao gerar PDF:", e);
+                    alert("Ocorreu um erro ao gerar o PDF.");
+                } finally {
+                    restaurarSnapshotFormulario(formSnapshot);
+                    gerarCodigoControle();
+                }
+            }, 100);
         }
 
         function verificarParametroVerificacaoQr() {
