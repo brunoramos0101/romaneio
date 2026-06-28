@@ -18,9 +18,9 @@
         }
 
         body {
-            font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
-            background: #f4f6fa;
-            color: #2c3e50;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
             min-height: 100vh;
             padding: 24px 12px;
             line-height: 1.5;
@@ -30,32 +30,32 @@
             max-width: 1140px;
             margin: 0 auto;
             background: #ffffff;
-            border-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
-            border: 1px solid #dcdcdc;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+            border: 1px solid #e2e8f0;
             overflow: hidden;
         }
 
         .header {
-            background: #0f2646;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
             color: #ffffff;
-            padding: 24px 30px;
+            padding: 30px;
             text-align: left;
-            border-bottom: 4px solid #005caa;
+            border-bottom: 4px solid #3b82f6;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
         }
 
         .header h1 {
             font-size: 1.8em;
-            font-weight: 700;
+            font-weight: 800;
             letter-spacing: 0.5px;
         }
 
         .header p {
-            opacity: 0.85;
-            font-size: 0.85em;
+            opacity: 0.9;
+            font-size: 0.88em;
         }
 
         .content {
@@ -73,42 +73,45 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #0a192f;
+            background: radial-gradient(circle at top left, #1e3a8a, #0f172a 70%);
             padding: 20px;
         }
 
         .login-card {
-            background: #ffffff;
-            border-radius: 4px;
-            padding: 36px 32px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 40px 32px;
             width: 100%;
-            max-width: 380px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
-            border: 1px solid #ced4da;
+            max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             text-align: center;
         }
 
         .login-logo-area {
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .login-brand-title {
-            font-size: 2.1em;
-            font-weight: 800;
+            font-size: 2.4em;
+            font-weight: 900;
             letter-spacing: 2px;
-            color: #005caa;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             text-transform: uppercase;
             line-height: 1;
         }
 
         .login-brand-sub {
-            font-size: 0.8em;
-            font-weight: 600;
-            letter-spacing: 2px;
-            color: #7f8c8d;
+            font-size: 0.85em;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: #64748b;
             text-transform: uppercase;
-            margin-top: 4px;
-            margin-bottom: 8px;
+            margin-top: 6px;
+            margin-bottom: 12px;
         }
 
         .header-brand-title {
@@ -121,11 +124,11 @@
 
         .login-sys-label {
             display: block;
-            font-size: 0.7em;
-            font-weight: 700;
-            letter-spacing: 2px;
+            font-size: 0.75em;
+            font-weight: 800;
+            letter-spacing: 3px;
             text-transform: uppercase;
-            color: #95a5a6;
+            color: #94a3b8;
             margin-bottom: 20px;
         }
 
@@ -137,77 +140,79 @@
 
         .login-field {
             text-align: left;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .login-field label {
             display: block;
-            font-size: 0.75em;
+            font-size: 0.78em;
             font-weight: 700;
             letter-spacing: 0.5px;
             text-transform: uppercase;
-            color: #4a5568;
-            margin-bottom: 6px;
+            color: #475569;
+            margin-bottom: 8px;
         }
 
         .login-field select,
         .login-field input[type="password"] {
             width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            font-size: 0.9em;
+            padding: 12px 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95em;
             background: #ffffff;
-            color: #2d3748;
-            transition: border-color 0.15s, box-shadow 0.15s;
+            color: #0f172a;
+            transition: all 0.2s ease-in-out;
             outline: none;
         }
 
         .login-field select:focus,
         .login-field input[type="password"]:focus {
-            border-color: #005caa;
-            box-shadow: 0 0 0 3px rgba(0,92,170,0.15);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
         }
 
         .login-btn {
             width: 100%;
-            padding: 12px;
-            background: #005caa;
+            padding: 14px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
             color: #ffffff;
-            font-size: 0.9em;
+            font-size: 0.95em;
             font-weight: 700;
             letter-spacing: 1px;
             text-transform: uppercase;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
             margin-top: 8px;
-            transition: background 0.15s;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+            transition: all 0.2s ease-in-out;
         }
 
         .login-btn:hover {
-            background: #004b8c;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35);
         }
 
         .login-btn:active {
-            background: #003c70;
+            transform: translateY(0);
         }
 
         .login-user-info {
-            margin-top: 16px;
-            padding: 10px 12px;
-            border-radius: 4px;
+            margin-top: 20px;
+            padding: 12px 16px;
+            border-radius: 8px;
             background: #f8fafc;
-            border-left: 4px solid #005caa;
-            font-size: 0.8em;
-            color: #64748b;
+            border-left: 4px solid #3b82f6;
+            font-size: 0.85em;
+            color: #475569;
             text-align: left;
             line-height: 1.5;
         }
 
         .login-footer-note {
-            margin-top: 16px;
-            font-size: 0.7em;
+            margin-top: 20px;
+            font-size: 0.72em;
             color: #94a3b8;
             line-height: 1.5;
         }
@@ -217,11 +222,11 @@
             justify-content: space-between;
             align-items: center;
             gap: 15px;
-            padding: 10px 24px;
-            background: #0a192f;
-            color: #cbd5e1;
-            font-size: 0.82em;
-            border-bottom: 2px solid #005caa;
+            padding: 12px 24px;
+            background: #0f172a;
+            color: #94a3b8;
+            font-size: 0.85em;
+            border-bottom: 2px solid #1e3a8a;
         }
 
         .session-bar strong {
@@ -229,100 +234,116 @@
         }
 
         .admin-panel {
-            margin-bottom: 24px;
-            border: 1px solid #ced4da;
-            border-left: 4px solid #005caa;
-            border-radius: 4px;
+            margin-bottom: 28px;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #3b82f6;
+            border-radius: 8px;
             background: #f8fafc;
-            padding: 20px;
+            padding: 24px;
         }
 
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(5, minmax(120px, 1fr));
-            gap: 12px;
-            margin-bottom: 18px;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
         }
 
         .kpi-card {
-            border: 1px solid #ced4da;
-            border-top: 3px solid #005caa;
-            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            border-top: 4px solid #3b82f6;
+            border-radius: 8px;
             background: #ffffff;
-            padding: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
         }
 
         .kpi-label {
-            font-size: 0.7em;
+            font-size: 0.72em;
             text-transform: uppercase;
-            color: #7f8c8d;
-            font-weight: 700;
-            letter-spacing: 0.3px;
+            color: #64748b;
+            font-weight: 800;
+            letter-spacing: 0.5px;
         }
 
         .kpi-value {
-            margin-top: 4px;
-            font-size: 1.2em;
-            font-weight: 700;
-            color: #0f2646;
+            margin-top: 6px;
+            font-size: 1.4em;
+            font-weight: 800;
+            color: #0f172a;
         }
 
         .admin-users-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 12px;
+            margin-top: 16px;
             background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
         }
 
         .admin-users-table th,
         .admin-users-table td {
-            border: 1px solid #dcdcdc;
-            padding: 10px 12px;
+            padding: 12px 16px;
             text-align: left;
-            font-size: 0.85em;
+            font-size: 0.88em;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .admin-users-table th {
-            background: #f2f4f7;
-            color: #2c3e50;
+            background: #f1f5f9;
+            color: #334155;
             font-weight: 700;
+            border-top: none;
+        }
+
+        .admin-users-table tr:last-child td {
+            border-bottom: none;
         }
 
         .admin-users-table tr:nth-child(even) {
-            background: #f9fafb;
+            background: #f8fafc;
         }
 
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-weight: 600;
-            font-size: 0.85em;
-            color: #2c3e50;
+            font-size: 0.88em;
+            color: #334155;
         }
 
         input, select, textarea {
             width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            font-size: 0.9em;
-            color: #2d3748;
+            padding: 12px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95em;
+            color: #0f172a;
             background: #ffffff;
-            transition: border-color 0.15s, box-shadow 0.15s;
+            transition: all 0.2s ease-in-out;
         }
 
         input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: #005caa;
-            box-shadow: 0 0 0 3px rgba(0,92,170,0.15);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
         }
 
         input[readonly] {
-            background: #e9ecef;
+            background: #f8fafc;
+            color: #64748b;
+            border-color: #e2e8f0;
             cursor: not-allowed;
         }
 
@@ -340,163 +361,181 @@
 
         .row-4 {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
+            grid-template-columns: repeat(4, 1fr);
             gap: 16px;
         }
 
         .row-5 {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+            grid-template-columns: repeat(5, 1fr);
             gap: 16px;
         }
 
         .row-6 {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 16px;
         }
 
         .control-box {
             background: #f8fafc;
-            border: 1px solid #ced4da;
-            border-left: 4px solid #0f2646;
-            border-radius: 4px;
-            padding: 16px;
-            margin-top: 12px;
-            margin-bottom: 16px;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #1e3a8a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 16px;
+            margin-bottom: 20px;
         }
 
         .section-title {
-            background: #f2f4f7;
-            color: #0f2646;
-            padding: 8px 12px;
-            border-radius: 4px;
-            margin: 24px 0 16px 0;
-            font-size: 0.9em;
-            font-weight: 700;
-            border-left: 4px solid #005caa;
+            background: #f1f5f9;
+            color: #1e3a8a;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin: 28px 0 16px 0;
+            font-size: 0.95em;
+            font-weight: 800;
+            border-left: 4px solid #3b82f6;
             letter-spacing: 0.5px;
         }
 
         .fornecedor-box {
             background: #f8fafc;
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 16px;
-            border-left: 4px solid #ffb900;
-            border: 1px solid #ced4da;
-            border-left-width: 4px;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #f59e0b;
         }
 
         .fornecedor-box p {
-            margin: 4px 0;
-            color: #4a5568;
-            font-size: 0.85em;
+            margin: 6px 0;
+            color: #475569;
+            font-size: 0.88em;
         }
 
         .fornecedor-box strong {
-            color: #2d3748;
+            color: #0f172a;
         }
 
         .materials-section {
-            margin: 16px 0;
+            margin: 20px 0;
         }
 
         .material-item {
             display: grid;
             grid-template-columns: 40px 2fr 1fr 1fr;
             gap: 12px;
-            margin-bottom: 8px;
-            padding: 12px;
+            margin-bottom: 10px;
+            padding: 14px;
             background: #ffffff;
-            border-radius: 4px;
-            border: 1px solid #ced4da;
-            border-left: 4px solid #bdc3c7;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            border-left: 4px solid #cbd5e1;
             align-items: center;
-            transition: all 0.2s;
+            transition: all 0.2s ease-in-out;
         }
 
         .material-item:has(input[type="checkbox"]:checked) {
-            border-left-color: #005caa;
-            background: #f4f8fc;
+            border-left-color: #3b82f6;
+            background: #f0f7ff;
+            border-color: #bfdbfe;
         }
 
         .material-item input[type="checkbox"] {
             width: 20px;
             height: 20px;
             cursor: pointer;
-            accent-color: #005caa;
+            accent-color: #3b82f6;
         }
 
         .material-item label {
             margin: 0;
-            font-size: 0.9em;
+            font-size: 0.92em;
             font-weight: 700;
+            color: #1e293b;
         }
 
         .btn-group {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             flex-wrap: wrap;
-            margin-top: 24px;
+            margin-top: 28px;
         }
 
         button {
-            padding: 10px 16px;
+            padding: 12px 20px;
             border: 1px solid transparent;
-            border-radius: 4px;
-            font-size: 0.85em;
-            font-weight: 600;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: 700;
             cursor: pointer;
-            transition: background 0.15s, border-color 0.15s;
+            transition: all 0.2s ease-in-out;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
         }
 
         .btn-primary {
-            background: #005caa;
+            background: #3b82f6;
             color: #ffffff;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
         }
 
         .btn-primary:hover {
-            background: #004b8c;
+            background: #2563eb;
+            box-shadow: 0 6px 14px rgba(59, 130, 246, 0.3);
         }
 
         .btn-success {
-            background: #107c41;
+            background: #10b981;
             color: #ffffff;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
         }
 
         .btn-success:hover {
-            background: #0b592e;
+            background: #059669;
+            box-shadow: 0 6px 14px rgba(16, 185, 129, 0.3);
         }
 
         .btn-info {
-            background: #0078d4;
+            background: #06b6d4;
             color: #ffffff;
+            box-shadow: 0 4px 10px rgba(6, 182, 212, 0.2);
         }
 
         .btn-info:hover {
-            background: #005a9e;
+            background: #0891b2;
+            box-shadow: 0 6px 14px rgba(6, 182, 212, 0.3);
         }
 
         .btn-warning {
-            background: #ffb900;
-            color: #111111;
+            background: #f59e0b;
+            color: #0f172a;
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);
         }
 
         .btn-warning:hover {
-            background: #d99e00;
+            background: #d97706;
+            box-shadow: 0 6px 14px rgba(245, 158, 11, 0.3);
         }
 
         .preview {
-            margin-top: 24px;
+            margin-top: 28px;
             padding: 24px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
             display: none;
             background: #ffffff;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         }
 
         .preview.active {
@@ -505,9 +544,27 @@
 
         .via {
             page-break-after: always;
-            padding: 20px;
+            padding: 24px;
             border: 2px solid #000000;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
+            position: relative;
+            background: #ffffff;
+        }
+
+        .via-watermark {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 320px;
+            height: 320px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            opacity: 0.06;
+            pointer-events: none;
+            z-index: 0;
+            display: none;
         }
 
         .via:last-child {
@@ -516,23 +573,23 @@
 
         .preview-header {
             text-align: center;
-            margin-bottom: 12px;
-            padding-bottom: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
             border-bottom: 2px solid #000000;
         }
 
         .preview-header h2 {
-            font-size: 1.25em;
+            font-size: 1.3em;
             margin-bottom: 4px;
         }
 
         .preview-header h3 {
-            font-size: 1.05em;
+            font-size: 1.1em;
             margin-top: 8px;
         }
 
         .preview-header p {
-            font-size: 0.8em;
+            font-size: 0.85em;
             margin: 2px 0;
         }
 
@@ -541,59 +598,59 @@
             font-weight: bold;
             font-size: 0.95em;
             margin-bottom: 8px;
-            padding: 4px 8px;
-            background: #e9ecef;
+            padding: 6px 12px;
+            background: #f1f5f9;
             border: 2px solid #000000;
             display: inline-block;
             float: right;
         }
 
         .preview-content {
-            margin: 12px 0;
-            font-size: 0.85em;
+            margin: 16px 0;
+            font-size: 0.88em;
         }
 
         .preview-item {
             display: flex;
             justify-content: space-between;
-            padding: 6px;
-            border-bottom: 1px solid #dcdcdc;
+            padding: 8px;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .preview-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin: 12px 0;
-            font-size: 0.85em;
+            gap: 16px;
+            margin: 16px 0;
+            font-size: 0.88em;
         }
 
         .fiscal-grid {
             display: grid;
             grid-template-columns: 1fr 2fr 1fr;
-            gap: 12px;
-            margin: 12px 0;
+            gap: 16px;
+            margin: 16px 0;
         }
 
         .identificacao-box {
-            margin: 12px 0;
+            margin: 16px 0;
             border: 1px solid #000000;
-            padding: 8px;
+            padding: 10px;
             display: grid;
-            grid-template-columns: 1fr 120px;
-            gap: 10px;
+            grid-template-columns: 1fr 130px;
+            gap: 12px;
             align-items: start;
         }
 
         .qr-preview-box {
             border: 1px solid #000000;
-            padding: 6px;
+            padding: 8px;
             text-align: center;
         }
 
         .qr-preview-box p {
             margin: 0;
-            font-size: 0.7em;
+            font-size: 0.72em;
             font-weight: 700;
             letter-spacing: 0.3px;
         }
@@ -601,30 +658,30 @@
         .qr-preview-box img {
             width: 80px;
             height: 80px;
-            margin-top: 4px;
-            border: 1px solid #dcdcdc;
+            margin-top: 6px;
+            border: 1px solid #e2e8f0;
             object-fit: contain;
             background: #ffffff;
         }
 
         .qr-preview-box small {
             display: block;
-            margin-top: 4px;
-            font-size: 0.6em;
+            margin-top: 6px;
+            font-size: 0.62em;
             line-height: 1.1;
         }
 
         .danfe-box {
-            margin: 12px 0;
+            margin: 16px 0;
             border: 1px solid #000000;
             background: #ffffff;
         }
 
         .danfe-title {
-            background: #f2f4f7;
+            background: #f1f5f9;
             border-bottom: 1px solid #000000;
-            padding: 4px 6px;
-            font-size: 0.72em;
+            padding: 6px 8px;
+            font-size: 0.75em;
             font-weight: 700;
             letter-spacing: 0.3px;
             text-transform: uppercase;
@@ -636,10 +693,10 @@
         }
 
         .danfe-cell {
-            padding: 6px;
+            padding: 8px;
             border-right: 1px solid #000000;
             border-bottom: 1px solid #000000;
-            min-height: 40px;
+            min-height: 44px;
         }
 
         .danfe-cell:nth-child(2n) {
@@ -659,28 +716,36 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
-            margin-top: 8px;
+            margin-top: 10px;
         }
 
         .foto-upload-box {
-            border: 1px dashed #ced4da;
-            border-radius: 4px;
-            padding: 12px;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 16px;
             background: #ffffff;
+            transition: border-color 0.2s ease-in-out;
+        }
+
+        .foto-upload-box:hover {
+            border-color: #3b82f6;
         }
 
         .foto-upload-box input[type="file"] {
-            margin-top: 6px;
-            border: 1px solid #ced4da;
-            background: #ffffff;
-            padding: 6px;
-            font-size: 0.8em;
+            margin-top: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            background: #f8fafc;
+            padding: 8px;
+            font-size: 0.85em;
+            cursor: pointer;
+            width: 100%;
         }
 
         .foto-preview {
-            margin-top: 8px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
+            margin-top: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
             width: 100%;
             aspect-ratio: 1 / 1;
             object-fit: cover;
@@ -695,22 +760,22 @@
         .fotos-via-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 8px;
+            gap: 12px;
+            margin-top: 12px;
         }
 
         .foto-via-box {
             border: 1px solid #000000;
-            min-height: 180px;
-            padding: 4px;
+            min-height: 190px;
+            padding: 6px;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
             align-items: center;
         }
 
         .foto-via-label {
-            font-size: 0.65em;
+            font-size: 0.7em;
             font-weight: 700;
             text-transform: uppercase;
         }
@@ -719,7 +784,7 @@
             width: 140px;
             height: 140px;
             object-fit: cover;
-            border: 1px solid #ced4da;
+            border: 1px solid #cbd5e1;
             background: #ffffff;
             display: none;
         }
@@ -731,75 +796,79 @@
         .foto-via-empty {
             width: 140px;
             height: 140px;
-            border: 1px dashed #ced4da;
-            color: #7f8c8d;
-            font-size: 0.7em;
+            border: 1.5px dashed #cbd5e1;
+            border-radius: 8px;
+            color: #64748b;
+            font-size: 0.72em;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 4px;
+            padding: 8px;
+            background: #f8fafc;
         }
 
         .auth-footer {
-            margin-top: 10px;
-            border-top: 1px dashed #000000;
-            padding-top: 6px;
-            font-size: 0.7em;
+            margin-top: 12px;
+            border-top: 1px dashed #cbd5e1;
+            padding-top: 8px;
+            font-size: 0.72em;
             line-height: 1.3;
+            color: #64748b;
         }
 
         .database-panel {
-            margin-top: 20px;
-            border: 1px solid #ced4da;
-            border-left: 4px solid #0f2646;
+            margin-top: 24px;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #0f172a;
             background: #f8fafc;
-            border-radius: 4px;
-            padding: 16px;
+            border-radius: 8px;
+            padding: 20px;
         }
 
         .database-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px 16px;
-            margin-top: 8px;
+            gap: 12px 20px;
+            margin-top: 12px;
         }
 
         .database-info {
-            font-size: 0.85em;
-            color: #4a5568;
+            font-size: 0.88em;
+            color: #475569;
         }
 
         .database-actions {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             flex-wrap: wrap;
-            margin-top: 12px;
+            margin-top: 16px;
         }
 
         .database-actions button {
-            padding: 8px 12px;
-            font-size: 0.8em;
+            padding: 8px 14px;
+            font-size: 0.82em;
         }
 
         .custom-materials-box {
-            margin-top: 16px;
-            border: 1px dashed #7f8c8d;
-            border-radius: 4px;
-            padding: 12px;
+            margin-top: 20px;
+            border: 1.5px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 16px;
             background: #f8fafc;
         }
 
         .custom-material-row {
             display: grid;
             grid-template-columns: 40px 2fr 1fr 1fr auto;
-            gap: 8px;
+            gap: 10px;
             align-items: center;
-            margin-bottom: 8px;
-            padding: 8px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
             background: #ffffff;
+            transition: all 0.2s ease-in-out;
         }
 
         .custom-material-row:last-child {
@@ -810,25 +879,26 @@
             width: 18px;
             height: 18px;
             justify-self: center;
+            accent-color: #3b82f6;
         }
 
         .fornecedor-novo-box,
         .contrato-novo-box {
-            margin-top: 8px;
-            border: 1px dashed #7f8c8d;
-            border-radius: 4px;
-            padding: 12px;
+            margin-top: 10px;
+            border: 1.5px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 16px;
             background: #f8fafc;
             display: none;
         }
 
         .danfe-label {
             display: block;
-            font-size: 0.65em;
+            font-size: 0.68em;
             font-weight: 700;
-            color: #555555;
+            color: #475569;
             text-transform: uppercase;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
 
         .danfe-value {
@@ -968,6 +1038,8 @@
                 width: 100%;
                 justify-content: center;
             }
+        #previewRegistroP1, #previewRegistroP2 {
+            display: none !important;
         }
     </style>
     <link rel="manifest" href="manifest.json">
@@ -992,7 +1064,7 @@
                     <select id="loginUserSelect"></select>
                 </div>
 
-                <div class="login-field">
+                <div class="login-field" style="display: none;">
                     <label>Senha</label>
                     <input type="password" id="loginSenha" placeholder="Digite sua senha" autocomplete="current-password">
                 </div>
@@ -1183,7 +1255,7 @@
                         </label>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="display: none;">
                     <label>Registro Interno Sucena</label>
                     <input type="text" id="registroInterno" placeholder="Gerado automaticamente" readonly>
                 </div>
@@ -1197,22 +1269,32 @@
                 <div class="section-title" style="margin: 0 0 15px 0;">🔐 CONTROLE DOCUMENTAL (ISO 9001 / PBQP-H)</div>
                 <div class="row-6">
                     <div class="form-group">
+                        <label>Contrato</label>
+                        <select id="contratoControle" onchange="aoMudarContratoControle()" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1;">
+                            <option value="">Selecione...</option>
+                            <option value="PACOTE 5">PACOTE 5- tac 2</option>
+                            <option value="PACOTE 6">PACOTE 6-</option>
+                            <option value="PACOTE 8">PACOTE 8: CT5500132904</option>
+                            <option value="INTEGRIDADE-599">INTEGRIDADE-599: CT5500132111</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="display: none;">
                         <label>TAC</label>
                         <select id="tacNumero"></select>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="display: none;">
                         <label>Pacote</label>
                         <select id="pacoteNumero"></select>
                     </div>
-                    <div class="form-group">
-                        <label>KM</label>
-                        <select id="kmNumero" onchange="atualizarKm()"></select>
+                    <div class="form-group" id="kmNumeroGroup" style="display: none;">
+                        <label>KM / Trecho</label>
+                        <select id="kmNumero" onchange="aoMudarKmNumero()"></select>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="display: none;">
                         <label>Sequência</label>
                         <select id="sequenciaNumero"></select>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="display: none;">
                         <label>Revisão</label>
                         <select id="revisaoDocumento"></select>
                     </div>
@@ -1267,8 +1349,16 @@
                     <input type="text" id="placaCaminhao" placeholder="Ex: ABC-1234" style="text-transform: uppercase;">
                 </div>
                 <div class="form-group">
-                    <label>Responsável</label>
-                    <input type="text" id="responsavel" placeholder="Nome do responsável" readonly>
+                    <label>Motorista</label>
+                    <select id="responsavel" onchange="atualizarMotoristaPersonalizado()" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1;"></select>
+                </div>
+            </div>
+            <div id="novoMotoristaBox" style="display: none; align-items: center; gap: 10px; background-color: #f1f5f9; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; margin-top: 10px; width: 100%; box-sizing: border-box;">
+                <div style="flex: 2;">
+                    <input type="text" id="novoMotoristaNome" placeholder="Nome do Motorista (ex: JOÃO DA SILVA)" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1; text-transform: uppercase;">
+                </div>
+                <div>
+                    <button type="button" class="btn-primary" onclick="adicionarMotoristaPersonalizado()" style="margin: 0; padding: 8px 16px;">Salvar para todos</button>
                 </div>
             </div>
 
@@ -1278,6 +1368,7 @@
                 <label>Selecione o Fornecedor</label>
                 <select id="fornecedor" onchange="atualizarFornecedor()">
                     <option value="">Selecione...</option>
+                    <option value="fabrica_verona">FÁBRICA VERONA</option>
                     <option value="gf6">GF6 EMPREENDIMENTOS IMOBILIÁRIOS LTDA</option>
                     <option value="pedreira">PEDREIRA SÃO FRANCISCO</option>
                     <option value="roque">ROQUE MATERIAIS DE CONSTRUÇÃO LTDA</option>
@@ -1349,7 +1440,7 @@
                 <button type="button" class="btn-primary" onclick="adicionarLinhaLote()" style="margin-top: 10px; padding: 6px 12px; font-size: 0.9em; background-color: #10b981; border-color: #10b981;">+ Adicionar Lote</button>
             </div>
 
-            <div class="row">
+            <div class="row" id="rowProdutoFiscal">
                 <div class="form-group">
                     <label>Código do Produto</label>
                     <input type="text" id="codigoProdutoFiscal" placeholder="Ex: MAT-001">
@@ -1363,17 +1454,17 @@
             <div class="section-title">📍 DESTINO</div>
             
             <div class="row">
-                <div class="form-group">
+                <div class="form-group" style="display: none;">
                     <label>Contrato</label>
                     <select id="contrato" onchange="atualizarContrato()"></select>
                 </div>
                 <div class="form-group">
                     <label>Local de Destino</label>
-                    <input type="text" id="destino" value="Obra KM 266+000">
+                    <input type="text" id="destino" value="Obra KM 266+000" readonly>
                 </div>
             </div>
 
-            <div id="contratoNovoBox" class="contrato-novo-box">
+            <div id="contratoNovoBox" class="contrato-novo-box" style="display: none;">
                 <div class="row" style="align-items: end;">
                     <div class="form-group" style="margin-bottom: 0;">
                         <label>Novo contrato</label>
@@ -1646,20 +1737,26 @@
             <div class="preview" id="preview">
                 <!-- VIA 1 -->
                 <div class="via">
+                    <div class="via-watermark" id="previewWatermark1"></div>
                     <div class="via-label">1ª VIA - CLIENTE</div>
                     <div style="clear: both;"></div>
                     
                     <div class="preview-header">
-                        <h2>SUCENA EMPREENDIMENTOS LTDA</h2>
-                        <p>CNPJ: 19.381.283/0001-97</p>
-                        <p>Rua São Francisco, 720 - Centro - Açailândia/MA - CEP: 65930-000</p>
+                        <div class="preview-header-logo-container" style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 4px;">
+                            <img id="previewLogo1" style="max-height: 48px; display: none;" alt="Logo">
+                            <div class="preview-header-text">
+                                <h2 style="margin: 0; font-size: 1.25em;">SUCENA EMPREENDIMENTOS LTDA</h2>
+                                <p style="margin: 2px 0; font-size: 0.8em;">CNPJ: 19.381.283/0001-97</p>
+                                <p style="margin: 2px 0; font-size: 0.8em;">Rua São Francisco, 720 - Centro - Açailândia/MA - CEP: 65930-000</p>
+                            </div>
+                        </div>
                         <h3>ROMANEIO DE MATERIAIS</h3>
                     </div>
 
                     <div class="identificacao-box">
                         <div>
                             <p><strong>Romaneio Nº:</strong> <span id="previewNumero1"></span></p>
-                            <p><strong>Registro Interno:</strong> <span id="previewRegistro1"></span></p>
+                            <p id="previewRegistroP1"><strong>Registro Interno:</strong> <span id="previewRegistro1"></span></p>
                             <p><strong>Código de Controle:</strong> <span id="previewControle1"></span></p>
                             <p><strong>Revisão:</strong> <span id="previewRevisao1"></span></p>
                             <p><strong>Data:</strong> <span id="previewData1"></span></p>
@@ -1704,11 +1801,11 @@
                                 <span class="danfe-label">Razão Social do Fornecedor</span>
                                 <span class="danfe-value" id="previewRazaoFornecedor1"></span>
                             </div>
-                            <div class="danfe-cell">
+                            <div class="danfe-cell" id="previewCellCodigoProduto1">
                                 <span class="danfe-label">Código do Produto</span>
                                 <span class="danfe-value" id="previewCodigoProduto1"></span>
                             </div>
-                            <div class="danfe-cell last-row">
+                            <div class="danfe-cell last-row" id="previewCellDescricaoProduto1">
                                 <span class="danfe-label">Descrição do Produto</span>
                                 <span class="danfe-value" id="previewDescricaoProduto1"></span>
                             </div>
@@ -1776,20 +1873,26 @@
 
                 <!-- VIA 2 -->
                 <div class="via">
+                    <div class="via-watermark" id="previewWatermark2"></div>
                     <div class="via-label">2ª VIA - EMPRESA</div>
                     <div style="clear: both;"></div>
                     
                     <div class="preview-header">
-                        <h2>SUCENA EMPREENDIMENTOS LTDA</h2>
-                        <p>CNPJ: 19.381.283/0001-97</p>
-                        <p>Rua São Francisco, 720 - Centro - Açailândia/MA - CEP: 65930-000</p>
+                        <div class="preview-header-logo-container" style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 4px;">
+                            <img id="previewLogo2" style="max-height: 48px; display: none;" alt="Logo">
+                            <div class="preview-header-text">
+                                <h2 style="margin: 0; font-size: 1.25em;">SUCENA EMPREENDIMENTOS LTDA</h2>
+                                <p style="margin: 2px 0; font-size: 0.8em;">CNPJ: 19.381.283/0001-97</p>
+                                <p style="margin: 2px 0; font-size: 0.8em;">Rua São Francisco, 720 - Centro - Açailândia/MA - CEP: 65930-000</p>
+                            </div>
+                        </div>
                         <h3>ROMANEIO DE MATERIAIS</h3>
                     </div>
 
                     <div class="identificacao-box">
                         <div>
                             <p><strong>Romaneio Nº:</strong> <span id="previewNumero2"></span></p>
-                            <p><strong>Registro Interno:</strong> <span id="previewRegistro2"></span></p>
+                            <p id="previewRegistroP2"><strong>Registro Interno:</strong> <span id="previewRegistro2"></span></p>
                             <p><strong>Código de Controle:</strong> <span id="previewControle2"></span></p>
                             <p><strong>Revisão:</strong> <span id="previewRevisao2"></span></p>
                             <p><strong>Data:</strong> <span id="previewData2"></span></p>
@@ -1834,11 +1937,11 @@
                                 <span class="danfe-label">Razão Social do Fornecedor</span>
                                 <span class="danfe-value" id="previewRazaoFornecedor2"></span>
                             </div>
-                            <div class="danfe-cell">
+                            <div class="danfe-cell" id="previewCellCodigoProduto2">
                                 <span class="danfe-label">Código do Produto</span>
                                 <span class="danfe-value" id="previewCodigoProduto2"></span>
                             </div>
-                            <div class="danfe-cell last-row">
+                            <div class="danfe-cell last-row" id="previewCellDescricaoProduto2">
                                 <span class="danfe-label">Descrição do Produto</span>
                                 <span class="danfe-value" id="previewDescricaoProduto2"></span>
                             </div>
@@ -2156,6 +2259,7 @@
 
             const responsavel = document.getElementById('responsavel');
             if (responsavel) {
+                renderMotoristasNoSelect();
                 responsavel.value = obterNomeUsuario(usuarioAtual);
             }
 
@@ -2169,26 +2273,6 @@
             const user = obterUsuarioSelecionadoLogin();
             if (!user) {
                 alert('Selecione um usuário válido.');
-                return;
-            }
-
-            const senhaInput = document.getElementById('loginSenha').value.trim();
-            if (!senhaInput) {
-                alert('Informe a senha.');
-                document.getElementById('loginSenha').focus();
-                return;
-            }
-            
-            // Garantir que o usuário tem a propriedade senha (migração)
-            if (!user.senha) {
-                user.senha = '1234';
-                setUsuariosSistema(usuariosSistema);
-            }
-
-            if (senhaInput !== user.senha) {
-                alert('Senha incorreta. Tente novamente.\n\nDica: Verifique se o CapsLock está ativo.');
-                document.getElementById('loginSenha').value = '';
-                document.getElementById('loginSenha').focus();
                 return;
             }
 
@@ -3298,6 +3382,18 @@
                                 console.warn("Erro ao fazer parse dos produtos extras:", e);
                             }
                         }
+                        if (cfg.motoristas_extra) {
+                            try {
+                                const list = JSON.parse(cfg.motoristas_extra);
+                                if (Array.isArray(list)) {
+                                    motoristasExtras = list;
+                                    localStorage.setItem('sucena_motoristas_extra_v1', JSON.stringify(motoristasExtras));
+                                    renderMotoristasNoSelect();
+                                }
+                            } catch (e) {
+                                console.warn("Erro ao fazer parse dos motoristas extras:", e);
+                            }
+                        }
                     }
                     console.log("Configurações globais sincronizadas da nuvem com sucesso.");
                 }
@@ -3700,6 +3796,26 @@
             }
 
             const campos = registro.campos;
+
+            // Deduzir e configurar o contratoControle
+            const pacNum = String(campos.pacoteNumero || '');
+            const tacNum = String(campos.tacNumero || '');
+            const ccSelect = document.getElementById('contratoControle');
+            if (ccSelect) {
+                if (pacNum === '5' && tacNum === '2') {
+                    ccSelect.value = 'PACOTE 5';
+                } else if (pacNum === '6') {
+                    ccSelect.value = 'PACOTE 6';
+                } else if (pacNum === '8') {
+                    ccSelect.value = 'PACOTE 8';
+                } else if (pacNum === '599') {
+                    ccSelect.value = 'INTEGRIDADE-599';
+                } else {
+                    ccSelect.value = '';
+                }
+                configurarCamposPorContratoControle(ccSelect.value, false);
+            }
+
             Object.keys(campos).forEach(function(chave) {
                 const el = document.getElementById(chave);
                 if (!el) return;
@@ -4123,78 +4239,180 @@
             atualizarTabelaPendentesSincronizacao();
         });
 
-        function gerarCodigoControle() {
-            const tacRaw = obterValorControle('tacNumero', 1);
-            const pacoteRaw = obterValorControle('pacoteNumero', 1);
-            const sequenciaRaw = obterValorControle('sequenciaNumero', 1);
-            const revisaoRaw = obterValorControle('revisaoDocumento', 0);
-            
-            const kmEl = document.getElementById('kmNumero');
-            const kmRaw = kmEl ? kmEl.value : 'NA';
+        function obterContratoCurto(contratoVal) {
+            if (!contratoVal) return 'NA';
+            if (contratoVal.includes('PACOTE 5')) return 'P5';
+            if (contratoVal.includes('PACOTE 6')) return 'P6';
+            if (contratoVal.includes('PACOTE 8')) return 'P8';
+            if (contratoVal.includes('INTEGRIDADE-599')) return 'I599';
+            return contratoVal.slice(0, 5).toUpperCase().replace(/\s+/g, '');
+        }
 
-            const tac = tacRaw === 'NA' ? 'NA' : Math.max(1, tacRaw);
-            const pacote = pacoteRaw === 'NA' ? 'NA' : Math.max(1, pacoteRaw);
-            const sequencia = sequenciaRaw === 'NA' ? 'NA' : Math.max(1, sequenciaRaw);
-            const revisao = revisaoRaw === 'NA' ? 'NA' : Math.max(0, revisaoRaw);
-            const ano = new Date().getFullYear();
+        function configurarCamposPorContratoControle(cc, resetValores) {
+            const kmGroup = document.getElementById('kmNumeroGroup');
+            const kmSelect = document.getElementById('kmNumero');
+            const tacSelect = document.getElementById('tacNumero');
+            const pacoteSelect = document.getElementById('pacoteNumero');
+            const revisaoSelect = document.getElementById('revisaoDocumento');
 
-            // Formatação do KM para o código (ex: "KM 599" -> "K599")
-            let kmClean = 'NA';
-            if (kmRaw && kmRaw !== 'NA' && kmRaw !== 'add_new_km') {
-                kmClean = kmRaw.replace(/KM\s*/i, 'K').replace(/\s+/g, '');
+            // Limpar KMs
+            while (kmSelect.options.length > 0) {
+                kmSelect.remove(0);
             }
+
+            if (cc === 'PACOTE 5') {
+                if (kmGroup) kmGroup.style.display = 'none';
+                if (resetValores) {
+                    garantirOpcaoNoSelect('tacNumero', '2');
+                    tacSelect.value = '2';
+                    garantirOpcaoNoSelect('pacoteNumero', '5');
+                    pacoteSelect.value = '5';
+                    garantirOpcaoNoSelect('kmNumero', '312');
+                    kmSelect.value = '312';
+                    garantirOpcaoNoSelect('revisaoDocumento', '0');
+                    revisaoSelect.value = '0';
+                    document.getElementById('contrato').value = 'PACOTE 5- tac 2';
+                    document.getElementById('destino').value = 'KM 312';
+                }
+            } else if (cc === 'PACOTE 6') {
+                if (kmGroup) kmGroup.style.display = 'none';
+                if (resetValores) {
+                    garantirOpcaoNoSelect('tacNumero', 'NA');
+                    tacSelect.value = 'NA';
+                    garantirOpcaoNoSelect('pacoteNumero', '6');
+                    pacoteSelect.value = '6';
+                    garantirOpcaoNoSelect('kmNumero', 'NA');
+                    kmSelect.value = 'NA';
+                    garantirOpcaoNoSelect('revisaoDocumento', '0');
+                    revisaoSelect.value = '0';
+                    document.getElementById('contrato').value = 'PACOTE 6-';
+                    document.getElementById('destino').value = 'N/A';
+                }
+            } else if (cc === 'PACOTE 8') {
+                if (kmGroup) kmGroup.style.display = '';
+
+                const kms = [
+                    { value: '', text: 'Selecione o KM...' },
+                    { value: 'MURO KM 335+700 INFRA', text: 'MURO KM 335+700 INFRA' },
+                    { value: 'MURO KM 344', text: 'MURO KM 344' },
+                    { value: 'PV KM 278', text: 'PV KM 278' },
+                    { value: 'PRAÇA KM 278', text: 'PRAÇA KM 278' },
+                    { value: 'MURO KM 278', text: 'MURO KM 278' },
+                    { value: 'MURO KM 294 LD', text: 'MURO KM 294 LD' },
+                    { value: 'MURO KM 335+700 MURB', text: 'MURO KM 335+700 MURB' },
+                    { value: 'MURO KM 358+700', text: 'MURO KM 358+700' },
+                    { value: 'PRAÇA KM 294', text: 'PRAÇA KM 294' },
+                    { value: 'MURO KM 344+30 MURB', text: 'MURO KM 344+30 MURB' },
+                    { value: 'ACESSO KM 344+300', text: 'ACESSO KM 344+300' }
+                ];
+                kms.forEach(function(k) {
+                    const option = document.createElement('option');
+                    option.value = k.value;
+                    option.textContent = k.text;
+                    kmSelect.appendChild(option);
+                });
+
+                // Adiciona opção para novos KMs extras cadastrados se houver
+                if (typeof kmsExtras !== 'undefined') {
+                    kmsExtras.forEach(function(nomeKm) {
+                        const option = document.createElement('option');
+                        option.value = nomeKm;
+                        option.textContent = nomeKm;
+                        kmSelect.appendChild(option);
+                    });
+                }
+
+                // Opção de adicionar outro KM
+                const addOption = document.createElement('option');
+                addOption.value = 'add_new_km';
+                addOption.textContent = '+ Adicionar outro KM';
+                kmSelect.appendChild(addOption);
+
+                if (resetValores) {
+                    garantirOpcaoNoSelect('tacNumero', 'NA');
+                    tacSelect.value = 'NA';
+                    garantirOpcaoNoSelect('pacoteNumero', '8');
+                    pacoteSelect.value = '8';
+                    garantirOpcaoNoSelect('revisaoDocumento', '0');
+                    revisaoSelect.value = '0';
+                    document.getElementById('contrato').value = 'PACOTE 8: CT5500132904';
+                    document.getElementById('destino').value = '';
+                }
+            } else if (cc === 'INTEGRIDADE-599') {
+                if (kmGroup) kmGroup.style.display = 'none';
+                if (resetValores) {
+                    garantirOpcaoNoSelect('tacNumero', 'NA');
+                    tacSelect.value = 'NA';
+                    garantirOpcaoNoSelect('pacoteNumero', '599');
+                    pacoteSelect.value = '599';
+                    garantirOpcaoNoSelect('kmNumero', '599');
+                    kmSelect.value = '599';
+                    garantirOpcaoNoSelect('revisaoDocumento', '0');
+                    revisaoSelect.value = '0';
+                    document.getElementById('contrato').value = 'INTEGRIDADE-599: CT5500132111';
+                    document.getElementById('destino').value = 'KM 599';
+                }
+            } else {
+                if (kmGroup) kmGroup.style.display = 'none';
+                if (resetValores) {
+                    document.getElementById('contrato').value = '';
+                    document.getElementById('destino').value = '';
+                }
+            }
+        }
+
+        function aoMudarContratoControle() {
+            const cc = document.getElementById('contratoControle').value;
+            configurarCamposPorContratoControle(cc, true);
+            aplicarProximaSequenciaBanco(true);
+            gerarCodigoControle();
+            atualizarQrPrevia();
+        }
+
+        function aoMudarKmNumero() {
+            const kmSelect = document.getElementById('kmNumero');
+            const kmVal = kmSelect.value;
+            atualizarKm(); // Mostra/oculta caixa de novo KM se necessário
+            if (kmVal !== 'add_new_km' && kmVal !== '') {
+                document.getElementById('destino').value = kmVal;
+            }
+            gerarCodigoControle();
+            atualizarQrPrevia();
+        }
+
+        function gerarCodigoControle() {
+            const cc = document.getElementById('contratoControle').value;
+            const contratoCurto = obterContratoCurto(cc);
+
+            const sequenciaRaw = obterValorControle('sequenciaNumero', 1);
+            const sequencia = sequenciaRaw === 'NA' ? 'NA' : Math.max(1, sequenciaRaw);
+            const ano = obterAnoSequencia();
+            const anoCurto = ano.slice(-2);
 
             const produtoCarregado = document.getElementById('produtoCarregado') ? document.getElementById('produtoCarregado').value : 'N/A';
             const sigla = obterSiglaProduto(produtoCarregado);
 
             const partesCodigo = ['RM'];
+            if (contratoCurto !== 'NA') {
+                partesCodigo.push(contratoCurto);
+            }
             if (sigla) {
                 partesCodigo.push(sigla);
             }
-            if (tac !== 'NA') {
-                partesCodigo.push('T' + padNumero(tac, 2));
-            }
-            if (pacote !== 'NA') {
-                partesCodigo.push('P' + padNumero(pacote, 2));
-            }
-            if (kmClean !== 'NA') {
-                partesCodigo.push(kmClean);
-            }
-            partesCodigo.push(String(ano).slice(-2)); // Ano com 2 dígitos
+            partesCodigo.push(anoCurto);
             if (sequencia !== 'NA') {
-                partesCodigo.push(padNumero(sequencia, 3)); // Sequência com 3 dígitos
-            }
-            if (revisao !== 'NA') {
-                partesCodigo.push('R' + padNumero(revisao, 1)); // Revisão sem padding extra (R0, R1)
+                partesCodigo.push(padNumero(sequencia, 3));
             }
 
             const codigo = partesCodigo.join('-');
             document.getElementById('codigoControle').value = codigo;
 
             const numeroInput = document.getElementById('numeroRomaneio');
-            const partesNumero = ['RM'];
-            if (sigla) {
-                partesNumero.push(sigla);
-            }
-            if (tac !== 'NA') {
-                partesNumero.push('T' + padNumero(tac, 2));
-            }
-            if (pacote !== 'NA') {
-                partesNumero.push('P' + padNumero(pacote, 2));
-            }
-            if (kmClean !== 'NA') {
-                partesNumero.push(kmClean);
-            }
-            partesNumero.push(String(ano).slice(-2));
-            if (sequencia !== 'NA') {
-                partesNumero.push(padNumero(sequencia, 3));
-            }
-            
             const chkContinuar = document.getElementById('chkContinuarSeqPacote6');
             if (!chkContinuar || !chkContinuar.checked) {
-                numeroInput.value = partesNumero.join('-');
+                numeroInput.value = codigo;
             }
-            
+
             atualizarRegistroInternoAutomatico();
         }
 
@@ -4206,6 +4424,12 @@
             const modo = isModoPlacasMuro();
             document.getElementById('nfGroup').style.display = modo ? 'none' : 'block';
             document.getElementById('ilsGroup').style.display = modo ? 'block' : 'none';
+            
+            const rowProd = document.getElementById('rowProdutoFiscal');
+            if (rowProd) {
+                rowProd.style.display = modo ? 'none' : '';
+            }
+
             atualizarVisibilidadeLotes();
             document.getElementById('tituloDadosFiscais').textContent = modo
                 ? '🧾 CONTROLE DE PRÉ MOLDADOS (FÁBRICA PRÓPRIA)'
@@ -4215,12 +4439,20 @@
                 document.getElementById('numeroNotaFiscal').value = '';
                 document.getElementById('cnpjFornecedorFiscal').value = 'FÁBRICA PRÓPRIA VERONA';
                 document.getElementById('razaoSocialFornecedor').value = 'FÁBRICA PRÓPRIA VERONA';
+                document.getElementById('codigoProdutoFiscal').value = '';
+                document.getElementById('descricaoProdutoFiscal').value = '';
             } else {
                 document.getElementById('ilsNumero').value = '';
                 document.getElementById('controleConcretoNumero').value = '';
                 document.getElementById('cnpjFornecedorFiscal').value = '';
                 document.getElementById('razaoSocialFornecedor').value = '';
             }
+
+            // Ocultar células da prévia
+            ['previewCellCodigoProduto1', 'previewCellDescricaoProduto1', 'previewCellCodigoProduto2', 'previewCellDescricaoProduto2'].forEach(function(id) {
+                const el = document.getElementById(id);
+                if (el) el.style.display = modo ? 'none' : '';
+            });
 
             atualizarQrPrevia();
         }
@@ -4330,6 +4562,9 @@
             const codigoControle = document.getElementById('codigoControle').value || 'SEM-CONTROLE';
             const assinatura = assinaturaCurta(baseIntegridadeRomaneio());
 
+            // Atualizar logomarca e marca d'água na prévia
+            const logo = localStorage.getItem('sucena_cfg_logo_base64') || null;
+
             ['1', '2'].forEach(function(via) {
                 const img = document.getElementById('previewQr' + via);
                 const texto = document.getElementById('previewQrText' + via);
@@ -4346,6 +4581,32 @@
 
                 if (textoHash) {
                     textoHash.textContent = 'HASH: ' + assinatura;
+                }
+
+                const pLogo = document.getElementById('previewLogo' + via);
+                const pWatermark = document.getElementById('previewWatermark' + via);
+                const pHeaderText = pLogo ? pLogo.nextElementSibling : null;
+
+                if (logo) {
+                    if (pLogo) {
+                        pLogo.src = logo;
+                        pLogo.style.display = 'block';
+                    }
+                    if (pWatermark) {
+                        pWatermark.style.backgroundImage = 'url(' + logo + ')';
+                        pWatermark.style.display = 'block';
+                    }
+                    if (pHeaderText) {
+                        pHeaderText.style.textAlign = 'left';
+                        pHeaderText.parentElement.style.justifyContent = 'flex-start';
+                    }
+                } else {
+                    if (pLogo) pLogo.style.display = 'none';
+                    if (pWatermark) pWatermark.style.display = 'none';
+                    if (pHeaderText) {
+                        pHeaderText.style.textAlign = 'center';
+                        pHeaderText.parentElement.style.justifyContent = 'center';
+                    }
                 }
             });
 
@@ -4460,6 +4721,11 @@
         }
 
         const fornecedores = {
+            fabrica_verona: {
+                nome: 'FÁBRICA VERONA',
+                cnpj: 'FÁBRICA PRÓPRIA VERONA',
+                local: 'Fábrica Verona - Açailândia/MA'
+            },
             gf6: {
                 nome: 'GF6 EMPREENDIMENTOS IMOBILIÁRIOS LTDA',
                 cnpj: '16.586.275/0001-99',
@@ -4821,45 +5087,40 @@
                 
                 y = 50;
                 
-                pdf.rect(10, y, 190, 28);
+                pdf.rect(10, y, 190, 22);
                 pdf.setFontSize(10);
                 pdf.setFont('helvetica', 'bold');
                 pdf.text('Romaneio Nº: ', 12, y + 6);
                 pdf.setFont('helvetica', 'normal');
                 pdf.text(numero, 40, y + 6);
-                
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('Registro Interno: ', 12, y + 12);
-                pdf.setFont('helvetica', 'normal');
-                pdf.text(registro, 48, y + 12);
 
                 pdf.setFont('helvetica', 'bold');
-                pdf.text('Código Controle: ', 12, y + 18);
+                pdf.text('Código Controle: ', 12, y + 12);
                 pdf.setFont('helvetica', 'normal');
-                pdf.text(codigoControle, 45, y + 18);
+                pdf.text(codigoControle, 45, y + 12);
 
                 pdf.setFont('helvetica', 'bold');
-                pdf.text('Revisão: ', 140, y + 18);
+                pdf.text('Revisão: ', 110, y + 12);
                 pdf.setFont('helvetica', 'normal');
-                pdf.text(revisao, 158, y + 18);
-                
+                pdf.text(revisao, 128, y + 12);
+
                 pdf.setFont('helvetica', 'bold');
-                pdf.text('Data: ', 12, y + 24);
+                pdf.text('Data: ', 12, y + 18);
                 pdf.setFont('helvetica', 'normal');
-                pdf.text(data, 25, y + 24);
+                pdf.text(data, 25, y + 18);
 
                 if (qrDataUrl) {
-                    pdf.rect(162, y + 2, 36, 24);
+                    pdf.rect(162, y + 2, 36, 18);
                     pdf.setFontSize(7);
                     pdf.setFont('helvetica', 'bold');
                     pdf.text('QR CONTROLE', 180, y + 5, { align: 'center' });
-                    pdf.addImage(qrDataUrl, 'PNG', 171, y + 7, 18, 18);
-                    pdf.setFontSize(6);
+                    pdf.addImage(qrDataUrl, 'PNG', 172.5, y + 6, 11, 11);
+                    pdf.setFontSize(5);
                     pdf.setFont('helvetica', 'normal');
-                    pdf.text('HASH ' + assinatura, 180, y + 27, { align: 'center' });
+                    pdf.text('HASH ' + assinatura, 180, y + 19, { align: 'center' });
                 }
                 
-                y += 33;
+                y += 27;
                 
                 pdf.rect(10, y, 92, 20);
                 pdf.rect(108, y, 92, 20);
@@ -4896,7 +5157,9 @@
                 
                 y += 17;
 
-                pdf.rect(10, y, 190, 32);
+                const isMuro = isModoPlacasMuro();
+                const boxHeight = isMuro ? 20 : 32;
+                pdf.rect(10, y, 190, boxHeight);
                 pdf.setFontSize(10);
                 pdf.setFont('helvetica', 'bold');
                 pdf.text(docFiscal.label + ': ', 12, y + 6);
@@ -4915,18 +5178,20 @@
                 pdf.setFont('helvetica', 'normal');
                 pdf.text(cnpjFornecedorFiscal, 42, y + 18);
 
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('Código Produto: ', 12, y + 24);
-                pdf.setFont('helvetica', 'normal');
-                pdf.text(codigoProdutoFiscal, 40, y + 24);
+                if (!isMuro) {
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('Código Produto: ', 12, y + 24);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text(codigoProdutoFiscal, 40, y + 24);
 
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('Descrição Produto: ', 12, y + 30);
-                pdf.setFont('helvetica', 'normal');
-                const descLines = pdf.splitTextToSize(descricaoProdutoFiscal, 140);
-                pdf.text(descLines, 45, y + 30);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('Descrição Produto: ', 12, y + 30);
+                    pdf.setFont('helvetica', 'normal');
+                    const descLines = pdf.splitTextToSize(descricaoProdutoFiscal, 140);
+                    pdf.text(descLines, 45, y + 30);
+                }
 
-                y += 37;
+                y += isMuro ? 25 : 37;
                 
                 pdf.setFont('helvetica', 'bold');
                 pdf.text('MATERIAIS TRANSPORTADOS:', 12, y);
@@ -5680,6 +5945,126 @@
             atualizarQrPrevia();
         }
 
+        // --- GESTÃO DE MOTORISTAS ---
+        let motoristasExtras = [];
+
+        function carregarMotoristasExtras() {
+            try {
+                const bruto = localStorage.getItem('sucena_motoristas_extra_v1');
+                motoristasExtras = bruto ? JSON.parse(bruto) : [];
+                if (!Array.isArray(motoristasExtras)) motoristasExtras = [];
+            } catch (e) {
+                motoristasExtras = [];
+            }
+        }
+
+        function renderMotoristasNoSelect() {
+            const select = document.getElementById('responsavel');
+            if (!select) return;
+            const valorAtual = select.value;
+
+            while (select.options.length > 0) {
+                select.remove(0);
+            }
+
+            const optionDefault = document.createElement('option');
+            optionDefault.value = '';
+            optionDefault.textContent = 'Selecione...';
+            select.appendChild(optionDefault);
+
+            // Adiciona operador logado se houver
+            const nomeUsuario = typeof usuarioAtual !== 'undefined' ? obterNomeUsuario(usuarioAtual) : '';
+            if (nomeUsuario) {
+                const optionUser = document.createElement('option');
+                optionUser.value = nomeUsuario;
+                optionUser.textContent = nomeUsuario + ' (Operador)';
+                select.appendChild(optionUser);
+            }
+
+            motoristasExtras.forEach(function(mot) {
+                const option = document.createElement('option');
+                option.value = mot;
+                option.textContent = mot;
+                select.appendChild(option);
+            });
+
+            const addOption = document.createElement('option');
+            addOption.value = 'add_new_driver';
+            addOption.textContent = '+ Adicionar outro motorista';
+            select.appendChild(addOption);
+
+            if ([...select.options].some(function(opt) { return opt.value === valorAtual; })) {
+                select.value = valorAtual;
+            } else if (valorAtual) {
+                const optionTemp = document.createElement('option');
+                optionTemp.value = valorAtual;
+                optionTemp.textContent = valorAtual;
+                select.insertBefore(optionTemp, addOption);
+                select.value = valorAtual;
+            } else if (nomeUsuario) {
+                select.value = nomeUsuario;
+            }
+        }
+
+        function atualizarMotoristaPersonalizado() {
+            const select = document.getElementById('responsavel');
+            const box = document.getElementById('novoMotoristaBox');
+            if (select && box) {
+                box.style.display = select.value === 'add_new_driver' ? 'flex' : 'none';
+            }
+        }
+
+        function adicionarMotoristaPersonalizado() {
+            const input = document.getElementById('novoMotoristaNome');
+            const nome = input.value.trim().toUpperCase();
+
+            if (!nome) {
+                alert('Informe o nome do novo motorista.');
+                return;
+            }
+
+            const jaExisteExtra = motoristasExtras.includes(nome);
+            const nomeUsuario = typeof usuarioAtual !== 'undefined' ? obterNomeUsuario(usuarioAtual) : '';
+            const jaExisteBase = (nome === nomeUsuario.toUpperCase());
+
+            if (jaExisteExtra || jaExisteBase) {
+                alert('Este motorista já existe.');
+                return;
+            }
+
+            motoristasExtras.push(nome);
+            localStorage.setItem('sucena_motoristas_extra_v1', JSON.stringify(motoristasExtras));
+            renderMotoristasNoSelect();
+            document.getElementById('responsavel').value = nome;
+            input.value = '';
+            atualizarMotoristaPersonalizado();
+
+            const apiUrl = obterGoogleApiUrl();
+            if (apiUrl) {
+                fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: "salvar_configuracoes",
+                        configuracoes: {
+                            motoristas_extra: JSON.stringify(motoristasExtras)
+                        }
+                    })
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data && data.status === "success") {
+                        console.log("Motoristas extras salvos na nuvem com sucesso.");
+                    }
+                })
+                .catch(function(err) {
+                    console.warn("Erro ao salvar motorista na nuvem:", err);
+                });
+            }
+
+            alert('Motorista adicionado com sucesso.');
+        }
+
         // --- GESTÃO DE PRODUTOS CARREGADOS ---
         let produtosExtras = [];
 
@@ -6126,6 +6511,9 @@
         
         carregarProdutosExtras();
         renderProdutosNoSelect();
+        
+        carregarMotoristasExtras();
+        renderMotoristasNoSelect();
 
         carregarMateriaisExtras();
         atualizarDatalistMateriais();
