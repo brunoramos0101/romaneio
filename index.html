@@ -1064,7 +1064,7 @@
                     <select id="loginUserSelect"></select>
                 </div>
 
-                <div class="login-field" style="display: none;">
+                <div class="login-field">
                     <label>Senha</label>
                     <input type="password" id="loginSenha" placeholder="Digite sua senha" autocomplete="current-password">
                 </div>
@@ -1390,17 +1390,57 @@
 
             <div class="section-title">🏪 FORNECEDOR / ORIGEM</div>
 
-            <div class="form-group">
-                <label>Selecione o Fornecedor</label>
-                <select id="fornecedor" onchange="atualizarFornecedor()">
-                    <option value="">Selecione...</option>
-                    <option value="fabrica_verona">FÁBRICA VERONA</option>
-                    <option value="gf6">GF6 EMPREENDIMENTOS IMOBILIÁRIOS LTDA</option>
-                    <option value="pedreira">PEDREIRA SÃO FRANCISCO</option>
-                    <option value="roque">ROQUE MATERIAIS DE CONSTRUÇÃO LTDA</option>
-                    <option value="add_new_supplier">+ Adicionar novo fornecedor</option>
-                    <option value="custom">Outro (Personalizar)</option>
-                </select>
+            <!-- Marcador de Transporte entre Contratos -->
+            <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 15px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; align-items: center;">
+                <label style="display: inline-flex; align-items: center; gap: 10px; font-weight: bold; color: #1e3a8a; cursor: pointer; user-select: none; width: 100%;">
+                    <input type="checkbox" id="transporteEntreContratos" onchange="aoMudarTransporteEntreContratos()" style="width: 18px; height: 18px; cursor: pointer;">
+                    <span>O transporte vai ser ENTRE CONTRATOS? (Carga sai de um Contrato para outro)</span>
+                </label>
+            </div>
+
+            <!-- Container Origem Normal (Fornecedores) -->
+            <div id="origemNormalContainer">
+                <div class="form-group">
+                    <label>Selecione o Fornecedor</label>
+                    <select id="fornecedor" onchange="atualizarFornecedor()">
+                        <option value="">Selecione...</option>
+                        <option value="fabrica_verona">FÁBRICA VERONA</option>
+                        <option value="gf6">GF6 EMPREENDIMENTOS IMOBILIÁRIOS LTDA</option>
+                        <option value="pedreira">PEDREIRA SÃO FRANCISCO</option>
+                        <option value="roque">ROQUE MATERIAIS DE CONSTRUÇÃO LTDA</option>
+                        <option value="add_new_supplier">+ Adicionar novo fornecedor</option>
+                        <option value="custom">Outro (Personalizar)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Container Origem entre Contratos (Oculto por padrão) -->
+            <div id="origemEntreContratosContainer" style="display: none; background: rgba(59, 130, 246, 0.05); border: 1px solid #3b82f6; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                <h4 style="margin-top: 0; color: #1e3a8a; font-weight: bold; font-size: 0.9em; display: flex; align-items: center; gap: 6px;">
+                    <span>📤 ORIGEM (SAÍDA DO CONTRATO)</span>
+                </h4>
+                <div class="row" style="gap: 15px; margin-bottom: 0;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Contrato de Origem</label>
+                        <select id="contratoOrigem" onchange="aoMudarContratoOrigem()" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1;"></select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label>Local de Origem</label>
+                        <select id="destinoOrigem" onchange="aoMudarDestinoOrigem()" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1;"></select>
+                    </div>
+                </div>
+                
+                <div id="destinoOrigemNovoBox" style="display: none; margin-top: 10px; background-color: white; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1;">
+                    <div class="row" style="align-items: end; gap: 10px; margin-bottom: 0;">
+                        <div class="form-group" style="margin-bottom: 0; flex: 2;">
+                            <label>Novo local de origem para este contrato</label>
+                            <input type="text" id="novoDestinoOrigemNome" placeholder="Ex: KM 344+300 OBRA" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1;">
+                        </div>
+                        <div style="margin-bottom: 0;">
+                            <button class="btn-primary" type="button" onclick="adicionarDestinoOrigemPersonalizado()" style="margin: 0; padding: 8px 16px;">Salvar Origem</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div id="fornecedorInfo" class="fornecedor-box" style="display: none;">
@@ -1480,24 +1520,36 @@
             <div class="section-title">📍 DESTINO</div>
             
             <div class="row">
-                <div class="form-group" style="display: none;">
-                    <label>Contrato</label>
+                <div class="form-group">
+                    <label>Contrato Destino</label>
                     <select id="contrato" onchange="atualizarContrato()"></select>
                 </div>
                 <div class="form-group">
                     <label>Local de Destino</label>
-                    <input type="text" id="destino" value="Obra KM 266+000" readonly>
+                    <select id="destino" onchange="aoMudarDestinoDestino()" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1;"></select>
                 </div>
             </div>
 
-            <div id="contratoNovoBox" class="contrato-novo-box" style="display: none;">
-                <div class="row" style="align-items: end;">
-                    <div class="form-group" style="margin-bottom: 0;">
+            <div id="contratoNovoBox" class="contrato-novo-box" style="display: none; background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                <div class="row" style="align-items: end; margin-bottom: 0; gap: 10px;">
+                    <div class="form-group" style="margin-bottom: 0; flex: 2;">
                         <label>Novo contrato</label>
                         <input type="text" id="novoContratoNome" placeholder="Ex: OBRA KM 266+000">
                     </div>
-                    <div class="form-group" style="margin-bottom: 0; text-align: right;">
-                        <button class="btn-primary" type="button" onclick="adicionarContratoPersonalizado()">Adicionar contrato</button>
+                    <div style="margin-bottom: 0;">
+                        <button class="btn-primary" type="button" onclick="adicionarContratoPersonalizado()" style="margin: 0; padding: 8px 16px;">Adicionar contrato</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="destinoDestinoNovoBox" style="display: none; background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                <div class="row" style="align-items: end; margin-bottom: 0; gap: 10px;">
+                    <div class="form-group" style="margin-bottom: 0; flex: 2;">
+                        <label>Novo local de destino para este contrato</label>
+                        <input type="text" id="novoDestinoDestinoNome" placeholder="Ex: MURO KM 312 VEDAÇÃO" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1;">
+                    </div>
+                    <div style="margin-bottom: 0;">
+                        <button class="btn-primary" type="button" onclick="adicionarDestinoDestinoPersonalizado()" style="margin: 0; padding: 8px 16px;">Salvar Destino</button>
                     </div>
                 </div>
             </div>
@@ -2346,6 +2398,14 @@
                 return;
             }
 
+            const senhaInput = document.getElementById('loginSenha').value;
+            const senhaCorreta = String(user.senha || '1234').trim();
+
+            if (senhaInput.trim() !== senhaCorreta) {
+                alert('Senha incorreta. Tente novamente.');
+                return;
+            }
+
             usuarioAtual = user;
             document.getElementById('accessScreen').classList.add('app-hidden');
             document.getElementById('mainHeader').classList.remove('app-hidden');
@@ -3022,6 +3082,7 @@
         function validarCamposObrigatorios() {
             const pacote = document.getElementById('pacoteNumero').value;
             const contrato = document.getElementById('contrato').value;
+            const destino = document.getElementById('destino').value;
             const pacoteNumero = parseInt(pacote, 10);
 
             if (!pacote) {
@@ -3042,8 +3103,33 @@
                 }
             }
 
+            const isEntreContratos = document.getElementById('transporteEntreContratos').checked;
+            if (isEntreContratos) {
+                const cOrig = document.getElementById('contratoOrigem').value;
+                const dOrig = document.getElementById('destinoOrigem').value;
+                if (!cOrig || cOrig === 'add_new_contract') {
+                    alert('Selecione um Contrato de Origem válido.');
+                    return false;
+                }
+                if (!dOrig || dOrig === 'add_new_destino') {
+                    alert('Selecione um Local de Origem válido.');
+                    return false;
+                }
+            } else {
+                const fornecedor = document.getElementById('fornecedor').value;
+                if (!fornecedor) {
+                    alert('Selecione um fornecedor ou origem.');
+                    return false;
+                }
+            }
+
             if (!contrato || contrato === 'add_new_contract') {
-                alert('Contrato é obrigatório. Se necessário, cadastre um novo contrato e selecione-o.');
+                alert('Contrato de destino é obrigatório. Se necessário, cadastre um novo contrato e selecione-o.');
+                return false;
+            }
+
+            if (!destino || destino === 'add_new_destino') {
+                alert('Local de destino é obrigatório. Se necessário, cadastre um novo local de destino e selecione-o.');
                 return false;
             }
 
@@ -3051,6 +3137,13 @@
         }
 
         function obterOrigemTextoMapa() {
+            const isEntreContratos = document.getElementById('transporteEntreContratos').checked;
+            if (isEntreContratos) {
+                const cOrig = document.getElementById('contratoOrigem').value || 'Não informado';
+                const dOrig = document.getElementById('destinoOrigem').value || 'Não informado';
+                return cOrig + ' - ' + dOrig;
+            }
+
             const fornSelect = document.getElementById('fornecedor').value;
             if (fornSelect === 'custom') {
                 return document.getElementById('origemPersonalizada').value || 'Não informado';
@@ -3562,35 +3655,165 @@
 
         function renderContratosNoSelect() {
             const select = document.getElementById('contrato');
-            const valorAtual = select.value;
+            const selectOrigem = document.getElementById('contratoOrigem');
+            const valorAtual = select ? select.value : '';
+            const valorAtualOrigem = selectOrigem ? selectOrigem.value : '';
 
-            while (select.options.length > 0) {
-                select.remove(0);
+            if (select) {
+                while (select.options.length > 0) select.remove(0);
+            }
+            if (selectOrigem) {
+                while (selectOrigem.options.length > 0) selectOrigem.remove(0);
             }
 
             const opcoesBase = [
                 { value: '', text: 'Selecione...' },
-                { value: 'VR 177', text: 'VR 177' },
-                { value: 'ILUMINAÇÃO KM 312', text: 'ILUMINAÇÃO KM 312' }
+                { value: 'PACOTE 5', text: 'PACOTE 5' },
+                { value: 'PACOTE 6', text: 'PACOTE 6' },
+                { value: 'PACOTE 8', text: 'PACOTE 8' },
+                { value: 'INTEGRIDADE-599', text: 'INTEGRIDADE-599' }
             ];
 
             opcoesBase.forEach(function(op) {
-                const option = document.createElement('option');
-                option.value = op.value;
-                option.textContent = op.text;
-                select.appendChild(option);
+                if (select) {
+                    const option = document.createElement('option');
+                    option.value = op.value;
+                    option.textContent = op.text;
+                    select.appendChild(option);
+                }
+                if (selectOrigem) {
+                    const option = document.createElement('option');
+                    option.value = op.value;
+                    option.textContent = op.text;
+                    selectOrigem.appendChild(option);
+                }
             });
 
             contratosExtras.forEach(function(nomeContrato) {
+                if (select) {
+                    const option = document.createElement('option');
+                    option.value = nomeContrato;
+                    option.textContent = nomeContrato;
+                    select.appendChild(option);
+                }
+                if (selectOrigem) {
+                    const option = document.createElement('option');
+                    option.value = nomeContrato;
+                    option.textContent = nomeContrato;
+                    selectOrigem.appendChild(option);
+                }
+            });
+
+            if (select) {
+                const addOption = document.createElement('option');
+                addOption.value = 'add_new_contract';
+                addOption.textContent = '+ Adicionar novo contrato';
+                select.appendChild(addOption);
+            }
+            if (selectOrigem) {
+                const addOption = document.createElement('option');
+                addOption.value = 'add_new_contract';
+                addOption.textContent = '+ Adicionar novo contrato';
+                selectOrigem.appendChild(addOption);
+            }
+
+            if (select && [...select.options].some(function(opt) { return opt.value === valorAtual; })) {
+                select.value = valorAtual;
+            }
+            if (selectOrigem && [...selectOrigem.options].some(function(opt) { return opt.value === valorAtualOrigem; })) {
+                selectOrigem.value = valorAtualOrigem;
+            }
+        }
+
+        function atualizarContrato() {
+            const contratoSelecionado = document.getElementById('contrato').value;
+            const boxNovo = document.getElementById('contratoNovoBox');
+            if (boxNovo) {
+                boxNovo.style.display = contratoSelecionado === 'add_new_contract' ? 'block' : 'none';
+            }
+            
+            renderDestinosNoSelect(contratoSelecionado, 'destino');
+            const destBox = document.getElementById('destinoDestinoNovoBox');
+            if (destBox) destBox.style.display = 'none';
+        }
+
+        function getDestinosPorContrato(contratoNome) {
+            if (!contratoNome) return [];
+            
+            const padrao = {
+                "PACOTE 5": ["KM 312"],
+                "PACOTE 6": ["N/A"],
+                "PACOTE 8": [
+                    "MURO KM 335+700 INFRA",
+                    "MURO KM 344",
+                    "PV KM 278",
+                    "PRAÇA KM 278",
+                    "MURO KM 278",
+                    "MURO KM 294 LD",
+                    "MURO KM 335+700 MURB",
+                    "MURO KM 358+700",
+                    "PRAÇA KM 294",
+                    "MURO KM 344+30 MURB",
+                    "ACESSO KM 344+300"
+                ],
+                "INTEGRIDADE-599": ["KM 599"]
+            };
+
+            let extras = {};
+            try {
+                const raw = localStorage.getItem('sucena_contrato_destinos_v1');
+                if (raw) extras = JSON.parse(raw);
+            } catch (e) {
+                console.error("Erro ao carregar destinos extras:", e);
+            }
+
+            const listPadrao = padrao[contratoNome] || [];
+            const listExtra = extras[contratoNome] || [];
+            
+            return [...new Set([...listPadrao, ...listExtra])];
+        }
+
+        function salvarDestinoParaContrato(contratoNome, novoDestino) {
+            if (!contratoNome || !novoDestino) return;
+            let extras = {};
+            try {
+                const raw = localStorage.getItem('sucena_contrato_destinos_v1');
+                if (raw) extras = JSON.parse(raw);
+            } catch (e) {
+                console.error(e);
+            }
+
+            if (!extras[contratoNome]) extras[contratoNome] = [];
+            if (!extras[contratoNome].includes(novoDestino)) {
+                extras[contratoNome].push(novoDestino);
+                localStorage.setItem('sucena_contrato_destinos_v1', JSON.stringify(extras));
+            }
+        }
+
+        function renderDestinosNoSelect(contratoNome, selectId) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            const valorAtual = select.value;
+
+            while (select.options.length > 0) select.remove(0);
+
+            const options = getDestinosPorContrato(contratoNome);
+            
+            const emptyOpt = document.createElement('option');
+            emptyOpt.value = '';
+            emptyOpt.textContent = 'Selecione o destino...';
+            select.appendChild(emptyOpt);
+
+            options.forEach(function(dest) {
                 const option = document.createElement('option');
-                option.value = nomeContrato;
-                option.textContent = nomeContrato;
+                option.value = dest;
+                option.textContent = dest;
                 select.appendChild(option);
             });
 
             const addOption = document.createElement('option');
-            addOption.value = 'add_new_contract';
-            addOption.textContent = '+ Adicionar novo contrato';
+            addOption.value = 'add_new_destino';
+            addOption.textContent = '+ Adicionar novo destino';
             select.appendChild(addOption);
 
             if ([...select.options].some(function(opt) { return opt.value === valorAtual; })) {
@@ -3598,10 +3821,115 @@
             }
         }
 
-        function atualizarContrato() {
-            const contratoSelecionado = document.getElementById('contrato').value;
-            const boxNovo = document.getElementById('contratoNovoBox');
-            boxNovo.style.display = contratoSelecionado === 'add_new_contract' ? 'block' : 'none';
+        function aoMudarTransporteEntreContratos() {
+            const checkbox = document.getElementById('transporteEntreContratos');
+            const isEntreContratos = checkbox.checked;
+            
+            const normalContainer = document.getElementById('origemNormalContainer');
+            const entreContratosContainer = document.getElementById('origemEntreContratosContainer');
+            
+            if (isEntreContratos) {
+                normalContainer.style.display = 'none';
+                entreContratosContainer.style.display = 'block';
+                
+                document.getElementById('fornecedor').value = '';
+                atualizarFornecedor();
+                
+                renderContratosNoSelect();
+            } else {
+                normalContainer.style.display = 'block';
+                entreContratosContainer.style.display = 'none';
+                
+                document.getElementById('contratoOrigem').value = '';
+                document.getElementById('destinoOrigem').value = '';
+                document.getElementById('destinoOrigemNovoBox').style.display = 'none';
+            }
+            gerarCodigoControle();
+            atualizarQrPrevia();
+        }
+
+        function aoMudarContratoOrigem() {
+            const val = document.getElementById('contratoOrigem').value;
+            
+            if (val === 'add_new_contract') {
+                document.getElementById('contrato').value = 'add_new_contract';
+                atualizarContrato();
+                document.querySelector('.contrato-novo-box').scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+
+            renderDestinosNoSelect(val, 'destinoOrigem');
+            document.getElementById('destinoOrigemNovoBox').style.display = 'none';
+            gerarCodigoControle();
+            atualizarQrPrevia();
+        }
+
+        function aoMudarDestinoOrigem() {
+            const val = document.getElementById('destinoOrigem').value;
+            const boxNovo = document.getElementById('destinoOrigemNovoBox');
+            if (boxNovo) {
+                boxNovo.style.display = val === 'add_new_destino' ? 'block' : 'none';
+            }
+            gerarCodigoControle();
+            atualizarQrPrevia();
+        }
+
+        function aoMudarDestinoDestino() {
+            const val = document.getElementById('destino').value;
+            const boxNovo = document.getElementById('destinoDestinoNovoBox');
+            if (boxNovo) {
+                boxNovo.style.display = val === 'add_new_destino' ? 'block' : 'none';
+            }
+            gerarCodigoControle();
+            atualizarQrPrevia();
+        }
+
+        function adicionarDestinoOrigemPersonalizado() {
+            const contratoNome = document.getElementById('contratoOrigem').value;
+            const input = document.getElementById('novoDestinoOrigemNome');
+            const nome = input.value.trim().toUpperCase();
+
+            if (!contratoNome) {
+                alert('Selecione primeiro o contrato de origem.');
+                return;
+            }
+            if (!nome) {
+                alert('Digite o nome do local de origem.');
+                return;
+            }
+
+            salvarDestinoParaContrato(contratoNome, nome);
+            renderDestinosNoSelect(contratoNome, 'destinoOrigem');
+            document.getElementById('destinoOrigem').value = nome;
+            input.value = '';
+            document.getElementById('destinoOrigemNovoBox').style.display = 'none';
+            gerarCodigoControle();
+            atualizarQrPrevia();
+            alert('Origem cadastrada com sucesso!');
+        }
+
+        function adicionarDestinoDestinoPersonalizado() {
+            const contratoNome = document.getElementById('contrato').value;
+            const input = document.getElementById('novoDestinoDestinoNome');
+            const nome = input.value.trim().toUpperCase();
+
+            if (!contratoNome) {
+                alert('Selecione primeiro o contrato de destino.');
+                return;
+            }
+            if (!nome) {
+                alert('Digite o nome do local de destino.');
+                return;
+            }
+
+            salvarDestinoParaContrato(contratoNome, nome);
+            renderDestinosNoSelect(contratoNome, 'destino');
+            document.getElementById('destino').value = nome;
+            input.value = '';
+            document.getElementById('destinoDestinoNovoBox').style.display = 'none';
+            gerarCodigoControle();
+            atualizarQrPrevia();
+            alert('Destino cadastrado com sucesso!');
         }
 
         function adicionarContratoPersonalizado() {
@@ -3911,6 +4239,9 @@
                     cnpjFornecedorFiscal: document.getElementById('cnpjFornecedorFiscal').value,
                     codigoProdutoFiscal: document.getElementById('codigoProdutoFiscal').value,
                     descricaoProdutoFiscal: document.getElementById('descricaoProdutoFiscal').value,
+                    transporteEntreContratos: document.getElementById('transporteEntreContratos').checked,
+                    contratoOrigem: document.getElementById('contratoOrigem').value,
+                    destinoOrigem: document.getElementById('destinoOrigem').value,
                     contrato: document.getElementById('contrato').value,
                     destino: document.getElementById('destino').value,
                     observacoes: document.getElementById('observacoes').value,
@@ -4010,6 +4341,47 @@
                     el.value = campos[chave];
                 }
             });
+
+            // Garantir que os contêineres e listas de destino dinâmicos sejam corretamente configurados e selecionados:
+            const transporteEntreContratosCheck = document.getElementById('transporteEntreContratos');
+            if (transporteEntreContratosCheck) {
+                transporteEntreContratosCheck.checked = !!campos.transporteEntreContratos;
+                aoMudarTransporteEntreContratos();
+            }
+
+            if (campos.transporteEntreContratos) {
+                const cOrig = campos.contratoOrigem || '';
+                const dOrig = campos.destinoOrigem || '';
+                
+                const selectCOrig = document.getElementById('contratoOrigem');
+                if (selectCOrig) {
+                    garantirOpcaoNoSelect('contratoOrigem', cOrig);
+                    selectCOrig.value = cOrig;
+                    renderDestinosNoSelect(cOrig, 'destinoOrigem');
+                }
+                
+                const selectDOrig = document.getElementById('destinoOrigem');
+                if (selectDOrig) {
+                    garantirOpcaoNoSelect('destinoOrigem', dOrig);
+                    selectDOrig.value = dOrig;
+                }
+            }
+
+            const cDest = campos.contrato || '';
+            const dDest = campos.destino || '';
+
+            const selectCDest = document.getElementById('contrato');
+            if (selectCDest) {
+                garantirOpcaoNoSelect('contrato', cDest);
+                selectCDest.value = cDest;
+                renderDestinosNoSelect(cDest, 'destino');
+            }
+
+            const selectDDest = document.getElementById('destino');
+            if (selectDDest) {
+                garantirOpcaoNoSelect('destino', dDest);
+                selectDDest.value = dDest;
+            }
 
             // Recriar linhas de tipos de placas
             const containerPlacas = document.getElementById('placasMuroItensContainer');
@@ -4490,6 +4862,8 @@
                     revisaoSelect.value = '0';
                     garantirOpcaoNoSelect('contrato', 'PACOTE 5- tac 2');
                     document.getElementById('contrato').value = 'PACOTE 5- tac 2';
+                    renderDestinosNoSelect('PACOTE 5- tac 2', 'destino');
+                    garantirOpcaoNoSelect('destino', 'KM 312');
                     document.getElementById('destino').value = 'KM 312';
                 }
             } else if (cc === 'PACOTE 6') {
@@ -4505,6 +4879,8 @@
                     revisaoSelect.value = '0';
                     garantirOpcaoNoSelect('contrato', 'PACOTE 6-');
                     document.getElementById('contrato').value = 'PACOTE 6-';
+                    renderDestinosNoSelect('PACOTE 6-', 'destino');
+                    garantirOpcaoNoSelect('destino', 'N/A');
                     document.getElementById('destino').value = 'N/A';
                 }
             } else if (cc === 'PACOTE 8') {
@@ -4571,6 +4947,8 @@
                     revisaoSelect.value = '0';
                     garantirOpcaoNoSelect('contrato', 'INTEGRIDADE-599: CT5500132111');
                     document.getElementById('contrato').value = 'INTEGRIDADE-599: CT5500132111';
+                    renderDestinosNoSelect('INTEGRIDADE-599: CT5500132111', 'destino');
+                    garantirOpcaoNoSelect('destino', 'KM 599');
                     document.getElementById('destino').value = 'KM 599';
                 }
             } else {
@@ -4770,8 +5148,11 @@
                 return '';
             }
 
+            const baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            const fullUrl = baseUrl + "?verify=" + encodeURIComponent(montarPayloadQr());
+
             const qr = new QRious({
-                value: montarPayloadQr(),
+                value: fullUrl,
                 size: 220,
                 level: 'H'
             });
@@ -5094,17 +5475,25 @@
             document.getElementById('previewAuthCode2').textContent = auth.code;
             document.getElementById('previewAuthMeta2').textContent = auth.meta;
 
-            const fornSelect = document.getElementById('fornecedor').value;
+            const isEntreContratos = document.getElementById('transporteEntreContratos').checked;
             let fornTexto = 'Não informado';
             let cnpjTexto = '';
 
-            if (fornSelect === 'custom') {
-                fornTexto = document.getElementById('origemPersonalizada').value || 'Não informado';
-            } else if (fornSelect) {
-                const fornObj = obterFornecedorSelecionado(fornSelect);
-                if (fornObj) {
-                    fornTexto = fornObj.nome + '\n' + (fornObj.local || 'Local não informado');
-                    cnpjTexto = 'CNPJ: ' + (fornObj.cnpj || 'Não informado');
+            if (isEntreContratos) {
+                const cOrig = document.getElementById('contratoOrigem').value || 'Não informado';
+                const dOrig = document.getElementById('destinoOrigem').value || 'Não informado';
+                fornTexto = cOrig + ' - ' + dOrig;
+                cnpjTexto = 'ORIGEM CONTRATO';
+            } else {
+                const fornSelect = document.getElementById('fornecedor').value;
+                if (fornSelect === 'custom') {
+                    fornTexto = document.getElementById('origemPersonalizada').value || 'Não informado';
+                } else if (fornSelect) {
+                    const fornObj = obterFornecedorSelecionado(fornSelect);
+                    if (fornObj) {
+                        fornTexto = fornObj.nome + '\n' + (fornObj.local || 'Local não informado');
+                        cnpjTexto = 'CNPJ: ' + (fornObj.cnpj || 'Não informado');
+                    }
                 }
             }
 
@@ -5215,17 +5604,25 @@
             const assinatura = assinaturaCurta(baseIntegridadeRomaneio());
             const fotosCarga = atualizarFotosNaPrevia();
 
-            const fornSelect = document.getElementById('fornecedor').value;
+            const isEntreContratos = document.getElementById('transporteEntreContratos').checked;
             let fornTexto = 'Não informado';
             let cnpjTexto = '';
 
-            if (fornSelect === 'custom') {
-                fornTexto = document.getElementById('origemPersonalizada').value || 'Não informado';
-            } else if (fornSelect) {
-                const fornObj = obterFornecedorSelecionado(fornSelect);
-                if (fornObj) {
-                    fornTexto = fornObj.nome;
-                    cnpjTexto = 'CNPJ: ' + (fornObj.cnpj || 'Não informado');
+            if (isEntreContratos) {
+                const cOrig = document.getElementById('contratoOrigem').value || 'Não informado';
+                const dOrig = document.getElementById('destinoOrigem').value || 'Não informado';
+                fornTexto = cOrig + ' - ' + dOrig;
+                cnpjTexto = 'ORIGEM CONTRATO';
+            } else {
+                const fornSelect = document.getElementById('fornecedor').value;
+                if (fornSelect === 'custom') {
+                    fornTexto = document.getElementById('origemPersonalizada').value || 'Não informado';
+                } else if (fornSelect) {
+                    const fornObj = obterFornecedorSelecionado(fornSelect);
+                    if (fornObj) {
+                        fornTexto = fornObj.nome;
+                        cnpjTexto = 'CNPJ: ' + (fornObj.cnpj || 'Não informado');
+                    }
                 }
             }
 
@@ -5630,17 +6027,25 @@
             const assinatura = assinaturaCurta(baseIntegridadeRomaneio());
             const fotosCarga = atualizarFotosNaPrevia();
 
-            const fornSelect = document.getElementById('fornecedor').value;
+            const isEntreContratos = document.getElementById('transporteEntreContratos').checked;
             let fornTexto = 'Não informado';
             let cnpjTexto = '';
 
-            if (fornSelect === 'custom') {
-                fornTexto = document.getElementById('origemPersonalizada').value || 'Não informado';
-            } else if (fornSelect) {
-                const fornObj = obterFornecedorSelecionado(fornSelect);
-                if (fornObj) {
-                    fornTexto = fornObj.nome;
-                    cnpjTexto = fornObj.cnpj || 'Não informado';
+            if (isEntreContratos) {
+                const cOrig = document.getElementById('contratoOrigem').value || 'Não informado';
+                const dOrig = document.getElementById('destinoOrigem').value || 'Não informado';
+                fornTexto = cOrig + ' - ' + dOrig;
+                cnpjTexto = 'ORIGEM CONTRATO';
+            } else {
+                const fornSelect = document.getElementById('fornecedor').value;
+                if (fornSelect === 'custom') {
+                    fornTexto = document.getElementById('origemPersonalizada').value || 'Não informado';
+                } else if (fornSelect) {
+                    const fornObj = obterFornecedorSelecionado(fornSelect);
+                    if (fornObj) {
+                        fornTexto = fornObj.nome;
+                        cnpjTexto = fornObj.cnpj || 'Não informado';
+                    }
                 }
             }
 
