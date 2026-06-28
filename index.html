@@ -1129,6 +1129,28 @@
                     </div>
                 </div>
 
+                <div class="section-title" style="margin-top: 25px;">📊 FLUXO DE CARGAS (DE ONDE SAIU ➔ PARA ONDE FOI)</div>
+                <div class="row" style="margin-bottom: 25px; gap: 15px; display: flex; flex-wrap: wrap;">
+                    <!-- Painel Origem -->
+                    <div style="flex: 1; min-width: 250px; background: white; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                        <h4 style="margin-top: 0; color: #1e3a8a; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid #3b82f6; padding-bottom: 5px; font-weight: 800; font-size: 0.9em;">
+                            <span>📤 DE ONDE SAIU (ORIGEM)</span>
+                        </h4>
+                        <div id="kpiOrigemList" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                            <!-- populated dynamically -->
+                        </div>
+                    </div>
+                    <!-- Painel Destino -->
+                    <div style="flex: 1; min-width: 250px; background: white; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                        <h4 style="margin-top: 0; color: #10b981; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid #10b981; padding-bottom: 5px; font-weight: 800; font-size: 0.9em;">
+                            <span>📥 PARA ONDE FOI (DESTINO)</span>
+                        </h4>
+                        <div id="kpiDestinoList" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                            <!-- populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row-3">
                     <div class="form-group">
                         <label>Primeiro nome</label>
@@ -1343,7 +1365,7 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row-3">
                 <div class="form-group">
                     <label>Placa do Caminhão</label>
                     <input type="text" id="placaCaminhao" placeholder="Ex: ABC-1234" style="text-transform: uppercase;">
@@ -1351,6 +1373,10 @@
                 <div class="form-group">
                     <label>Motorista</label>
                     <select id="responsavel" onchange="atualizarMotoristaPersonalizado()" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1;"></select>
+                </div>
+                <div class="form-group">
+                    <label>Preenchido Por (Emissor)</label>
+                    <input type="text" id="emissorNome" readonly style="background-color: #f1f5f9; color: #475569; font-weight: 500; cursor: not-allowed;">
                 </div>
             </div>
             <div id="novoMotoristaBox" style="display: none; align-items: center; gap: 10px; background-color: #f1f5f9; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; margin-top: 10px; width: 100%; box-sizing: border-box;">
@@ -1746,6 +1772,28 @@
                             </div>
                         </div>
                         <h3>ROMANEIO DE MATERIAIS</h3>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.7em; border: 1px solid #000; text-align: center;">
+                            <thead>
+                                <tr style="background-color: #f1f5f9; font-weight: bold; border-bottom: 1px solid #000;">
+                                    <th style="border-right: 1px solid #000; padding: 4px;">Nº FORMULÁRIO</th>
+                                    <th style="border-right: 1px solid #000; padding: 4px;">ELABORADO</th>
+                                    <th style="border-right: 1px solid #000; padding: 4px;">APROVADO</th>
+                                    <th style="border-right: 1px solid #000; padding: 4px;">SETOR</th>
+                                    <th style="border-right: 1px solid #000; padding: 4px;">REVISÃO</th>
+                                    <th style="padding: 4px;">DATA</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="previewFormNumero1" style="border-right: 1px solid #000; padding: 4px;">-</td>
+                                    <td id="previewFormElaborado1" style="border-right: 1px solid #000; padding: 4px;">-</td>
+                                    <td id="previewFormAprovado1" style="border-right: 1px solid #000; padding: 4px;">-</td>
+                                    <td id="previewFormSetor1" style="border-right: 1px solid #000; padding: 4px;">-</td>
+                                    <td id="previewFormRevisao1_header" style="border-right: 1px solid #000; padding: 4px;">-</td>
+                                    <td id="previewFormData1" style="padding: 4px;">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
                     <div class="identificacao-box">
@@ -1776,9 +1824,12 @@
                         </div>
                     </div>
 
-                    <div style="margin: 15px 0; border: 1px solid #000; padding: 10px;">
-                        <p><strong>PLACA DO CAMINHÃO:</strong> <span id="previewPlaca1"></span></p>
-                        <p style="margin-top: 5px;"><strong>RESPONSÁVEL:</strong> <span id="previewResponsavel1"></span></p>
+                    <div style="margin: 15px 0; border: 1px solid #000; padding: 8px 10px; font-size: 0.85em;">
+                        <div style="display: flex; justify-content: space-between; gap: 15px;">
+                            <div><strong>PLACA:</strong> <span id="previewPlaca1"></span></div>
+                            <div><strong>MOTORISTA:</strong> <span id="previewResponsavel1"></span></div>
+                            <div><strong>EMISSOR:</strong> <span id="previewEmissor1"></span></div>
+                        </div>
                     </div>
 
                     <div class="danfe-box">
@@ -1882,6 +1933,28 @@
                             </div>
                         </div>
                         <h3>ROMANEIO DE MATERIAIS</h3>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.7em; border: 1px solid #000; text-align: center;">
+                            <thead>
+                                <tr style="background-color: #f1f5f9; font-weight: bold; border-bottom: 1px solid #000;">
+                                    <th style="border-right: 1px solid #000; padding: 4px;">Nº FORMULÁRIO</th>
+                                    <th style="border-right: 1px solid #000; padding: 4px;">ELABORADO</th>
+                                    <th style="border-right: 1px solid #000; padding: 4px;">APROVADO</th>
+                                    <th style="border-right: 1px solid #000; padding: 4px;">SETOR</th>
+                                    <th style="border-right: 1px solid #000; padding: 4px;">REVISÃO</th>
+                                    <th style="padding: 4px;">DATA</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="previewFormNumero2" style="border-right: 1px solid #000; padding: 4px;">-</td>
+                                    <td id="previewFormElaborado2" style="border-right: 1px solid #000; padding: 4px;">-</td>
+                                    <td id="previewFormAprovado2" style="border-right: 1px solid #000; padding: 4px;">-</td>
+                                    <td id="previewFormSetor2" style="border-right: 1px solid #000; padding: 4px;">-</td>
+                                    <td id="previewFormRevisao2_header" style="border-right: 1px solid #000; padding: 4px;">-</td>
+                                    <td id="previewFormData2" style="padding: 4px;">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
                     <div class="identificacao-box">
@@ -1912,9 +1985,12 @@
                         </div>
                     </div>
 
-                    <div style="margin: 15px 0; border: 1px solid #000; padding: 10px;">
-                        <p><strong>PLACA DO CAMINHÃO:</strong> <span id="previewPlaca2"></span></p>
-                        <p style="margin-top: 5px;"><strong>RESPONSÁVEL:</strong> <span id="previewResponsavel2"></span></p>
+                    <div style="margin: 15px 0; border: 1px solid #000; padding: 8px 10px; font-size: 0.85em;">
+                        <div style="display: flex; justify-content: space-between; gap: 15px;">
+                            <div><strong>PLACA:</strong> <span id="previewPlaca2"></span></div>
+                            <div><strong>MOTORISTA:</strong> <span id="previewResponsavel2"></span></div>
+                            <div><strong>EMISSOR:</strong> <span id="previewEmissor2"></span></div>
+                        </div>
                     </div>
 
                     <div class="danfe-box">
@@ -2255,7 +2331,6 @@
             const responsavel = document.getElementById('responsavel');
             if (responsavel) {
                 renderMotoristasNoSelect();
-                responsavel.value = obterNomeUsuario(usuarioAtual);
             }
 
             gerarCodigoControle();
@@ -2281,6 +2356,8 @@
             document.getElementById('sessaoPerfil').textContent = user.perfil.toUpperCase();
             document.getElementById('sessaoLocal').textContent = user.local || 'N/D';
             document.getElementById('sessaoCampo').textContent = user.campo || 'N/D';
+            
+            document.getElementById('emissorNome').value = obterNomeUsuario(user);
 
             document.getElementById('loginSenha').value = '';
             aplicarPermissoesPorPerfil();
@@ -2608,6 +2685,88 @@
             document.getElementById('kpiOperadores').textContent = String(totalOperadores);
             document.getElementById('kpiRomaneiosTotal').textContent = String(totalRomaneios);
             document.getElementById('kpiRomaneiosHoje').textContent = String(romaneiosHoje);
+
+            // Contagem de Origem e Destino
+            const origens = {};
+            const destinos = {};
+
+            db.romaneios.forEach(function(r) {
+                if (!r.campos) return;
+                
+                // Obter nome legível da Origem
+                let orig = r.campos.fornecedor || 'Não informado';
+                if (orig === 'gf6') orig = 'GF6 EMPREENDIMENTOS';
+                else if (orig === 'pedreira') orig = 'PEDREIRA SÃO FRANCISCO';
+                else if (orig === 'roque') orig = 'ROQUE MATERIAIS';
+                else if (orig === 'fabrica_verona') orig = 'FÁBRICA VERONA';
+                else if (orig === 'custom' && r.campos.origemPersonalizada) orig = r.campos.origemPersonalizada;
+                orig = orig.toUpperCase().trim();
+                
+                origens[orig] = (origens[orig] || 0) + 1;
+
+                // Obter nome legível do Destino
+                let dest = r.campos.contrato || 'SEM CONTRATO';
+                if (r.campos.destino) {
+                    dest += ' - ' + r.campos.destino;
+                }
+                dest = dest.toUpperCase().trim();
+                
+                destinos[dest] = (destinos[dest] || 0) + 1;
+            });
+
+            // Ordenar e renderizar Origens
+            const listOrigem = document.getElementById('kpiOrigemList');
+            if (listOrigem) {
+                listOrigem.innerHTML = '';
+                const sortedOrig = Object.entries(origens).sort((a, b) => b[1] - a[1]);
+                if (sortedOrig.length === 0) {
+                    listOrigem.innerHTML = '<div style="color: #64748b; text-align: center; padding: 10px; font-size: 0.9em;">Nenhuma carga registrada</div>';
+                } else {
+                    const maxVal = Math.max(...Object.values(origens));
+                    sortedOrig.forEach(function([name, count]) {
+                        const pct = maxVal > 0 ? (count / maxVal) * 100 : 0;
+                        const row = document.createElement('div');
+                        row.style.margin = '4px 0';
+                        row.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; font-size: 0.8em; margin-bottom: 2px;">
+                                <strong style="color: #334155;">${name}</strong>
+                                <span style="color: #1e3a8a; font-weight: bold;">${count} viag${count > 1 ? 'ens' : 'em'}</span>
+                            </div>
+                            <div style="background-color: #f1f5f9; border: 1px solid #cbd5e1; height: 10px; border-radius: 9999px; overflow: hidden; width: 100%;">
+                                <div style="background: linear-gradient(90deg, #3b82f6, #60a5fa); width: ${pct}%; height: 100%; border-radius: 9999px;"></div>
+                            </div>
+                        `;
+                        listOrigem.appendChild(row);
+                    });
+                }
+            }
+
+            // Ordenar e renderizar Destinos
+            const listDestino = document.getElementById('kpiDestinoList');
+            if (listDestino) {
+                listDestino.innerHTML = '';
+                const sortedDest = Object.entries(destinos).sort((a, b) => b[1] - a[1]);
+                if (sortedDest.length === 0) {
+                    listDestino.innerHTML = '<div style="color: #64748b; text-align: center; padding: 10px; font-size: 0.9em;">Nenhuma carga registrada</div>';
+                } else {
+                    const maxVal = Math.max(...Object.values(destinos));
+                    sortedDest.forEach(function([name, count]) {
+                        const pct = maxVal > 0 ? (count / maxVal) * 100 : 0;
+                        const row = document.createElement('div');
+                        row.style.margin = '4px 0';
+                        row.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; font-size: 0.8em; margin-bottom: 2px;">
+                                <strong style="color: #334155;">${name}</strong>
+                                <span style="color: #10b981; font-weight: bold;">${count} viag${count > 1 ? 'ens' : 'em'}</span>
+                            </div>
+                            <div style="background-color: #f1f5f9; border: 1px solid #cbd5e1; height: 10px; border-radius: 9999px; overflow: hidden; width: 100%;">
+                                <div style="background: linear-gradient(90deg, #10b981, #34d399); width: ${pct}%; height: 100%; border-radius: 9999px;"></div>
+                            </div>
+                        `;
+                        listDestino.appendChild(row);
+                    });
+                }
+            }
         }
 
         function validarPermissaoAdmin() {
@@ -3735,6 +3894,7 @@
                     revisaoDocumento: document.getElementById('revisaoDocumento').value,
                     placaCaminhao: document.getElementById('placaCaminhao').value,
                     responsavel: document.getElementById('responsavel').value,
+                    emissorNome: document.getElementById('emissorNome').value,
                     fornecedor: document.getElementById('fornecedor').value,
                     origemPersonalizada: document.getElementById('origemPersonalizada').value,
                     modoPlacasMuro: document.getElementById('modoPlacasMuro').checked,
@@ -4856,6 +5016,14 @@
             const dataRecebimento = document.getElementById('dataRecebimento').value ? formatarData(document.getElementById('dataRecebimento').value) : '____/____/______';
             const auth = gerarCodigoAutenticacao();
 
+            const cfgFormNumero = localStorage.getItem('sucena_cfg_form_numero') || 'MRR-01-VALE-001';
+            const cfgFormElaborado = localStorage.getItem('sucena_cfg_form_elaborado') || 'BRUNO RAMOS';
+            const cfgFormAprovado = localStorage.getItem('sucena_cfg_form_aprovado') || 'DIRETORIA';
+            const cfgFormSetor = localStorage.getItem('sucena_cfg_form_setor') || 'QUALIDADE';
+            const cfgFormRevisao = localStorage.getItem('sucena_cfg_form_revisao') || '01';
+            const cfgFormData = localStorage.getItem('sucena_cfg_form_data') || '13/11/2026';
+            const emissorVal = document.getElementById('emissorNome').value || 'Não informado';
+
             // Atualizar VIA 1
             document.getElementById('previewNumero1').textContent = numero;
             document.getElementById('previewRegistro1').textContent = registro;
@@ -4864,6 +5032,13 @@
             document.getElementById('previewData1').textContent = formatarData(data);
             document.getElementById('previewPlaca1').textContent = placa;
             document.getElementById('previewResponsavel1').textContent = responsavel;
+            document.getElementById('previewEmissor1').textContent = emissorVal;
+            document.getElementById('previewFormNumero1').textContent = cfgFormNumero;
+            document.getElementById('previewFormElaborado1').textContent = cfgFormElaborado;
+            document.getElementById('previewFormAprovado1').textContent = cfgFormAprovado;
+            document.getElementById('previewFormSetor1').textContent = cfgFormSetor;
+            document.getElementById('previewFormRevisao1_header').textContent = cfgFormRevisao;
+            document.getElementById('previewFormData1').textContent = cfgFormData;
             document.getElementById('previewDocFiscalLabel1').textContent = docFiscal.label;
             document.getElementById('previewDocFiscal1').textContent = docFiscal.valor;
             document.getElementById('previewRazaoFornecedor1').textContent = razaoFornecedorFiscal;
@@ -4884,6 +5059,13 @@
             document.getElementById('previewData2').textContent = formatarData(data);
             document.getElementById('previewPlaca2').textContent = placa;
             document.getElementById('previewResponsavel2').textContent = responsavel;
+            document.getElementById('previewEmissor2').textContent = emissorVal;
+            document.getElementById('previewFormNumero2').textContent = cfgFormNumero;
+            document.getElementById('previewFormElaborado2').textContent = cfgFormElaborado;
+            document.getElementById('previewFormAprovado2').textContent = cfgFormAprovado;
+            document.getElementById('previewFormSetor2').textContent = cfgFormSetor;
+            document.getElementById('previewFormRevisao2_header').textContent = cfgFormRevisao;
+            document.getElementById('previewFormData2').textContent = cfgFormData;
             document.getElementById('previewDocFiscalLabel2').textContent = docFiscal.label;
             document.getElementById('previewDocFiscal2').textContent = docFiscal.valor;
             document.getElementById('previewRazaoFornecedor2').textContent = razaoFornecedorFiscal;
@@ -4991,6 +5173,7 @@
             const cfgLogoBase64 = localStorage.getItem('sucena_cfg_logo_base64') || null;
             
             const pdf = new jsPDF('p', 'mm', 'a4');
+            const emissorNome = document.getElementById('emissorNome').value || 'Não informado';
             
             const numero = document.getElementById('numeroRomaneio').value || 'S/N';
             const registro = document.getElementById('registroInterno').value || 'S/N';
@@ -5192,14 +5375,19 @@
                 
                 pdf.rect(10, y, 190, 12);
                 pdf.setFont('helvetica', 'bold');
-                pdf.text('PLACA DO CAMINHÃO: ', 12, y + 6);
+                pdf.text('PLACA: ', 12, y + 7);
                 pdf.setFont('helvetica', 'normal');
-                pdf.text(placa, 55, y + 6);
+                pdf.text(placa, 28, y + 7);
                 
                 pdf.setFont('helvetica', 'bold');
-                pdf.text('RESPONSÁVEL: ', 110, y + 6);
+                pdf.text('MOTORISTA: ', 75, y + 7);
                 pdf.setFont('helvetica', 'normal');
-                pdf.text(responsavel, 145, y + 6);
+                pdf.text(responsavel, 103, y + 7);
+                
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('EMISSOR: ', 145, y + 7);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(emissorNome, 168, y + 7);
                 
                 y += 17;
 
@@ -6567,6 +6755,137 @@
             alert('Romaneio carregado no formulário com sucesso!');
         }
 
+        function verificarParametroVerificacaoQr() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const verifyData = urlParams.get('verify');
+            if (verifyData) {
+                mostrarModalVerificacaoQr(verifyData);
+            }
+        }
+
+        function mostrarModalVerificacaoQr(verifyData) {
+            const partes = verifyData.split('|');
+            const dados = {};
+            partes.forEach(function(p) {
+                const eqIdx = p.indexOf('=');
+                if (eqIdx !== -1) {
+                    const key = p.substring(0, eqIdx);
+                    const val = p.substring(eqIdx + 1);
+                    dados[key] = val;
+                } else {
+                    dados[p] = true;
+                }
+            });
+
+            const codigoControle = dados['CONTROLE'] || 'Desconhecido';
+            const romNum = dados['ROM'] || 'Desconhecido';
+            const dataEmissao = dados['DATA'] || 'Desconhecido';
+            const hashAssinatura = dados['HASH'] || 'N/A';
+            
+            let notaFiscal = 'N/A';
+            let cnpjForn = 'N/A';
+            let codProd = 'N/A';
+            partes.forEach(function(p) {
+                if (p.startsWith('NF=')) notaFiscal = p.replace('NF=', '');
+                if (p.startsWith('CNPJ_FORN=')) cnpjForn = p.replace('CNPJ_FORN=', '');
+                if (p.startsWith('COD_PROD=')) codProd = p.replace('COD_PROD=', '');
+            });
+
+            const logo = localStorage.getItem('sucena_cfg_logo_base64') || null;
+
+            const overlay = document.createElement('div');
+            overlay.id = 'qrVerificationModal';
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100vw';
+            overlay.style.height = '100vh';
+            overlay.style.backgroundColor = 'rgba(15, 23, 42, 0.85)';
+            overlay.style.backdropFilter = 'blur(10px)';
+            overlay.style.display = 'flex';
+            overlay.style.alignItems = 'center';
+            overlay.style.justifyContent = 'center';
+            overlay.style.zIndex = '99999';
+            overlay.style.padding = '20px';
+            overlay.style.boxSizing = 'border-box';
+            overlay.style.fontFamily = "'Outfit', 'Inter', sans-serif";
+
+            overlay.innerHTML = `
+                <div class="verification-card" style="background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 16px; width: 100%; max-width: 500px; padding: 30px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3); text-align: center; position: relative; animation: modalAppear 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+                    <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 80%; height: 4px; background: linear-gradient(90deg, #3b82f6, #10b981); border-radius: 0 0 8px 8px;"></div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        ${logo ? `<img src="${logo}" style="max-height: 60px; margin-bottom: 10px;" alt="Logo">` : ''}
+                        <h2 style="margin: 0; color: #0f172a; font-size: 1.5em; font-weight: 800;">SUCENA EMPREENDIMENTOS</h2>
+                        <span style="font-size: 0.8em; color: #64748b; font-weight: 600;">CNPJ: 19.381.283/0001-97</span>
+                    </div>
+
+                    <div style="display: inline-flex; align-items: center; gap: 8px; background-color: #d1fae5; border: 1px solid #10b981; color: #065f46; padding: 8px 16px; border-radius: 9999px; font-weight: bold; font-size: 0.9em; margin-bottom: 25px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="color: #10b981;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        ROMANEIO ORIGINAL VERIFICADO
+                    </div>
+
+                    <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 25px; box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.02);">
+                        <div style="margin-bottom: 12px; border-bottom: 1px solid #cbd5e1; padding-bottom: 8px;">
+                            <span style="font-size: 0.8em; color: #64748b; text-transform: uppercase; font-weight: bold; display: block;">Código de Controle</span>
+                            <strong style="font-size: 1.25em; color: #1e3a8a; font-family: monospace;">${codigoControle}</strong>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 12px;">
+                            <div>
+                                <span style="font-size: 0.8em; color: #64748b; font-weight: bold; display: block;">Nº Romaneio</span>
+                                <strong style="color: #334155;">${romNum}</strong>
+                            </div>
+                            <div>
+                                <span style="font-size: 0.8em; color: #64748b; font-weight: bold; display: block;">Data de Emissão</span>
+                                <strong style="color: #334155;">${dataEmissao}</strong>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 12px; border-top: 1px solid #f1f5f9; padding-top: 10px;">
+                            <div>
+                                <span style="font-size: 0.8em; color: #64748b; font-weight: bold; display: block;">Nota Fiscal</span>
+                                <strong style="color: #334155;">${notaFiscal}</strong>
+                            </div>
+                            <div>
+                                <span style="font-size: 0.8em; color: #64748b; font-weight: bold; display: block;">Cód. Produto</span>
+                                <strong style="color: #334155;">${codProd}</strong>
+                            </div>
+                        </div>
+
+                        <div style="border-top: 1px solid #f1f5f9; padding-top: 10px;">
+                            <span style="font-size: 0.8em; color: #64748b; font-weight: bold; display: block;">Hash Assinatura (Integridade)</span>
+                            <span style="font-family: monospace; font-size: 0.85em; color: #475569; word-break: break-all; font-weight: bold;">${hashAssinatura}</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button type="button" onclick="fecharModalVerificacaoQr()" style="background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.3); transition: all 0.2s;">
+                            Entrar no Sistema
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @keyframes modalAppear {
+                    from { transform: scale(0.9) translateY(20px); opacity: 0; }
+                    to { transform: scale(1) translateY(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+
+            document.body.appendChild(overlay);
+        }
+
+        function fecharModalVerificacaoQr() {
+            const modal = document.getElementById('qrVerificationModal');
+            if (modal) modal.remove();
+            const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.pushState({ path: newUrl }, '', newUrl);
+        }
+
         usuariosSistema = getUsuariosSistema();
         setUsuariosSistema(usuariosSistema);
         renderLoginUsers();
@@ -6608,6 +6927,7 @@
         carregarDadosIniciais();
         atualizarStatusBaseDados();
         atualizarKpisAdmin();
+        verificarParametroVerificacaoQr();
     </script>
         <script>
             if ('serviceWorker' in navigator) {
