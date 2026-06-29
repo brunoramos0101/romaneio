@@ -1322,7 +1322,7 @@
                     </div>
                     <div class="form-group">
                         <label>Produto Carregado</label>
-                        <select id="produtoCarregado" onchange="atualizarVisibilidadeLotes(); atualizarProdutoPersonalizado(); aplicarProximaSequenciaBanco(true); gerarCodigoControle();" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1;">
+                        <select id="produtoCarregado" onchange="atualizarVisibilidadeLotes(); atualizarProdutoPersonalizado(); aplicarProximaSequenciaBanco(true); atualizarVisibilidadeMateriaisPorProduto(); gerarCodigoControle();" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #cbd5e1;">
                             <option value="N/A">N/A</option>
                             <option value="PLACA (PL)">PLACA (PL)</option>
                             <option value="ADUELA SIMPLES (ADS)">ADUELA SIMPLES (ADS)</option>
@@ -4147,7 +4147,16 @@
                         const lastIndex = detalhe.lastIndexOf(', ');
                         detalhe = detalhe.slice(0, lastIndex) + ' E ' + detalhe.slice(lastIndex + 2);
                     }
-                    placasMuroNome += ' (TOTAL ' + totalQtd + ': ' + detalhe + ')';
+                    placasMuroNome += ' (' + detalhe + ')';
+                }
+
+                // Obter lotes estruturados para adicionar nº do lote e quantidade
+                const lotes = obterLotesEstruturados();
+                if (lotes.length > 0) {
+                    const partesLote = lotes.map(function(item) {
+                        return 'Lote ' + item.lote + ' (' + item.qtd + ' un)';
+                    });
+                    placasMuroNome += '\n[Lotes: ' + partesLote.join(', ') + ']';
                 }
             }
 
@@ -4974,6 +4983,7 @@
             const kmVal = kmSelect.value;
             atualizarKm(); // Mostra/oculta caixa de novo KM se necessário
             if (kmVal !== 'add_new_km' && kmVal !== '') {
+                garantirOpcaoNoSelect('destino', kmVal);
                 document.getElementById('destino').value = kmVal;
             }
             gerarCodigoControle();
@@ -5507,7 +5517,7 @@
             const materiaisSelecionados = obterMateriaisSelecionados();
             materiaisSelecionados.forEach(function(mat) {
                 materiaisHTML += '<tr>';
-                materiaisHTML += '<td><strong>' + mat.nome + '</strong></td>';
+                materiaisHTML += '<td style="white-space: pre-wrap;"><strong>' + mat.nome + '</strong></td>';
                 materiaisHTML += '<td style="text-align: center;">' + mat.qtd + '</td>';
                 materiaisHTML += '<td style="text-align: center;">' + mat.unidade + '</td>';
                 materiaisHTML += '</tr>';
@@ -6600,6 +6610,41 @@
             atualizarQrPrevia();
         }
 
+        function atualizarVisibilidadeMateriaisPorProduto() {
+            const produtoVal = document.getElementById('produtoCarregado').value;
+            const sigla = obterSiglaProduto(produtoVal);
+            const isPlaca = (sigla === 'PL' || produtoVal.indexOf('PLACA') !== -1);
+            
+            const items = document.querySelectorAll('.materials-section .material-item');
+            
+            items.forEach(function(item) {
+                const isPlacasMuroItem = item.querySelector('#placasMuroCheck') || item.id === 'placasMuroTipoBox';
+                
+                if (isPlaca) {
+                    if (isPlacasMuroItem) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                } else {
+                    if (item.id === 'placasMuroTipoBox') {
+                        const check = document.getElementById('placasMuroCheck');
+                        item.style.display = check && check.checked ? 'grid' : 'none';
+                    } else {
+                        item.style.display = '';
+                    }
+                }
+            });
+
+            if (isPlaca) {
+                const check = document.getElementById('placasMuroCheck');
+                if (check && !check.checked) {
+                    check.checked = true;
+                    atualizarVisibilidadeTipoPlaca();
+                }
+            }
+        }
+
         // --- GESTÃO DE MOTORISTAS ---
         let motoristasExtras = [];
 
@@ -7422,6 +7467,7 @@
         renderContratosNoSelect();
         atualizarContrato();
         atualizarModoPlacasMuro();
+        atualizarVisibilidadeMateriaisPorProduto();
 
         carregarConfiguracoesCabecalhoLocal();
         
