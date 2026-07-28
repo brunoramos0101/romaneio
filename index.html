@@ -6167,6 +6167,26 @@
             return [codigoControle, numero, registro, data, docFiscal, cnpjFornecedorFiscal, codigoProdutoFiscal, contrato].join('|');
         }
 
+        function obterResumoCargaTextoQr() {
+            try {
+                if (isModoPlacasMuro()) {
+                    const produto = document.getElementById('produtoCarregado').value || 'PLACAS/PRÉ-MOLDADOS';
+                    return produto;
+                }
+                const materiais = (typeof obterMateriaisSelecionados === 'function') ? obterMateriaisSelecionados() : [];
+                if (Array.isArray(materiais) && materiais.length > 0) {
+                    return materiais.map(function(m) {
+                        const qtd = (m.qtd && m.qtd !== '-') ? (m.qtd + ' ' + (m.unidade || '') + ' de ') : '';
+                        return (qtd + m.nome).trim();
+                    }).join(', ');
+                }
+                const desc = document.getElementById('descricaoProdutoFiscal').value;
+                return desc || document.getElementById('produtoCarregado').value || 'Não informado';
+            } catch (e) {
+                return 'Não informado';
+            }
+        }
+
         function montarPayloadQr() {
             const codigoControle = document.getElementById('codigoControle').value || 'SEM-CONTROLE';
             const numero = document.getElementById('numeroRomaneio').value || 'S/N';
@@ -6176,6 +6196,11 @@
             const codigoProdutoFiscal = document.getElementById('codigoProdutoFiscal').value || 'SEM-COD-PROD';
             const assinatura = assinaturaCurta(baseIntegridadeRomaneio());
 
+            const origem = String((typeof obterOrigemTextoMapa === 'function' ? obterOrigemTextoMapa() : '') || 'Não informado').replace(/\|/g, '/');
+            const destino = String(document.getElementById('destino').value || 'Não informado').replace(/\|/g, '/');
+            const contratoDestino = String(document.getElementById('contrato').value || 'Não informado').replace(/\|/g, '/');
+            const cargaResumo = String(obterResumoCargaTextoQr() || 'Não informado').replace(/\|/g, '/');
+
             return [
                 'ROMANEIO-SUCENA',
                 'CONTROLE=' + codigoControle,
@@ -6184,6 +6209,10 @@
                 docFiscal.payload,
                 'CNPJ_FORN=' + cnpjFornecedorFiscal,
                 'COD_PROD=' + codigoProdutoFiscal,
+                'ORIGEM=' + origem,
+                'DESTINO=' + destino,
+                'CONTRATO=' + contratoDestino,
+                'CARGA=' + cargaResumo,
                 'HASH=' + assinatura
             ].join('|');
         }
@@ -8502,10 +8531,16 @@
                 }
             });
 
-            const codigoControle = dados['CONTROLE'] || 'Desconhecido';
-            const romNum = dados['ROM'] || 'Desconhecido';
-            const dataEmissao = dados['DATA'] || 'Desconhecido';
-            const hashAssinatura = dados['HASH'] || 'N/A';
+            // Todos os valores vêm do parâmetro de URL "?verify=" (potencialmente manipulável
+            // por quem monta o link), então são sempre sanitizados antes de entrar no innerHTML.
+            const codigoControle = sanitizarHTML(dados['CONTROLE'] || 'Desconhecido');
+            const romNum = sanitizarHTML(dados['ROM'] || 'Desconhecido');
+            const dataEmissao = sanitizarHTML(dados['DATA'] || 'Desconhecido');
+            const hashAssinatura = sanitizarHTML(dados['HASH'] || 'N/A');
+            const origemTransporte = sanitizarHTML(dados['ORIGEM'] || 'Não informado');
+            const destinoTransporte = sanitizarHTML(dados['DESTINO'] || 'Não informado');
+            const contratoDestino = sanitizarHTML(dados['CONTRATO'] || '');
+            const cargaTransportada = sanitizarHTML(dados['CARGA'] || 'Não informado');
             
             let notaFiscal = 'N/A';
             let cnpjForn = 'N/A';
@@ -8515,6 +8550,9 @@
                 if (p.startsWith('CNPJ_FORN=')) cnpjForn = p.replace('CNPJ_FORN=', '');
                 if (p.startsWith('COD_PROD=')) codProd = p.replace('COD_PROD=', '');
             });
+            notaFiscal = sanitizarHTML(notaFiscal);
+            cnpjForn = sanitizarHTML(cnpjForn);
+            codProd = sanitizarHTML(codProd);
 
             const logo = localStorage.getItem('sucena_cfg_logo_base64') || null;
 
@@ -8536,56 +8574,71 @@
             overlay.style.fontFamily = "'Outfit', 'Inter', sans-serif";
 
             overlay.innerHTML = `
-                <div class="verification-card" style="background: rgba(255, 255, 255, 0.95); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 16px; width: 100%; max-width: 500px; padding: 30px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3); text-align: center; position: relative; animation: modalAppear 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
-                    <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 80%; height: 4px; background: linear-gradient(90deg, #3b82f6, #10b981); border-radius: 0 0 8px 8px;"></div>
-                    
-                    <div style="margin-bottom: 20px;">
-                        ${logo ? `<img src="${logo}" style="max-height: 60px; margin-bottom: 10px;" alt="Logo">` : ''}
-                        <h2 style="margin: 0; color: #0f172a; font-size: 1.5em; font-weight: 800;">SUCENA EMPREENDIMENTOS</h2>
-                        <span style="font-size: 0.8em; color: #64748b; font-weight: 600;">CNPJ: 19.381.283/0001-97</span>
-                    </div>
+                <div class="verification-card" style="background: rgba(255, 255, 255, 0.97); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 18px; width: 100%; max-width: 460px; max-height: 92vh; overflow-y: auto; padding: 0; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); text-align: center; position: relative; animation: modalAppear 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
 
-                    <div style="display: inline-flex; align-items: center; gap: 8px; background-color: #d1fae5; border: 1px solid #10b981; color: #065f46; padding: 8px 16px; border-radius: 9999px; font-weight: bold; font-size: 0.9em; margin-bottom: 25px;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="color: #10b981;"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        ROMANEIO ORIGINAL VERIFICADO
-                    </div>
+                    <div style="background: linear-gradient(135deg, #0f172a, #1e3a8a 55%, #3b82f6); padding: 26px 24px 20px; border-radius: 18px 18px 0 0;">
+                        ${logo ? `<img src="${logo}" style="max-height: 54px; margin-bottom: 10px; background: #fff; border-radius: 8px; padding: 6px 10px;" alt="Logo">` : ''}
+                        <h2 style="margin: 0; color: #ffffff; font-size: 1.35em; font-weight: 800; letter-spacing: 0.3px;">SUCENA EMPREENDIMENTOS</h2>
+                        <span style="font-size: 0.78em; color: #cbd5e1; font-weight: 600; display: block; margin-top: 2px;">CNPJ: 19.381.283/0001-97</span>
 
-                    <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; text-align: left; margin-bottom: 25px; box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.02);">
-                        <div style="margin-bottom: 12px; border-bottom: 1px solid #cbd5e1; padding-bottom: 8px;">
-                            <span style="font-size: 0.8em; color: #64748b; text-transform: uppercase; font-weight: bold; display: block;">Código de Controle</span>
-                            <strong style="font-size: 1.25em; color: #1e3a8a; font-family: monospace;">${codigoControle}</strong>
-                        </div>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 12px;">
-                            <div>
-                                <span style="font-size: 0.8em; color: #64748b; font-weight: bold; display: block;">Nº Romaneio</span>
-                                <strong style="color: #334155;">${romNum}</strong>
-                            </div>
-                            <div>
-                                <span style="font-size: 0.8em; color: #64748b; font-weight: bold; display: block;">Data de Emissão</span>
-                                <strong style="color: #334155;">${dataEmissao}</strong>
-                            </div>
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 12px; border-top: 1px solid #f1f5f9; padding-top: 10px;">
-                            <div>
-                                <span style="font-size: 0.8em; color: #64748b; font-weight: bold; display: block;">Nota Fiscal</span>
-                                <strong style="color: #334155;">${notaFiscal}</strong>
-                            </div>
-                            <div>
-                                <span style="font-size: 0.8em; color: #64748b; font-weight: bold; display: block;">Cód. Produto</span>
-                                <strong style="color: #334155;">${codProd}</strong>
-                            </div>
-                        </div>
-
-                        <div style="border-top: 1px solid #f1f5f9; padding-top: 10px;">
-                            <span style="font-size: 0.8em; color: #64748b; font-weight: bold; display: block;">Hash Assinatura (Integridade)</span>
-                            <span style="font-family: monospace; font-size: 0.85em; color: #475569; word-break: break-all; font-weight: bold;">${hashAssinatura}</span>
+                        <div style="display: inline-flex; align-items: center; gap: 7px; background-color: rgba(16, 185, 129, 0.18); border: 1px solid #34d399; color: #d1fae5; padding: 6px 14px; border-radius: 9999px; font-weight: bold; font-size: 0.82em; margin-top: 14px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            ROMANEIO ORIGINAL VERIFICADO
                         </div>
                     </div>
 
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <button type="button" onclick="fecharModalVerificacaoQr()" style="background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.3); transition: all 0.2s;">
+                    <div style="padding: 22px 24px 26px;">
+
+                        <div style="background: linear-gradient(180deg, #eff6ff, #f8fafc); border: 1px solid #bfdbfe; border-radius: 14px; padding: 18px; text-align: left; margin-bottom: 16px;">
+                            <span style="font-size: 0.72em; color: #1e3a8a; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; margin-bottom: 10px;">📦 O que está sendo transportado</span>
+                            <strong style="display: block; font-size: 1.05em; color: #0f172a; line-height: 1.4; white-space: pre-line;">${cargaTransportada}</strong>
+
+                            <div style="display: flex; align-items: center; gap: 6px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed #93c5fd;">
+                                <span style="font-size: 0.85em;">📅</span>
+                                <span style="font-size: 0.78em; color: #475569; font-weight: 700;">Data de Saída:</span>
+                                <strong style="font-size: 0.9em; color: #1e3a8a;">${dataEmissao}</strong>
+                            </div>
+                        </div>
+
+                        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; margin-bottom: 16px;">
+                            <div style="display: flex; align-items: stretch; gap: 10px; text-align: left;">
+                                <div style="flex: 1; min-width: 0;">
+                                    <span style="font-size: 0.72em; color: #64748b; text-transform: uppercase; font-weight: 800; letter-spacing: 0.4px; display: block;">📍 De onde saiu</span>
+                                    <strong style="display: block; color: #0f172a; font-size: 0.95em; margin-top: 4px; word-break: break-word;">${origemTransporte}</strong>
+                                </div>
+                                <div style="display: flex; align-items: center; color: #3b82f6; font-size: 1.3em; font-weight: 900;">➜</div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <span style="font-size: 0.72em; color: #64748b; text-transform: uppercase; font-weight: 800; letter-spacing: 0.4px; display: block;">🏁 Para onde vai</span>
+                                    <strong style="display: block; color: #0f172a; font-size: 0.95em; margin-top: 4px; word-break: break-word;">${destinoTransporte}</strong>
+                                    ${contratoDestino ? `<span style="display: block; font-size: 0.75em; color: #64748b; margin-top: 2px;">Contrato: ${contratoDestino}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; text-align: left; margin-bottom: 20px; box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.02);">
+                            <div style="margin-bottom: 10px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">
+                                <span style="font-size: 0.72em; color: #64748b; text-transform: uppercase; font-weight: bold; display: block;">Código de Controle</span>
+                                <strong style="font-size: 1.15em; color: #1e3a8a; font-family: monospace;">${codigoControle}</strong>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px;">
+                                <div>
+                                    <span style="font-size: 0.72em; color: #64748b; font-weight: bold; display: block;">Nº Romaneio</span>
+                                    <strong style="color: #334155; font-size: 0.9em;">${romNum}</strong>
+                                </div>
+                                <div>
+                                    <span style="font-size: 0.72em; color: #64748b; font-weight: bold; display: block;">Nota Fiscal</span>
+                                    <strong style="color: #334155; font-size: 0.9em;">${notaFiscal}</strong>
+                                </div>
+                            </div>
+
+                            <div style="border-top: 1px solid #f1f5f9; padding-top: 8px;">
+                                <span style="font-size: 0.72em; color: #64748b; font-weight: bold; display: block;">Hash Assinatura (Integridade)</span>
+                                <span style="font-family: monospace; font-size: 0.8em; color: #475569; word-break: break-all; font-weight: bold;">${hashAssinatura}</span>
+                            </div>
+                        </div>
+
+                        <button type="button" onclick="fecharModalVerificacaoQr()" style="width: 100%; background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: white; border: none; padding: 13px 24px; border-radius: 10px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.35); transition: all 0.2s;">
                             Entrar no Sistema
                         </button>
                     </div>
