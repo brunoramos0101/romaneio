@@ -2673,12 +2673,30 @@
             ];
         }
 
+        function garantirUsuariosPadrao(lista) {
+            const base = Array.isArray(lista) ? lista.slice() : [];
+            const padrao = criarUsuariosPadrao();
+
+            padrao.forEach(function(userPadrao) {
+                const existe = base.some(function(user) {
+                    return user && user.id === userPadrao.id;
+                });
+                if (!existe) {
+                    base.push(userPadrao);
+                }
+            });
+
+            return base;
+        }
+
         function getUsuariosSistema() {
             try {
                 const bruto = localStorage.getItem(USERS_STORAGE_KEY);
                 if (!bruto) return criarUsuariosPadrao();
                 let lista = JSON.parse(bruto);
                 if (!Array.isArray(lista) || !lista.length) return criarUsuariosPadrao();
+
+                lista = garantirUsuariosPadrao(lista);
                 
                 // Migração: garantir que todos os usuários têm senha
                 lista = lista.map(function(user) {
@@ -2702,7 +2720,8 @@
         }
 
         function setUsuariosSistema(lista) {
-            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(lista));
+            const saneList = garantirUsuariosPadrao(Array.isArray(lista) ? lista : []);
+            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(saneList));
         }
 
         function obterNomeUsuario(usuario) {
@@ -2720,6 +2739,11 @@
             const select = document.getElementById('loginUserSelect');
             if (!select) return;
 
+            if (!Array.isArray(usuariosSistema) || usuariosSistema.length === 0) {
+                usuariosSistema = criarUsuariosPadrao();
+                setUsuariosSistema(usuariosSistema);
+            }
+
             while (select.options.length > 0) {
                 select.remove(0);
             }
@@ -2730,6 +2754,13 @@
                 option.textContent = obterNomeUsuario(user) + ' (' + user.perfil.toUpperCase() + ')';
                 select.appendChild(option);
             });
+
+            if (select.options.length === 0) {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'Nenhum usuário disponível';
+                select.appendChild(option);
+            }
 
             atualizarResumoUsuarioSelecionado();
         }
@@ -3133,24 +3164,17 @@
             .then(function(res) { return res.json(); })
             .then(function(data) {
                 if (data && data.status === "success" && Array.isArray(data.usuarios)) {
-                    if (data.usuarios.length === 0) {
-                        usuariosSistema = criarUsuariosPadrao();
-                    } else {
-                        usuariosSistema = data.usuarios;
-                        const temAdminMaster = usuariosSistema.some(function(u) { return u.id === 'adm_master'; });
-                        if (!temAdminMaster) {
-                            usuariosSistema.unshift({
-                                id: 'adm_master',
-                                primeiroNome: 'ADMIN',
-                                segundoNome: 'MASTER',
-                                perfil: 'admin',
-                                local: 'FÁBRICA VERONA - AÇAILÂNDIA',
-                                campo: 'TODOS',
-                                pacotesPermitidos: [],
-                                senha: '1234'
-                            });
+                    usuariosSistema = data.usuarios.length === 0
+                        ? criarUsuariosPadrao()
+                        : garantirUsuariosPadrao(data.usuarios);
+
+                    usuariosSistema = usuariosSistema.map(function(user) {
+                        if (!user.senha) {
+                            user.senha = '1234';
                         }
-                    }
+                        return user;
+                    });
+
                     setUsuariosSistema(usuariosSistema);
                     renderLoginUsers();
                     renderTabelaUsuariosAdmin();
