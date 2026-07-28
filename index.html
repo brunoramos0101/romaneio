@@ -2673,96 +2673,12 @@
             ];
         }
 
-        function garantirUsuariosPadrao(lista) {
-            const base = Array.isArray(lista) ? lista.slice() : [];
-            const padrao = criarUsuariosPadrao();
-
-            padrao.forEach(function(userPadrao) {
-                const existe = base.some(function(user) {
-                    return user && user.id === userPadrao.id;
-                });
-                if (!existe) {
-                    base.push(userPadrao);
-                }
-            });
-
-            return base;
-        }
-
-        function normalizarPerfilUsuario(perfil) {
-            const valor = String(perfil || '').trim().toLowerCase();
-            if (valor === 'admin' || valor === 'adm' || valor === 'superadmin') {
-                return 'admin';
-            }
-            return 'operador';
-        }
-
-        function normalizarPacotesPermitidos(raw, perfilNormalizado) {
-            if (perfilNormalizado !== 'operador') return [];
-            if (!Array.isArray(raw)) return [];
-
-            return raw
-                .map(function(item) {
-                    const num = parseInt(item, 10);
-                    return Number.isFinite(num) ? num : null;
-                })
-                .filter(function(item) {
-                    return item !== null && item >= 1 && item <= 30;
-                });
-        }
-
-        function normalizarUsuario(user, index) {
-            if (!user || typeof user !== 'object') return null;
-
-            const primeiroNome = String(user.primeiroNome || user.primeiro_nome || user.nome || 'USUARIO').trim();
-            const segundoNome = String(user.segundoNome || user.segundo_nome || user.sobrenome || 'ROMANEIO').trim();
-            const perfil = normalizarPerfilUsuario(user.perfil || user.role || user.tipo);
-            const baseId = String(user.id || user.userId || '').trim();
-            const fallbackId = ('usr_' + primeiroNome + '_' + segundoNome + '_' + index)
-                .toLowerCase()
-                .replace(/[^a-z0-9_]+/g, '_')
-                .replace(/^_+|_+$/g, '');
-            const id = baseId || fallbackId || ('usr_auto_' + index);
-            const senha = String(user.senha || '').trim() || '1234';
-
-            return {
-                id: id,
-                primeiroNome: primeiroNome || 'USUARIO',
-                segundoNome: segundoNome || 'ROMANEIO',
-                perfil: perfil,
-                local: String(user.local || user.unidade || 'FÁBRICA VERONA - AÇAILÂNDIA').trim(),
-                campo: String(user.campo || 'NÃO INFORMADO').trim(),
-                pacotesPermitidos: normalizarPacotesPermitidos(user.pacotesPermitidos, perfil),
-                senha: senha
-            };
-        }
-
-        function normalizarListaUsuarios(lista) {
-            if (!Array.isArray(lista)) return [];
-
-            const vistos = new Set();
-            const normalizados = [];
-
-            lista.forEach(function(user, index) {
-                const normalizado = normalizarUsuario(user, index);
-                if (!normalizado) return;
-                if (vistos.has(normalizado.id)) return;
-                vistos.add(normalizado.id);
-                normalizados.push(normalizado);
-            });
-
-            return normalizados;
-        }
-
         function getUsuariosSistema() {
             try {
                 const bruto = localStorage.getItem(USERS_STORAGE_KEY);
                 if (!bruto) return criarUsuariosPadrao();
                 let lista = JSON.parse(bruto);
                 if (!Array.isArray(lista) || !lista.length) return criarUsuariosPadrao();
-
-                lista = normalizarListaUsuarios(lista);
-                lista = garantirUsuariosPadrao(lista);
                 
                 // Migração: garantir que todos os usuários têm senha
                 lista = lista.map(function(user) {
@@ -2786,8 +2702,7 @@
         }
 
         function setUsuariosSistema(lista) {
-            const saneList = garantirUsuariosPadrao(normalizarListaUsuarios(Array.isArray(lista) ? lista : []));
-            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(saneList));
+            localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(lista));
         }
 
         function obterNomeUsuario(usuario) {
@@ -2805,33 +2720,16 @@
             const select = document.getElementById('loginUserSelect');
             if (!select) return;
 
-            if (!Array.isArray(usuariosSistema) || usuariosSistema.length === 0) {
-                usuariosSistema = criarUsuariosPadrao();
-                setUsuariosSistema(usuariosSistema);
-            }
-
             while (select.options.length > 0) {
                 select.remove(0);
             }
 
             usuariosSistema.forEach(function(user) {
-                if (!user || !user.id) return;
                 const option = document.createElement('option');
                 option.value = user.id;
-                option.textContent = obterNomeUsuario(user) + ' (' + String(user.perfil || 'operador').toUpperCase() + ')';
+                option.textContent = obterNomeUsuario(user) + ' (' + user.perfil.toUpperCase() + ')';
                 select.appendChild(option);
             });
-
-            if (select.options.length > 0 && !select.value) {
-                select.selectedIndex = 0;
-            }
-
-            if (select.options.length === 0) {
-                const option = document.createElement('option');
-                option.value = '';
-                option.textContent = 'Nenhum usuário disponível';
-                select.appendChild(option);
-            }
 
             atualizarResumoUsuarioSelecionado();
         }
@@ -3235,17 +3133,24 @@
             .then(function(res) { return res.json(); })
             .then(function(data) {
                 if (data && data.status === "success" && Array.isArray(data.usuarios)) {
-                    usuariosSistema = data.usuarios.length === 0
-                        ? criarUsuariosPadrao()
-                        : garantirUsuariosPadrao(normalizarListaUsuarios(data.usuarios));
-
-                    usuariosSistema = usuariosSistema.map(function(user) {
-                        if (!user.senha) {
-                            user.senha = '1234';
+                    if (data.usuarios.length === 0) {
+                        usuariosSistema = criarUsuariosPadrao();
+                    } else {
+                        usuariosSistema = data.usuarios;
+                        const temAdminMaster = usuariosSistema.some(function(u) { return u.id === 'adm_master'; });
+                        if (!temAdminMaster) {
+                            usuariosSistema.unshift({
+                                id: 'adm_master',
+                                primeiroNome: 'ADMIN',
+                                segundoNome: 'MASTER',
+                                perfil: 'admin',
+                                local: 'FÁBRICA VERONA - AÇAILÂNDIA',
+                                campo: 'TODOS',
+                                pacotesPermitidos: [],
+                                senha: '1234'
+                            });
                         }
-                        return user;
-                    });
-
+                    }
                     setUsuariosSistema(usuariosSistema);
                     renderLoginUsers();
                     renderTabelaUsuariosAdmin();
@@ -8770,59 +8675,10 @@
         verificarParametroVerificacaoQr();
     </script>
         <script>
-            const APP_PWA_BUILD = '2026-07-28-login-fix-1';
-
-            function forcarAtualizacaoPwaSeNecessario() {
-                if (!('caches' in window)) return Promise.resolve(false);
-
-                const buildAtual = localStorage.getItem('sucena_pwa_build_v1');
-                if (buildAtual === APP_PWA_BUILD) return Promise.resolve(false);
-
-                return caches.keys()
-                    .then(function(keys) {
-                        return Promise.all(keys.map(function(key) {
-                            return caches.delete(key);
-                        }));
-                    })
-                    .then(function() {
-                        localStorage.setItem('sucena_pwa_build_v1', APP_PWA_BUILD);
-                        return true;
-                    })
-                    .catch(function(err) {
-                        console.warn('Falha ao limpar cache PWA automaticamente:', err);
-                        return false;
-                    });
-            }
-
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function() {
                     navigator.serviceWorker.register('sw.js').then(function(registration) {
                         console.log('ServiceWorker registrado com sucesso com o escopo: ', registration.scope);
-
-                        // Garante verificação imediata de nova versão do SW
-                        registration.update();
-
-                        // Se houver um SW aguardando, ativa agora para evitar cache antigo
-                        if (registration.waiting) {
-                            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-                        }
-
-                        registration.addEventListener('updatefound', function() {
-                            const newWorker = registration.installing;
-                            if (!newWorker) return;
-                            newWorker.addEventListener('statechange', function() {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
-                                }
-                            });
-                        });
-
-                        forcarAtualizacaoPwaSeNecessario().then(function(limpouCache) {
-                            if (limpouCache) {
-                                registration.update();
-                                window.location.reload();
-                            }
-                        });
                     }, function(err) {
                         console.log('Falha ao registrar o ServiceWorker: ', err);
                     });
