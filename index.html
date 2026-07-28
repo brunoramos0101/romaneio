@@ -6104,7 +6104,14 @@
                 document.getElementById('razaoSocialFornecedor').value = 'FÁBRICA PRÓPRIA VERONA';
                 document.getElementById('codigoProdutoFiscal').value = '';
                 document.getElementById('descricaoProdutoFiscal').value = '';
+                sincronizarNumeroInternoGeralComHistorico();
                 aplicarNumeroInternoGeralNoFormulario(true);
+                setTimeout(function() {
+                    if (!isModoPlacasMuro()) return;
+                    sincronizarNumeroInternoGeralComHistorico();
+                    aplicarNumeroInternoGeralNoFormulario(true);
+                    atualizarQrPrevia();
+                }, 120);
             } else {
                 document.getElementById('ilsNumero').value = '';
                 document.getElementById('controleConcretoNumero').value = '';
