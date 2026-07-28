@@ -1041,6 +1041,97 @@
         #previewRegistroP1, #previewRegistroP2 {
             display: none !important;
         }
+
+        /* Sistema de Notificações (Toast) */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            border-radius: 8px;
+            min-width: 300px;
+            max-width: 450px;
+            font-size: 0.9em;
+            font-weight: 500;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.3s ease-out;
+            pointer-events: auto;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
+        .toast.info {
+            background: #e0f2fe;
+            color: #0c4a6e;
+            border-left: 4px solid #0284c7;
+        }
+
+        .toast.success {
+            background: #dcfce7;
+            color: #15803d;
+            border-left: 4px solid #22c55e;
+        }
+
+        .toast.warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #fbbf24;
+        }
+
+        .toast.error {
+            background: #fee2e2;
+            color: #7f1d1d;
+            border-left: 4px solid #ef4444;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .toast.hide {
+            animation: slideOut 0.3s ease-out forwards;
+        }
+
+        @media (max-width: 640px) {
+            .toast-container {
+                right: 10px;
+                left: 10px;
+                width: calc(100% - 20px);
+            }
+            .toast {
+                min-width: auto;
+                max-width: 100%;
+            }
+        }
     </style>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1e3c72">
@@ -1476,7 +1567,7 @@
             <div class="form-group">
                 <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
                     <input type="checkbox" id="modoPlacasMuro" style="width: 20px; height: 20px;">
-                    <span>Controle de Pré Moldados (Fábrica Própria) (substitui NF por ILS)</span>
+                    <span>Controle de Pré Moldados (Fábrica Própria) (substitui NF por ILS/FVS: Nº)</span>
                 </label>
             </div>
 
@@ -1486,8 +1577,8 @@
                     <input type="text" id="numeroNotaFiscal" placeholder="Ex: 000123">
                 </div>
                 <div class="form-group" id="ilsGroup" style="display: none;">
-                    <label>ILS/FVS: Nº</label>
-                    <input type="text" id="ilsNumero" placeholder="Ex: ILS/FVS-001">
+                        <label>ILS/FVS: Nº (Nota Interna)</label>
+                    <input type="text" id="ilsNumero" placeholder="Ex: NFI-000001" readonly>
                 </div>
                 <input type="hidden" id="controleConcretoNumero">
                 <div class="form-group">
@@ -1802,6 +1893,39 @@
                         </thead>
                         <tbody id="userRomaneiosTableBody">
                             <tr><td colspan="6" style="text-align: center; color: #64748b; padding: 12px;">Nenhum romaneio emitido</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="database-panel admin-only" id="adminGerenciarRomaneiosPanel" style="margin-top: 24px;">
+                <div class="section-title" style="margin: 0 0 15px 0;">🗑️ ADMIN - GERENCIAR E APAGAR ROMANEIOS</div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px;">
+                    <input type="text" id="adminRomaneiosFiltro" placeholder="Filtrar por código, placa, contrato ou data" style="flex: 1; min-width: 260px;">
+                    <input type="date" id="adminRomaneiosDataInicio" title="Data inicial">
+                    <input type="date" id="adminRomaneiosDataFim" title="Data final">
+                    <button class="btn-primary" type="button" id="btnAdminRomaneiosFiltrar">Filtrar</button>
+                    <button class="btn-info" type="button" id="btnAdminRomaneiosLimparFiltro">Limpar</button>
+                    <button class="btn-success" type="button" id="btnAdminRomaneiosExportarCsv">Exportar CSV</button>
+                    <button class="btn-warning" type="button" id="btnAdminRomaneiosMarcarTodos">Marcar todos</button>
+                    <button class="btn-info" type="button" id="btnAdminRomaneiosDesmarcarTodos">Desmarcar</button>
+                    <button class="btn-warning" type="button" id="btnAdminRomaneiosApagarSelecionados" style="background: linear-gradient(135deg, #b91c1c, #ef4444);">Apagar selecionados</button>
+                </div>
+                <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; overflow-x: auto;">
+                    <table class="admin-users-table" style="margin-top: 5px;">
+                        <thead>
+                            <tr>
+                                <th style="width: 42px; text-align: center;"><input type="checkbox" id="adminRomaneiosSelectAll" title="Marcar todos" style="width: 16px; height: 16px;"></th>
+                                <th>Cód. Controle</th>
+                                <th>Data</th>
+                                <th>Contrato</th>
+                                <th>Placa</th>
+                                <th>Usuário</th>
+                                <th style="text-align: center; width: 110px;">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminRomaneiosTableBody">
+                            <tr><td colspan="7" style="text-align: center; color: #64748b; padding: 12px;">Nenhum romaneio encontrado.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -2144,7 +2268,9 @@
         const AUDITORIA_LOG_STORAGE_KEY = 'sucena_auditoria_log_v1';
         const USERS_STORAGE_KEY = 'sucena_users_v1';
         const GOOGLE_API_URL_STORAGE_KEY = 'sucena_google_api_url_v1';
+        const NUMERO_INTERNO_GERAL_STORAGE_KEY = 'sucena_numero_interno_geral_v1';
         const DEFAULT_GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbyVvWRgo2_v00zmBPel49gT7ElT2MVQRl9GyCAl8vOUQ6XBND8xSLBpBCVBxW7dBlH5Lw/exec';
+        const GLOBAL_CONFIG_SYNC_INTERVAL_MS = 30000;
 
         function obterGoogleApiUrl() {
             const url = localStorage.getItem(GOOGLE_API_URL_STORAGE_KEY);
@@ -2157,6 +2283,298 @@
         
         let cacheRomaneios = [];
         let sequenceState = {};
+        let numeroInternoGeralAtual = 0;
+        let globalConfigSyncTimer = null;
+        let configCabecalhoSujo = false;
+
+        // ============================================
+        // SISTEMA CENTRALIZADO DE NOTIFICAÇÕES
+        // ============================================
+        function mostrarNotificacao(mensagem, tipo = 'info', duracao = 4000) {
+            let container = document.getElementById('toastContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toastContainer';
+                container.className = 'toast-container';
+                document.body.appendChild(container);
+            }
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + tipo;
+            toast.textContent = String(mensagem || '');
+            container.appendChild(toast);
+            if (duracao > 0) {
+                setTimeout(() => {
+                    toast.classList.add('hide');
+                    setTimeout(() => toast.remove(), 300);
+                }, duracao);
+            }
+            return toast;
+        }
+
+        // ============================================
+        // MELHORIA 5: WRAPPER ROBUSTO PARA FETCH COM TRATAMENTO DE ERRO
+        // ============================================
+        function fetchComTratamento(url, opcoes, nomeOperacao = 'operação') {
+            return fetch(url, opcoes)
+                .then(function(res) {
+                    if (!res.ok) {
+                        throw new Error('Erro HTTP ' + res.status + ': ' + res.statusText);
+                    }
+                    return res.json();
+                })
+                .catch(function(err) {
+                    console.error('Erro em ' + nomeOperacao + ':', err);
+                    mostrarNotificacao(nomeOperacao + ' falhou: ' + (err.message || 'Erro desconhecido'), 'error');
+                    throw err;
+                });
+        }
+
+        // ============================================
+        // MELHORIA 1: CONSOLIDAÇÃO - NORMALIZACAO UNIFICADA
+        // ============================================
+        // normalizarChaveTexto já centraliza a lógica
+        // chaveContratoMapa a usa corretamente, sem duplicação
+        // Padrão mantido para o resto do código
+        const debounceTimers = {};
+        function debounce(funcao, tempo = 300, chave = 'default') {
+            return function(...args) {
+                if (debounceTimers[chave]) {
+                    clearTimeout(debounceTimers[chave]);
+                }
+                debounceTimers[chave] = setTimeout(() => {
+                    funcao.apply(this, args);
+                    delete debounceTimers[chave];
+                }, tempo);
+            };
+        }
+
+        // Versão debounced de gerarCodigoControle
+        const gerarCodigoControleDebounced = debounce(function() {
+            gerarCodigoControle();
+        }, 200, 'gerarCodigo');
+
+        // ============================================
+        // SISTEMA DE CACHE INTELIGENTE PARA STORAGE
+        // ============================================
+        const storageCache = {};
+        const storageCacheTTL = {};
+        const CACHE_TTL_DEFAULT = 60000; // 1 minuto
+
+        function obterComCache(chave, funcaoObtencao, ttl = CACHE_TTL_DEFAULT) {
+            const agora = Date.now();
+            if (storageCache.hasOwnProperty(chave) && storageCacheTTL[chave] > agora) {
+                return storageCache[chave];
+            }
+            const valor = funcaoObtencao();
+            storageCache[chave] = valor;
+            storageCacheTTL[chave] = agora + ttl;
+            return valor;
+        }
+
+        function invalidarCache(chave) {
+            delete storageCache[chave];
+            delete storageCacheTTL[chave];
+        }
+
+        // ============================================
+        // FUNÇÕES DE SANITIZAÇÃO HTML (Prevenção XSS)
+        // ============================================
+        function sanitizarHTML(texto) {
+            if (!texto) return '';
+            const div = document.createElement('div');
+            div.textContent = String(texto);
+            return div.innerHTML;
+        }
+
+        function adicionarTextoSeguro(elemento, texto) {
+            if (!elemento) return;
+            elemento.textContent = String(texto || '');
+        }
+
+        function adicionarHTMLSeguro(elemento, html) {
+            if (!elemento) return;
+            elemento.innerHTML = sanitizarHTML(html);
+        }
+
+        // ============================================
+        // WRAPPER CENTRALIZADO PARA LOCALSTORAGE
+        // ============================================
+        const storageWrapper = {
+            set: function(chave, valor) {
+                try {
+                    localStorage.setItem(chave, JSON.stringify(valor));
+                    invalidarCache(chave);
+                    return true;
+                } catch (e) {
+                    console.error('Erro ao salvar no localStorage:', e);
+                    mostrarNotificacao('Erro ao salvar dados localmente', 'error');
+                    return false;
+                }
+            },
+            get: function(chave, padrao = null) {
+                try {
+                    const valor = localStorage.getItem(chave);
+                    return valor ? JSON.parse(valor) : padrao;
+                } catch (e) {
+                    console.error('Erro ao ler do localStorage:', e);
+                    return padrao;
+                }
+            },
+            remove: function(chave) {
+                try {
+                    localStorage.removeItem(chave);
+                    invalidarCache(chave);
+                    return true;
+                } catch (e) {
+                    console.error('Erro ao remover do localStorage:', e);
+                    return false;
+                }
+            },
+            clear: function() {
+                try {
+                    localStorage.clear();
+                    Object.keys(storageCache).forEach(k => delete storageCache[k]);
+                    Object.keys(storageCacheTTL).forEach(k => delete storageCacheTTL[k]);
+                    return true;
+                } catch (e) {
+                    console.error('Erro ao limpar localStorage:', e);
+                    return false;
+                }
+            }
+        };
+
+        // ============================================
+        // MELHORIA 4: PAGINAÇÃO PARA MAPAS GRANDES
+        // ============================================
+        const paginacaoMapaRastreio = { paginaAtual: 1, itensPorPagina: 50 };
+        
+        function paginarItensMapaRastreio(itens, pagina = 1, itensPorPagina = 50) {
+            const inicio = (pagina - 1) * itensPorPagina;
+            const fim = inicio + itensPorPagina;
+            const totalPaginas = Math.ceil(itens.length / itensPorPagina);
+            return {
+                itens: itens.slice(inicio, fim),
+                pagina: pagina,
+                totalPaginas: totalPaginas,
+                totalItens: itens.length,
+                inicio: inicio + 1,
+                fim: Math.min(fim, itens.length)
+            };
+        }
+
+        // ============================================
+        // SISTEMA CENTRALIZADO DE NOTIFICAÇÕES
+        // ============================================
+        function mostrarNotificacao(mensagem, tipo = 'info', duracao = 4000) {
+            let container = document.getElementById('toastContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toastContainer';
+                container.className = 'toast-container';
+                document.body.appendChild(container);
+            }
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + tipo;
+            toast.textContent = String(mensagem || '');
+            container.appendChild(toast);
+            if (duracao > 0) {
+                setTimeout(() => {
+                    toast.classList.add('hide');
+                    setTimeout(() => toast.remove(), 300);
+                }, duracao);
+            }
+            return toast;
+        }
+
+        // ============================================
+        // SISTEMA DE CACHE INTELIGENTE PARA STORAGE
+        // ============================================
+        const storageCache = {};
+        const storageCacheTTL = {};
+        const CACHE_TTL_DEFAULT = 60000; // 1 minuto
+
+        function obterComCache(chave, funcaoObtencao, ttl = CACHE_TTL_DEFAULT) {
+            const agora = Date.now();
+            if (storageCache.hasOwnProperty(chave) && storageCacheTTL[chave] > agora) {
+                return storageCache[chave];
+            }
+            const valor = funcaoObtencao();
+            storageCache[chave] = valor;
+            storageCacheTTL[chave] = agora + ttl;
+            return valor;
+        }
+
+        function invalidarCache(chave) {
+            delete storageCache[chave];
+            delete storageCacheTTL[chave];
+        }
+
+        // ============================================
+        // FUNÇÕES DE SANITIZAÇÃO HTML (Prevenção XSS)
+        // ============================================
+        function sanitizarHTML(texto) {
+            if (!texto) return '';
+            const div = document.createElement('div');
+            div.textContent = String(texto);
+            return div.innerHTML;
+        }
+
+        function adicionarTextoSeguro(elemento, texto) {
+            if (!elemento) return;
+            elemento.textContent = String(texto || '');
+        }
+
+        function adicionarHTMLSeguro(elemento, html) {
+            if (!elemento) return;
+            elemento.innerHTML = sanitizarHTML(html);
+        }
+
+        // ============================================
+        // WRAPPER CENTRALIZADO PARA LOCALSTORAGE
+        // ============================================
+        const storageWrapper = {
+            set: function(chave, valor) {
+                try {
+                    localStorage.setItem(chave, JSON.stringify(valor));
+                    invalidarCache(chave);
+                    return true;
+                } catch (e) {
+                    console.error('Erro ao salvar no localStorage:', e);
+                    mostrarNotificacao('Erro ao salvar dados localmente', 'error');
+                    return false;
+                }
+            },
+            get: function(chave, padrao = null) {
+                try {
+                    const valor = localStorage.getItem(chave);
+                    return valor ? JSON.parse(valor) : padrao;
+                } catch (e) {
+                    console.error('Erro ao ler do localStorage:', e);
+                    return padrao;
+                }
+            },
+            remove: function(chave) {
+                try {
+                    localStorage.removeItem(chave);
+                    invalidarCache(chave);
+                    return true;
+                } catch (e) {
+                    console.error('Erro ao remover do localStorage:', e);
+                    return false;
+                }
+            },
+            clear: function() {
+                try {
+                    localStorage.clear();
+                    storageCache = {};
+                    storageCacheTTL = {};
+                    return true;
+                } catch (e) {
+                    console.error('Erro ao limpar localStorage:', e);
+                    return false;
+                }
+            }
+        };
 
         // --- INDEXEDDB WRAPPER ---
         const DB_NAME = 'SucenaRomaneioDB';
@@ -2292,6 +2710,12 @@
             return (usuario.primeiroNome + ' ' + usuario.segundoNome).trim();
         }
 
+        function ehPerfilAdmin(usuario) {
+            if (!usuario) return false;
+            const perfil = String(usuario.perfil || '').trim().toLowerCase();
+            return perfil === 'admin' || perfil === 'adm' || perfil === 'superadmin';
+        }
+
         function renderLoginUsers() {
             const select = document.getElementById('loginUserSelect');
             if (!select) return;
@@ -2369,7 +2793,7 @@
         }
 
         function aplicarPermissoesPorPerfil() {
-            const isAdmin = !!(usuarioAtual && usuarioAtual.perfil === 'admin');
+            const isAdmin = !!ehPerfilAdmin(usuarioAtual);
             document.querySelectorAll('.admin-only').forEach(function(el) {
                 if (isAdmin) {
                     el.classList.remove('app-hidden');
@@ -2394,7 +2818,7 @@
         function entrarSistema() {
             const user = obterUsuarioSelecionadoLogin();
             if (!user) {
-                alert('Selecione um usuário válido.');
+                mostrarNotificacao('Selecione um usuário válido.', 'warning');
                 return;
             }
 
@@ -2402,7 +2826,7 @@
             const senhaCorreta = String(user.senha || '1234').trim();
 
             if (senhaInput.trim() !== senhaCorreta) {
-                alert('Senha incorreta. Tente novamente.');
+                mostrarNotificacao('Senha incorreta. Tente novamente.', 'error');
                 return;
             }
 
@@ -2422,7 +2846,12 @@
             document.getElementById('loginSenha').value = '';
             aplicarPermissoesPorPerfil();
             atualizarTabelaRomaneiosUsuario();
+            if (navigator.onLine) {
+                sincronizarConfiguracoesGlobais({ forcarAplicacao: true });
+            }
+            iniciarSincronizacaoAutomaticaConfiguracoes();
             registrarAuditoria('login', 'Entrada no sistema: ' + obterNomeUsuario(user));
+            mostrarNotificacao('Bem-vindo, ' + obterNomeUsuario(user) + '!', 'success', 3000);
         }
 
         function sairSistema() {
@@ -2430,6 +2859,8 @@
                 registrarAuditoria('logout', 'Saída do sistema: ' + obterNomeUsuario(usuarioAtual));
             }
             usuarioAtual = null;
+            pararSincronizacaoAutomaticaConfiguracoes();
+            configCabecalhoSujo = false;
 
             document.getElementById('mainHeader').classList.add('app-hidden');
             document.getElementById('sessionBar').classList.add('app-hidden');
@@ -2447,8 +2878,8 @@
         }
 
         function criarUsuarioAdmin() {
-            if (!usuarioAtual || usuarioAtual.perfil !== 'admin') {
-                alert('Somente Admin pode criar ou editar usuários.');
+            if (!ehPerfilAdmin(usuarioAtual)) {
+                mostrarNotificacao('Somente Admin pode criar ou editar usuários.', 'error');
                 return;
             }
 
@@ -2462,22 +2893,22 @@
             const senhaConfirma = (document.getElementById('adminSenhaConfirma').value || '').trim();
 
             if (!primeiroNome || !segundoNome) {
-                alert('Informe primeiro e segundo nome do usuário.');
+                mostrarNotificacao('Informe primeiro e segundo nome do usuário.', 'warning');
                 return;
             }
 
             if (!senha) {
-                alert('Informe a senha do usuário.');
+                mostrarNotificacao('Informe a senha do usuário.', 'warning');
                 return;
             }
 
             if (senha !== senhaConfirma) {
-                alert('As senhas não conferem.');
+                mostrarNotificacao('As senhas não conferem.', 'error');
                 return;
             }
 
             if (senha.length < 3) {
-                alert('A senha deve ter no mínimo 3 caracteres.');
+                mostrarNotificacao('A senha deve ter no mínimo 3 caracteres.', 'warning');
                 return;
             }
 
@@ -2485,7 +2916,7 @@
                 // Modo Edição
                 const user = usuariosSistema.find(function(u) { return u.id === usuarioSendoEditadoId; });
                 if (!user) {
-                    alert('Usuário não encontrado para edição.');
+                    mostrarNotificacao('Usuário não encontrado para edição.', 'error');
                     usuarioSendoEditadoId = null;
                     document.getElementById('btnAdminCriarUsuario').textContent = 'Criar usuário';
                     return;
@@ -2518,7 +2949,8 @@
                         console.log("Usuário editado na nuvem:", data);
                     })
                     .catch(function(err) {
-                        console.warn("Erro ao editar usuário na nuvem:", err);
+                        console.error('Erro ao editar usuário na nuvem:', err);
+                        mostrarNotificacao('Aviso: usuário editado localmente, mas falhou sincronização com nuvem', 'warning');
                     });
                 }
 
@@ -2533,7 +2965,7 @@
                 document.getElementById('adminSenhaConfirma').value = '';
 
                 registrarAuditoria('admin_editar_usuario', 'Usuário editado: ' + obterNomeUsuario(user) + ' (' + user.perfil + ')');
-                alert('Usuário editado com sucesso!');
+                mostrarNotificacao('Usuário editado com sucesso!', 'success');
                 return;
             }
 
@@ -2543,7 +2975,7 @@
             });
 
             if (jaExiste) {
-                alert('Usuário já existe.');
+                mostrarNotificacao('Usuário já existe.', 'warning');
                 return;
             }
 
@@ -2578,7 +3010,8 @@
                     console.log("Novo usuário sincronizado com a nuvem:", data);
                 })
                 .catch(function(err) {
-                    console.warn("Erro ao salvar novo usuário na nuvem:", err);
+                    console.error('Erro ao salvar novo usuário na nuvem:', err);
+                    mostrarNotificacao('Aviso: usuário criado localmente, mas falhou sincronização com nuvem', 'warning');
                 });
             }
 
@@ -2590,7 +3023,7 @@
             document.getElementById('adminSenhaConfirma').value = '';
 
             registrarAuditoria('admin_criar_usuario', 'Usuário criado: ' + obterNomeUsuario(novo) + ' (' + novo.perfil + ')');
-            alert('Usuário criado com sucesso. Senha: ' + senha);
+            mostrarNotificacao('Usuário ' + obterNomeUsuario(novo) + ' criado com sucesso!', 'success');
         }
 
         function renderTabelaUsuariosAdmin() {
@@ -2649,7 +3082,7 @@
             if (!user) return;
 
             if (id === 'adm_master') {
-                alert('Não é possível excluir o Administrador Master.');
+                mostrarNotificacao('Não é possível excluir o Administrador Master.', 'error');
                 return;
             }
 
@@ -2677,12 +3110,13 @@
                     console.log("Usuário excluído da nuvem:", data);
                 })
                 .catch(function(err) {
-                    console.warn("Erro ao excluir usuário na nuvem:", err);
+                    console.error('Erro ao excluir usuário na nuvem:', err);
+                    mostrarNotificacao('Aviso: usuário excluído localmente, mas falhou sincronização com nuvem', 'warning');
                 });
             }
 
             registrarAuditoria('admin_excluir_usuario', 'Usuário excluído: ' + obterNomeUsuario(user) + ' (' + user.perfil + ')');
-            alert('Usuário excluído com sucesso!');
+            mostrarNotificacao('Usuário excluído com sucesso!', 'success');
         }
 
         function sincronizarUsuariosComNuvem() {
@@ -2725,7 +3159,8 @@
                 }
             })
             .catch(function(err) {
-                console.warn("Erro ao carregar usuários da nuvem:", err);
+                console.error('Erro ao carregar usuários da nuvem:', err);
+                mostrarNotificacao('Falha ao sincronizar usuários: ' + (err.message || 'Erro desconhecido'), 'warning');
             });
         }
 
@@ -2830,8 +3265,8 @@
         }
 
         function validarPermissaoAdmin() {
-            if (!usuarioAtual || usuarioAtual.perfil !== 'admin') {
-                alert('Acesso restrito ao perfil Admin.');
+            if (!ehPerfilAdmin(usuarioAtual)) {
+                mostrarNotificacao('Acesso restrito ao perfil Admin.', 'error');
                 return false;
             }
             return true;
@@ -2913,7 +3348,7 @@
             }
             const logs = getLogAuditoria();
             if (!logs.length) {
-                alert('Não há eventos de auditoria registrados.');
+                mostrarNotificacao('Não há eventos de auditoria registrados.', 'info');
                 return;
             }
             const blob = new Blob([JSON.stringify(logs, null, 2)], { type: 'application/json' });
@@ -3007,6 +3442,62 @@
             return String(valor).padStart(tamanho, '0');
         }
 
+        function extrairSequenciaNumeroInterno(valor) {
+            const texto = String(valor || '').trim();
+            if (!texto) return 0;
+            const match = texto.match(/(\d+)$/);
+            if (!match) return 0;
+            const numero = parseInt(match[1], 10);
+            return Number.isFinite(numero) && numero > 0 ? numero : 0;
+        }
+
+        function formatarNumeroInternoGeral(sequencia) {
+            return 'NFI-' + padNumero(Math.max(1, sequencia), 6);
+        }
+
+        function salvarNumeroInternoGeralAtual() {
+            localStorage.setItem(NUMERO_INTERNO_GERAL_STORAGE_KEY, String(numeroInternoGeralAtual));
+        }
+
+        function aplicarNumeroInternoGeralNoFormulario(force) {
+            if (!isModoPlacasMuro()) return;
+            const input = document.getElementById('ilsNumero');
+            if (!input) return;
+
+            if (!force && String(input.value || '').trim()) {
+                return;
+            }
+
+            const proximo = Math.max(1, numeroInternoGeralAtual + 1);
+            input.value = formatarNumeroInternoGeral(proximo);
+        }
+
+        function marcarNumeroInternoGeralComoUtilizado(valorNumeroInterno) {
+            const utilizado = extrairSequenciaNumeroInterno(valorNumeroInterno);
+            if (utilizado <= 0) return;
+            if (utilizado > numeroInternoGeralAtual) {
+                numeroInternoGeralAtual = utilizado;
+                salvarNumeroInternoGeralAtual();
+            }
+        }
+
+        function sincronizarNumeroInternoGeralComHistorico() {
+            let maximoHistorico = 0;
+            cacheRomaneios.forEach(function(registro) {
+                if (!registro || !registro.campos) return;
+                if (!registro.campos.modoPlacasMuro) return;
+                const seq = extrairSequenciaNumeroInterno(registro.campos.ilsNumero);
+                if (seq > maximoHistorico) {
+                    maximoHistorico = seq;
+                }
+            });
+
+            if (maximoHistorico > numeroInternoGeralAtual) {
+                numeroInternoGeralAtual = maximoHistorico;
+                salvarNumeroInternoGeralAtual();
+            }
+        }
+
         function obterAnoSequencia() {
             const data = document.getElementById('dataRomaneio').value;
             if (!data) {
@@ -3015,11 +3506,72 @@
             return String(new Date(data + 'T00:00:00').getFullYear());
         }
 
+        function normalizarChaveTexto(valor) {
+            return String(valor || '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-zA-Z0-9]+/g, '_')
+                .replace(/^_+|_+$/g, '')
+                .toLowerCase() || 'sem_contrato';
+        }
+
+        function obterContratoParaSequencia() {
+            return document.getElementById('contrato').value || document.getElementById('contratoControle').value || 'SEM-CONTRATO';
+        }
+
+        function chaveContratoMapa(contratoValor) {
+            return 'contrato_' + normalizarChaveTexto(contratoValor || 'SEM-CONTRATO');
+        }
+
+        function obterBucketMapaRastreabilidade(contratoValor, mapa) {
+            const chave = chaveContratoMapa(contratoValor);
+            if (!mapa || typeof mapa !== 'object') {
+                mapa = { version: 1, porContrato: {} };
+            }
+            if (!mapa.porContrato || typeof mapa.porContrato !== 'object') {
+                mapa.porContrato = {};
+            }
+            if (!mapa.porContrato[chave]) {
+                mapa.porContrato[chave] = {
+                    contrato: contratoValor || 'SEM-CONTRATO',
+                    itens: []
+                };
+            }
+            return { chave: chave, bucket: mapa.porContrato[chave] };
+        }
+
+        function obterChaveSequenciaParaRegistro(registro) {
+            if (!registro) {
+                return chaveSequenciaAtual();
+            }
+            const campos = registro.campos || {};
+            const contratoValor = campos.contrato || campos.contratoControle || campos.contratoOrigem || obterContratoParaSequencia();
+            const tacValor = campos.tacNumero || obterValorControle('tacNumero', 1);
+            const pacoteValor = campos.pacoteNumero || obterValorControle('pacoteNumero', 1);
+            const produtoCarregado = campos.produtoCarregado || document.getElementById('produtoCarregado').value;
+            const sigla = obterSiglaProduto(produtoCarregado) || 'NA';
+            const contratoChave = 'C-' + normalizarChaveTexto(contratoValor);
+            const ano = (campos.dataRomaneio ? String(new Date(campos.dataRomaneio + 'T00:00:00').getFullYear()) : obterAnoSequencia());
+            const partes = [];
+            if (tacValor !== 'NA') {
+                partes.push('TAC' + padNumero(Math.max(1, parseInt(tacValor, 10) || 1), 2));
+            }
+            if (pacoteValor !== 'NA') {
+                partes.push('P' + padNumero(Math.max(1, parseInt(pacoteValor, 10) || 1), 2));
+            }
+            partes.push(sigla);
+            partes.push(contratoChave);
+            partes.push(ano);
+            return partes.join('-');
+        }
+
         function chaveSequenciaAtual() {
             const tacValor = obterValorControle('tacNumero', 1);
             const pacoteValor = obterValorControle('pacoteNumero', 1);
             const produtoCarregado = document.getElementById('produtoCarregado').value;
             const sigla = obterSiglaProduto(produtoCarregado) || 'NA';
+            const contratoValor = obterContratoParaSequencia();
+            const contratoChave = 'C-' + normalizarChaveTexto(contratoValor);
             const ano = obterAnoSequencia();
             const partes = [];
             if (tacValor !== 'NA') {
@@ -3029,6 +3581,7 @@
                 partes.push('P' + padNumero(Math.max(1, pacoteValor), 2));
             }
             partes.push(sigla);
+            partes.push(contratoChave);
             partes.push(ano);
             return partes.join('-');
         }
@@ -3052,30 +3605,70 @@
             return {
                 version: 1,
                 romaneios: cacheRomaneios,
-                sequenceState: sequenceState
+                sequenceState: sequenceState,
+                numeroInternoGeralAtual: numeroInternoGeralAtual
             };
         }
 
         function setBaseDadosLocal(db) {
             sequenceState = db.sequenceState;
             localStorage.setItem('sucena_sequence_state_v1', JSON.stringify(sequenceState));
+
+            const numeroImportado = Math.max(0, parseInt(db.numeroInternoGeralAtual, 10) || 0);
+            if (numeroImportado > 0) {
+                numeroInternoGeralAtual = Math.max(numeroInternoGeralAtual, numeroImportado);
+                salvarNumeroInternoGeralAtual();
+            }
         }
 
         function getMapaRastreabilidade() {
             try {
                 const bruto = localStorage.getItem(MAPA_RASTREABILIDADE_STORAGE_KEY);
-                if (!bruto) return { version: 1, itens: [] };
+                if (!bruto) return { version: 1, porContrato: {} };
                 const mapa = JSON.parse(bruto);
-                if (!mapa || !Array.isArray(mapa.itens)) {
-                    return { version: 1, itens: [] };
+                if (!mapa || typeof mapa !== 'object') {
+                    return { version: 1, porContrato: {} };
                 }
-                return mapa;
+
+                const retorno = {
+                    version: mapa.version || 1,
+                    porContrato: {}
+                };
+
+                if (mapa.porContrato && typeof mapa.porContrato === 'object') {
+                    retorno.porContrato = mapa.porContrato;
+                } else if (Array.isArray(mapa.itens)) {
+                    retorno.porContrato = {};
+                    mapa.itens.forEach(function(item) {
+                        const contratoValor = item && item.contrato ? String(item.contrato) : 'GERAL';
+                        const { chave, bucket } = obterBucketMapaRastreabilidade(contratoValor, retorno);
+                        if (!retorno.porContrato[chave]) {
+                            retorno.porContrato[chave] = bucket;
+                        }
+                        (retorno.porContrato[chave].itens || []).push(item);
+                    });
+                }
+
+                retorno.itens = Object.keys(retorno.porContrato).reduce(function(acc, chave) {
+                    return acc.concat(retorno.porContrato[chave].itens || []);
+                }, []);
+
+                return retorno;
             } catch (e) {
-                return { version: 1, itens: [] };
+                return { version: 1, porContrato: {} };
             }
         }
 
         function setMapaRastreabilidade(mapa) {
+            if (!mapa || typeof mapa !== 'object') {
+                mapa = { version: 1, porContrato: {} };
+            }
+            if (!mapa.porContrato || typeof mapa.porContrato !== 'object') {
+                mapa.porContrato = {};
+            }
+            mapa.itens = Object.keys(mapa.porContrato).reduce(function(acc, chave) {
+                return acc.concat(mapa.porContrato[chave].itens || []);
+            }, []);
             localStorage.setItem(MAPA_RASTREABILIDADE_STORAGE_KEY, JSON.stringify(mapa));
         }
 
@@ -3086,7 +3679,7 @@
             const pacoteNumero = parseInt(pacote, 10);
 
             if (!pacote) {
-                alert('Pacote é obrigatório no controle documental.');
+                mostrarNotificacao('Pacote é obrigatório no controle documental.', 'warning');
                 return false;
             }
 
@@ -3098,7 +3691,7 @@
                     usuarioAtual.pacotesPermitidos.length > 0 &&
                     (!Number.isFinite(pacoteNumero) || usuarioAtual.pacotesPermitidos.indexOf(pacoteNumero) === -1)
                 ) {
-                    alert('Este usuário não possui permissão para o pacote selecionado.');
+                    mostrarNotificacao('Este usuário não possui permissão para o pacote selecionado.', 'error');
                     return false;
                 }
             }
@@ -3108,28 +3701,28 @@
                 const cOrig = document.getElementById('contratoOrigem').value;
                 const dOrig = document.getElementById('destinoOrigem').value;
                 if (!cOrig || cOrig === 'add_new_contract') {
-                    alert('Selecione um Contrato de Origem válido.');
+                    mostrarNotificacao('Selecione um Contrato de Origem válido.', 'warning');
                     return false;
                 }
                 if (!dOrig || dOrig === 'add_new_destino') {
-                    alert('Selecione um Local de Origem válido.');
+                    mostrarNotificacao('Selecione um Local de Origem válido.', 'warning');
                     return false;
                 }
             } else {
                 const fornecedor = document.getElementById('fornecedor').value;
                 if (!fornecedor) {
-                    alert('Selecione um fornecedor ou origem.');
+                    mostrarNotificacao('Selecione um fornecedor ou origem.', 'warning');
                     return false;
                 }
             }
 
             if (!contrato || contrato === 'add_new_contract') {
-                alert('Contrato de destino é obrigatório. Se necessário, cadastre um novo contrato e selecione-o.');
+                mostrarNotificacao('Contrato de destino é obrigatório. Se necessário, cadastre um novo contrato e selecione-o.', 'warning');
                 return false;
             }
 
             if (!destino || destino === 'add_new_destino') {
-                alert('Local de destino é obrigatório. Se necessário, cadastre um novo local de destino e selecione-o.');
+                mostrarNotificacao('Local de destino é obrigatório. Se necessário, cadastre um novo local de destino e selecione-o.', 'warning');
                 return false;
             }
 
@@ -3161,7 +3754,7 @@
             if (isModoPlacasMuro()) {
                 const ils = document.getElementById('ilsNumero').value || 'Não informado';
                 const concreto = document.getElementById('controleConcretoNumero').value || 'Não informado';
-                return 'ILS/FVS: ' + ils + ' | CC ' + concreto;
+                return 'ILS/FVS: Nº ' + ils + ' | CC ' + concreto;
             }
             return 'NF: ' + (document.getElementById('numeroNotaFiscal').value || 'Não informado');
         }
@@ -3173,7 +3766,10 @@
             }
 
             const mapa = getMapaRastreabilidade();
-            mapa.itens = mapa.itens.filter(function(item) {
+            const contrato = document.getElementById('contrato').value || 'Não informado';
+            const { bucket } = obterBucketMapaRastreabilidade(contrato, mapa);
+
+            bucket.itens = (bucket.itens || []).filter(function(item) {
                 return item.codigoControle !== codigoControle;
             });
 
@@ -3184,11 +3780,9 @@
             const destinoFinal = document.getElementById('destino').value || 'Não informado';
             const placa = document.getElementById('placaCaminhao').value.toUpperCase() || 'Não informada';
             const motorista = document.getElementById('responsavel').value || 'Não informado';
-            const contrato = document.getElementById('contrato').value || 'Não informado';
             const pacote = document.getElementById('pacoteNumero').value || 'Não informado';
             const docRef = obterDocumentoRastreio();
 
-            // Novos campos para a rastreabilidade completa
             const numeroRomaneio = document.getElementById('numeroRomaneio').value || 'Não informado';
             const registroInterno = document.getElementById('registroInterno').value || 'Não informado';
             const tacNumero = document.getElementById('tacNumero').value || 'Não informado';
@@ -3197,7 +3791,6 @@
             const revisaoDocumento = document.getElementById('revisaoDocumento').value || 'Não informado';
             const observacoes = document.getElementById('observacoes').value || '';
 
-            // Fornecedor/Origem detalhado
             const fornecedorSelect = document.getElementById('fornecedor').value || '';
             let fornecedorNome = '';
             let fornecedorCNPJ = '';
@@ -3218,7 +3811,6 @@
                 }
             }
 
-            // Dados Fiscais e Produto
             const modoMuro = document.getElementById('modoPlacasMuro').checked ? 'Sim' : 'Não';
             const numeroNotaFiscal = document.getElementById('numeroNotaFiscal').value || '';
             const ilsNumero = document.getElementById('ilsNumero').value || '';
@@ -3228,11 +3820,10 @@
             const codigoProdutoFiscal = document.getElementById('codigoProdutoFiscal').value || '';
             const descricaoProdutoFiscal = document.getElementById('descricaoProdutoFiscal').value || '';
 
-            // Segurança e Controle
             const hashIntegridade = assinaturaCurta(baseIntegridadeRomaneio()) || '';
 
             materiais.forEach(function(mat) {
-                mapa.itens.push({
+                bucket.itens.push({
                     numeroRomaneio: numeroRomaneio,
                     registroInterno: registroInterno,
                     dataRomaneio: data,
@@ -3279,8 +3870,11 @@
                 return;
             }
             const mapa = getMapaRastreabilidade();
-            if (!mapa.itens.length) {
-                alert('Não há itens no mapa de rastreabilidade para exportar.');
+            const contratoAtual = document.getElementById('contrato').value || 'SEM CONTRATO';
+            const { bucket } = obterBucketMapaRastreabilidade(contratoAtual, mapa);
+            const itens = bucket.itens || [];
+            if (!itens.length) {
+                mostrarNotificacao('Não há itens no mapa de rastreabilidade para este contrato.', 'info');
                 return;
             }
 
@@ -3290,39 +3884,51 @@
                 : padNumero(Math.max(0, parseInt(revisaoValor, 10) || 0), 2);
             const dataCabecalho = new Date().toLocaleDateString('pt-BR');
             const pacoteAtual = document.getElementById('pacoteNumero').value || 'S/N';
-            const contratoAtual = document.getElementById('contrato').value || 'SEM CONTRATO';
-            const codigoRastreio = 'MRR-' + padNumero(mapa.itens.length, 2);
-
-            const dados = [
-                ['MAPA DE RASTREABILIDADE DE REGISTROS', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-                ['Nº FORMULÁRIO', '', 'ELABORADO:', '', 'APROVADO:', '', 'SETOR:', '', 'REVISÃO:', '', 'DATA:', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-                ['MRR-01-VALE-001', '', 'BRUNO RAMOS', '', 'DIRETORIA', '', 'QUALIDADE', '', revisaoMapa, '', dataCabecalho, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-                ['PACOTE ' + pacoteAtual + ' - ' + contratoAtual, '', '', '', '', '', '', '', 'DATA DE ATUALIZAÇÃO:', '', dataCabecalho, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-                ['RELATÓRIO DE INSPEÇÃO E LIBERAÇÃO DE SERVIÇOS - ILS', '', '', '', '', '', '', '', 'CÓD DO REGISTRO:', '', 'Nº ILS', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'CÓD. RAST.: ' + codigoRastreio, '', '', ''],
-                [
-                    'IDENTIFICAÇÃO DO ROMANEIO', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
-                    'FORNECEDOR / ORIGEM', '', '',
-                    'DADOS FISCAIS E PRODUTO', '', '', '', '', '', '', '',
-                    'MATERIAIS TRANSPORTADOS', '', '',
-                    'SEGURANÇA / CONTROLE', ''
-                ],
-                [
-                    'Nº Romaneio', 'Registro Interno', 'Data Emissão', 'Código de Controle', 'TAC', 'Pacote', 'KM', 'Sequência', 'Revisão', 'Placa Caminhão', 'Responsável/Motorista', 'Contrato', 'Destino Final', 'Data Recebimento', 'Observações',
-                    'Fornecedor', 'CNPJ Fornecedor', 'Local de Origem',
-                    'Modo Muro?', 'Nota Fiscal', 'Nº ILS', 'Nº Controle Concreto', 'Razão Social (Fiscal)', 'CNPJ (Fiscal)', 'Código Produto', 'Descrição Produto',
-                    'Material', 'Quantidade', 'Unidade',
-                    'Código Autenticação', 'Sincronizado Em'
-                ]
-            ];
-
-            mapa.itens
+            
+            // MELHORIA 4: PAGINAÇÃO - Dividir em múltiplas sheets se houver muitos dados
+            const ITENS_POR_SHEET = 500; // Máximo de linhas por sheet para não ficar muito pesado
+            const numSheets = Math.ceil(itens.length / ITENS_POR_SHEET);
+            const wb = XLSX.utils.book_new();
+            
+            // Mapear e ordenar itens
+            const itensMapeados = itens
                 .slice()
                 .sort(function(a, b) {
                     if (a.pacote !== b.pacote) return String(a.pacote).localeCompare(String(b.pacote));
                     if (a.contrato !== b.contrato) return String(a.contrato).localeCompare(String(b.contrato));
                     return String(a.dataRomaneio).localeCompare(String(b.dataRomaneio));
-                })
-                .forEach(function(item) {
+                });
+
+            // Criar sheets paginadas
+            for (let pagina = 0; pagina < numSheets; pagina++) {
+                const inicio = pagina * ITENS_POR_SHEET;
+                const fim = Math.min(inicio + ITENS_POR_SHEET, itens.length);
+                const itensPagina = itensMapeados.slice(inicio, fim);
+                const codigoRastreio = 'MRR-' + padNumero(itensPagina.length, 2);
+
+                const dados = [
+                    ['MAPA DE RASTREABILIDADE DE REGISTROS', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+                    ['Nº FORMULÁRIO', '', 'ELABORADO:', '', 'APROVADO:', '', 'SETOR:', '', 'REVISÃO:', '', 'DATA:', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+                    ['MRR-01-VALE-001', '', 'BRUNO RAMOS', '', 'DIRETORIA', '', 'QUALIDADE', '', revisaoMapa, '', dataCabecalho, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+                    ['PACOTE ' + pacoteAtual + ' - ' + contratoAtual + ' (Pág. ' + (pagina + 1) + '/' + numSheets + ')', '', '', '', '', '', '', '', 'DATA DE ATUALIZAÇÃO:', '', dataCabecalho, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''],
+                    ['RELATÓRIO DE INSPEÇÃO E LIBERAÇÃO DE SERVIÇOS - ILS/FVS', '', '', '', '', '', '', '', 'CÓD DO REGISTRO:', '', 'ILS/FVS: Nº', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'CÓD. RAST.: ' + codigoRastreio, '', '', ''],
+                    [
+                        'IDENTIFICAÇÃO DO ROMANEIO', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
+                        'FORNECEDOR / ORIGEM', '', '',
+                        'DADOS FISCAIS E PRODUTO', '', '', '', '', '', '', '',
+                        'MATERIAIS TRANSPORTADOS', '', '',
+                        'SEGURANÇA / CONTROLE', ''
+                    ],
+                    [
+                        'Nº Romaneio', 'Registro Interno', 'Data Emissão', 'Código de Controle', 'TAC', 'Pacote', 'KM', 'Sequência', 'Revisão', 'Placa Caminhão', 'Responsável/Motorista', 'Contrato', 'Destino Final', 'Data Recebimento', 'Observações',
+                        'Fornecedor', 'CNPJ Fornecedor', 'Local de Origem',
+                        'Modo Muro?', 'Nota Fiscal', 'ILS/FVS: Nº', 'Nº Controle Concreto', 'Razão Social (Fiscal)', 'CNPJ (Fiscal)', 'Código Produto', 'Descrição Produto',
+                        'Material', 'Quantidade', 'Unidade',
+                        'Código Autenticação', 'Sincronizado Em'
+                    ]
+                ];
+
+                itensPagina.forEach(function(item) {
                     dados.push([
                         item.numeroRomaneio || '',
                         item.registroInterno || '',
@@ -3362,53 +3968,51 @@
                     ]);
                 });
 
-            const ws = XLSX.utils.aoa_to_sheet(dados);
-            ws['!merges'] = [
-                { s: { r: 0, c: 0 }, e: { r: 0, c: 30 } }, // Linha 0: A1:AE1
-                { s: { r: 1, c: 0 }, e: { r: 1, c: 1 } },  // Linha 1: A2:B2
-                { s: { r: 1, c: 2 }, e: { r: 1, c: 3 } },  // Linha 1: C2:D2
-                { s: { r: 1, c: 4 }, e: { r: 1, c: 5 } },  // Linha 1: E2:F2
-                { s: { r: 1, c: 6 }, e: { r: 1, c: 7 } },  // Linha 1: G2:H2
-                { s: { r: 1, c: 8 }, e: { r: 1, c: 9 } },  // Linha 1: I2:J2
-                { s: { r: 1, c: 10 }, e: { r: 1, c: 12 } }, // Linha 1: K2:M2
-                
-                { s: { r: 2, c: 0 }, e: { r: 2, c: 1 } },  // Linha 2: A3:B3
-                { s: { r: 2, c: 2 }, e: { r: 2, c: 3 } },  // Linha 2: C3:D3
-                { s: { r: 2, c: 4 }, e: { r: 2, c: 5 } },  // Linha 2: E3:F3
-                { s: { r: 2, c: 6 }, e: { r: 2, c: 7 } },  // Linha 2: G3:H3
-                { s: { r: 2, c: 8 }, e: { r: 2, c: 9 } },  // Linha 2: I3:J3
-                { s: { r: 2, c: 10 }, e: { r: 2, c: 12 } }, // Linha 2: K3:M3
-                
-                { s: { r: 3, c: 0 }, e: { r: 3, c: 14 } }, // Linha 3: A4:O4
-                { s: { r: 3, c: 15 }, e: { r: 3, c: 16 } }, // Linha 3: P4:Q4
-                { s: { r: 3, c: 17 }, e: { r: 3, c: 19 } }, // Linha 3: R4:T4
-                
-                { s: { r: 4, c: 0 }, e: { r: 4, c: 14 } }, // Linha 4: A5:O5
-                { s: { r: 4, c: 15 }, e: { r: 4, c: 16 } }, // Linha 4: P5:Q5
-                { s: { r: 4, c: 17 }, e: { r: 4, c: 19 } }, // Linha 4: R5:T5
-                { s: { r: 4, c: 20 }, e: { r: 4, c: 22 } }, // Linha 4: U5:W5
-                
-                { s: { r: 5, c: 0 }, e: { r: 5, c: 14 } }, // Linha 5: A6:O6
-                { s: { r: 5, c: 15 }, e: { r: 5, c: 17 } }, // Linha 5: P6:R6
-                { s: { r: 5, c: 18 }, e: { r: 5, c: 25 } }, // Linha 5: S6:Z6
-                { s: { r: 5, c: 26 }, e: { r: 5, c: 28 } }, // Linha 5: AA6:AC6
-                { s: { r: 5, c: 29 }, e: { r: 5, c: 30 } }  // Linha 5: AD6:AE6
-            ];
-            ws['!cols'] = [
-                { wch: 14 }, { wch: 16 }, { wch: 12 }, { wch: 22 }, { wch: 8 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 8 }, { wch: 14 }, { wch: 22 }, { wch: 14 }, { wch: 20 }, { wch: 14 }, { wch: 25 },
-                { wch: 22 }, { wch: 18 }, { wch: 20 },
-                { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 18 }, { wch: 22 }, { wch: 18 }, { wch: 14 }, { wch: 22 },
-                { wch: 20 }, { wch: 12 }, { wch: 10 },
-                { wch: 18 }, { wch: 18 }
-            ];
-            ws['!autofilter'] = {
-                ref: 'A7:AE' + String(dados.length)
-            };
+                const ws = XLSX.utils.aoa_to_sheet(dados);
+                ws['!merges'] = [
+                    { s: { r: 0, c: 0 }, e: { r: 0, c: 30 } },
+                    { s: { r: 1, c: 0 }, e: { r: 1, c: 1 } },
+                    { s: { r: 1, c: 2 }, e: { r: 1, c: 3 } },
+                    { s: { r: 1, c: 4 }, e: { r: 1, c: 5 } },
+                    { s: { r: 1, c: 6 }, e: { r: 1, c: 7 } },
+                    { s: { r: 1, c: 8 }, e: { r: 1, c: 9 } },
+                    { s: { r: 1, c: 10 }, e: { r: 1, c: 12 } },
+                    { s: { r: 2, c: 0 }, e: { r: 2, c: 1 } },
+                    { s: { r: 2, c: 2 }, e: { r: 2, c: 3 } },
+                    { s: { r: 2, c: 4 }, e: { r: 2, c: 5 } },
+                    { s: { r: 2, c: 6 }, e: { r: 2, c: 7 } },
+                    { s: { r: 2, c: 8 }, e: { r: 2, c: 9 } },
+                    { s: { r: 2, c: 10 }, e: { r: 2, c: 12 } },
+                    { s: { r: 3, c: 0 }, e: { r: 3, c: 14 } },
+                    { s: { r: 3, c: 15 }, e: { r: 3, c: 16 } },
+                    { s: { r: 3, c: 17 }, e: { r: 3, c: 19 } },
+                    { s: { r: 4, c: 0 }, e: { r: 4, c: 14 } },
+                    { s: { r: 4, c: 15 }, e: { r: 4, c: 16 } },
+                    { s: { r: 4, c: 17 }, e: { r: 4, c: 19 } },
+                    { s: { r: 4, c: 20 }, e: { r: 4, c: 22 } },
+                    { s: { r: 5, c: 0 }, e: { r: 5, c: 14 } },
+                    { s: { r: 5, c: 15 }, e: { r: 5, c: 17 } },
+                    { s: { r: 5, c: 18 }, e: { r: 5, c: 25 } },
+                    { s: { r: 5, c: 26 }, e: { r: 5, c: 28 } },
+                    { s: { r: 5, c: 29 }, e: { r: 5, c: 30 } }
+                ];
+                ws['!cols'] = [
+                    { wch: 14 }, { wch: 16 }, { wch: 12 }, { wch: 22 }, { wch: 8 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 8 }, { wch: 14 }, { wch: 22 }, { wch: 14 }, { wch: 20 }, { wch: 14 }, { wch: 25 },
+                    { wch: 22 }, { wch: 18 }, { wch: 20 },
+                    { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 18 }, { wch: 22 }, { wch: 18 }, { wch: 14 }, { wch: 22 },
+                    { wch: 20 }, { wch: 12 }, { wch: 10 },
+                    { wch: 18 }, { wch: 18 }
+                ];
+                ws['!autofilter'] = { ref: 'A7:AE' + String(dados.length) };
 
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'MapaRastreabilidade');
-            XLSX.writeFile(wb, 'Mapa_Rastreabilidade_Geral.xlsx');
-            registrarAuditoria('export_mapa_rastreabilidade', 'Exportou mapa geral em Excel');
+                const nomeSheet = numSheets > 1 ? 'Pág' + (pagina + 1) : 'MapaRastreabilidade';
+                XLSX.utils.book_append_sheet(wb, ws, nomeSheet);
+            }
+
+            const nomeArquivo = 'Mapa_Rastreabilidade_' + normalizarChaveTexto(contratoAtual) + '.xlsx';
+            XLSX.writeFile(wb, nomeArquivo);
+            registrarAuditoria('export_mapa_rastreabilidade', 'Exportou mapa geral em Excel (' + numSheets + ' página(s))');
+            mostrarNotificacao('Mapa exportado com sucesso (' + numSheets + ' página(s), ' + itens.length + ' registros)', 'success');
         }
 
         function atualizarStatusBaseDados() {
@@ -3456,6 +4060,401 @@
             db.sequenceState[chave] = Math.max(db.sequenceState[chave] || 0, sequencia);
             setBaseDadosLocal(db);
             atualizarStatusBaseDados();
+        }
+
+        function recalcularSequenciaRastreioPorBaseLocal() {
+            const novoEstadoSequencia = {};
+
+            cacheRomaneios.forEach(function(registro) {
+                const chave = registro && registro.chaveSequencia ? String(registro.chaveSequencia) : obterChaveSequenciaParaRegistro(registro);
+                const seq = registro && Number.isFinite(Number(registro.sequencia)) ? Number(registro.sequencia) : 0;
+                if (!chave || seq <= 0) {
+                    return;
+                }
+                novoEstadoSequencia[chave] = Math.max(novoEstadoSequencia[chave] || 0, seq);
+            });
+
+            const db = getBaseDadosLocal();
+            db.sequenceState = novoEstadoSequencia;
+            setBaseDadosLocal(db);
+            atualizarStatusBaseDados();
+            aplicarProximaSequenciaBanco(true);
+        }
+
+        function removerMapaRastreabilidadePorCodigoControle(codigoControle) {
+            const mapa = getMapaRastreabilidade();
+            let totalAntes = 0;
+            let totalDepois = 0;
+            Object.keys(mapa.porContrato || {}).forEach(function(chave) {
+                const bucket = mapa.porContrato[chave];
+                totalAntes += (bucket.itens || []).length;
+                bucket.itens = (bucket.itens || []).filter(function(item) {
+                    return item.codigoControle !== codigoControle;
+                });
+                totalDepois += (bucket.itens || []).length;
+            });
+            if (totalDepois !== totalAntes) {
+                setMapaRastreabilidade(mapa);
+            }
+        }
+
+        function removerMapaRastreabilidadePorCodigos(codigos) {
+            const listaCodigos = Array.isArray(codigos) ? codigos : [];
+            if (!listaCodigos.length) {
+                return;
+            }
+            const setCodigos = new Set(listaCodigos);
+            const mapa = getMapaRastreabilidade();
+            let totalAntes = 0;
+            let totalDepois = 0;
+            Object.keys(mapa.porContrato || {}).forEach(function(chave) {
+                const bucket = mapa.porContrato[chave];
+                totalAntes += (bucket.itens || []).length;
+                bucket.itens = (bucket.itens || []).filter(function(item) {
+                    return !setCodigos.has(item.codigoControle);
+                });
+                totalDepois += (bucket.itens || []).length;
+            });
+            if (totalDepois !== totalAntes) {
+                setMapaRastreabilidade(mapa);
+            }
+        }
+
+        function obterNomeUsuarioPorId(usuarioId) {
+            const user = (usuariosSistema || []).find(function(u) {
+                return u.id === usuarioId;
+            });
+            return user ? obterNomeUsuario(user) : (usuarioId || 'N/D');
+        }
+
+        function apagarRomaneioLocalAdmin(codigoControle, eventoAuditoria, mensagemAuditoria) {
+            return dbExcluirRomaneio(codigoControle)
+                .then(function() {
+                    cacheRomaneios = cacheRomaneios.filter(function(item) {
+                        return item.codigoControle !== codigoControle;
+                    });
+
+                    removerMapaRastreabilidadePorCodigoControle(codigoControle);
+                    recalcularSequenciaRastreioPorBaseLocal();
+
+                    atualizarKpisAdmin();
+                    atualizarTabelaRomaneiosUsuario();
+                    atualizarTabelaRomaneiosAdmin();
+                    atualizarTabelaPendentesSincronizacao();
+
+                    if (eventoAuditoria && mensagemAuditoria) {
+                        registrarAuditoria(eventoAuditoria, mensagemAuditoria);
+                    }
+                });
+        }
+
+        function excluirRomaneioComoAdmin(codigoControle) {
+            if (!validarPermissaoAdmin()) {
+                return;
+            }
+
+            const registro = cacheRomaneios.find(function(item) {
+                return item.codigoControle === codigoControle;
+            });
+
+            if (!registro) {
+                mostrarNotificacao('Romaneio não encontrado para exclusão.', 'error');
+                return;
+            }
+
+            const ok = confirm('Confirma apagar o romaneio ' + codigoControle + '? Esta ação remove o registro da base local e ajusta a numeração de rastreio.');
+            if (!ok) {
+                return;
+            }
+
+            apagarRomaneioLocalAdmin(codigoControle, 'admin_excluir_romaneio', 'Admin excluiu romaneio: ' + codigoControle)
+                .then(function() {
+                    mostrarNotificacao('Romaneio apagado com sucesso. Numeração de rastreio atualizada.', 'success');
+                })
+                .catch(function(err) {
+                    console.error('Erro ao excluir romaneio no IndexedDB:', err);
+                    mostrarNotificacao('Falha ao excluir romaneio. Tente novamente.', 'error');
+                });
+        }
+
+        function excluirRomaneioSincronizadoComoAdmin(codigoControle) {
+            if (!validarPermissaoAdmin()) {
+                return;
+            }
+
+            const registro = cacheRomaneios.find(function(item) {
+                return item.codigoControle === codigoControle;
+            });
+
+            if (!registro) {
+                mostrarNotificacao('Romaneio não encontrado.', 'error');
+                return;
+            }
+
+            if (registro.syncStatus !== 'synced') {
+                mostrarNotificacao('Este romaneio ainda não está sincronizado na nuvem.', 'warning');
+                return;
+            }
+
+            const apiUrl = obterGoogleApiUrl();
+            if (!apiUrl) {
+                mostrarNotificacao('URL do Google Apps Script não configurada.', 'error');
+                return;
+            }
+
+            const ok = confirm('Confirma apagar o romaneio sincronizado ' + codigoControle + ' da nuvem e da base local?');
+            if (!ok) {
+                return;
+            }
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                body: JSON.stringify({
+                    action: 'excluir_romaneio_sincronizado',
+                    codigoControle: codigoControle,
+                    pdfUrl: registro.pdfUrl || '',
+                    hashIntegridade: registro.hashIntegridade || ''
+                })
+            })
+            .then(function(res) {
+                if (!res.ok) {
+                    throw new Error('Erro na rede: ' + res.status);
+                }
+                return res.json();
+            })
+            .then(function(data) {
+                if (!data || data.status !== 'success') {
+                    throw new Error((data && data.message) || 'Falha ao excluir romaneio sincronizado na nuvem.');
+                }
+
+                return apagarRomaneioLocalAdmin(
+                    codigoControle,
+                    'admin_excluir_romaneio_sync',
+                    'Admin excluiu romaneio sincronizado (nuvem + local): ' + codigoControle
+                );
+            })
+            .then(function() {
+                mostrarNotificacao('Romaneio sincronizado apagado da nuvem e da base local com sucesso.', 'success');
+            })
+            .catch(function(err) {
+                console.error('Erro ao apagar romaneio sincronizado:', err);
+                alert('Não foi possível apagar o romaneio sincronizado: ' + err.message);
+            });
+        }
+
+        function atualizarTabelaRomaneiosAdmin() {
+            const tbody = document.getElementById('adminRomaneiosTableBody');
+            if (!tbody) return;
+            const selectAll = document.getElementById('adminRomaneiosSelectAll');
+
+            if (!ehPerfilAdmin(usuarioAtual)) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #64748b; padding: 12px;">Acesso restrito ao perfil Admin.</td></tr>';
+                if (selectAll) {
+                    selectAll.checked = false;
+                    selectAll.indeterminate = false;
+                }
+                return;
+            }
+
+            const lista = obterListaRomaneiosAdminFiltrada();
+
+            if (!lista.length) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #64748b; padding: 12px;">Nenhum romaneio encontrado.</td></tr>';
+                if (selectAll) {
+                    selectAll.checked = false;
+                    selectAll.indeterminate = false;
+                }
+                return;
+            }
+
+            tbody.innerHTML = '';
+            lista.forEach(function(r) {
+                const tr = document.createElement('tr');
+                const data = formatarData((r.campos && r.campos.dataRomaneio) || '');
+                const placa = (((r.campos && r.campos.placaCaminhao) || 'S/N') + '').toUpperCase();
+                const contrato = (r.campos && r.campos.contrato) || 'S/N';
+                const autor = obterNomeUsuarioPorId(r.usuarioId);
+                const linkApagarSync = r.syncStatus === 'synced'
+                    ? '<a href="#" onclick="excluirRomaneioSincronizadoComoAdmin(\'' + r.codigoControle + '\'); return false;" style="font-size: 0.75em; color: #b91c1c; text-decoration: underline;">Apagar sincronizado</a>'
+                    : '<span style="font-size: 0.75em; color: #94a3b8;">-</span>';
+                tr.innerHTML = '' +
+                    '<td style="text-align: center;"><input type="checkbox" class="admin-romaneio-select" value="' + r.codigoControle + '" style="width: 16px; height: 16px;" onchange="atualizarCheckboxCabecalhoAdmin()"></td>' +
+                    '<td><strong>' + r.codigoControle + '</strong></td>' +
+                    '<td>' + data + '</td>' +
+                    '<td>' + contrato + '</td>' +
+                    '<td>' + placa + '</td>' +
+                    '<td>' + autor + '</td>' +
+                    '<td style="text-align: center;">' +
+                        '<button class="btn-warning" style="padding: 4px 8px; font-size: 0.75em; margin: 0; background: linear-gradient(135deg, #dc2626, #ef4444);" onclick="excluirRomaneioComoAdmin(\'' + r.codigoControle + '\')">Apagar</button>' +
+                        '<div style="margin-top: 4px;">' + linkApagarSync + '</div>' +
+                    '</td>';
+                tbody.appendChild(tr);
+            });
+
+            atualizarCheckboxCabecalhoAdmin();
+        }
+
+        function obterListaRomaneiosAdminFiltrada() {
+            const filtroInput = document.getElementById('adminRomaneiosFiltro');
+            const dataInicioInput = document.getElementById('adminRomaneiosDataInicio');
+            const dataFimInput = document.getElementById('adminRomaneiosDataFim');
+            const filtro = filtroInput ? String(filtroInput.value || '').trim().toLowerCase() : '';
+            const dataInicio = dataInicioInput ? String(dataInicioInput.value || '') : '';
+            const dataFim = dataFimInput ? String(dataFimInput.value || '') : '';
+
+            return (cacheRomaneios || []).slice().sort(function(a, b) {
+                return new Date(b.savedAt || 0) - new Date(a.savedAt || 0);
+            }).filter(function(r) {
+                const dataIso = (r.campos && r.campos.dataRomaneio) ? String(r.campos.dataRomaneio) : '';
+                if (dataInicio && (!dataIso || dataIso < dataInicio)) {
+                    return false;
+                }
+                if (dataFim && (!dataIso || dataIso > dataFim)) {
+                    return false;
+                }
+
+                if (!filtro) {
+                    return true;
+                }
+
+                const data = formatarData(dataIso);
+                const placa = ((r.campos && r.campos.placaCaminhao) || '').toUpperCase();
+                const contrato = ((r.campos && r.campos.contrato) || '');
+                const codigo = r.codigoControle || '';
+                const autor = obterNomeUsuarioPorId(r.usuarioId);
+                const bloco = [codigo, data, placa, contrato, autor].join(' ').toLowerCase();
+                return bloco.indexOf(filtro) !== -1;
+            });
+        }
+
+        function atualizarCheckboxCabecalhoAdmin() {
+            const head = document.getElementById('adminRomaneiosSelectAll');
+            if (!head) return;
+            const checks = Array.from(document.querySelectorAll('#adminRomaneiosTableBody .admin-romaneio-select'));
+            if (!checks.length) {
+                head.checked = false;
+                head.indeterminate = false;
+                return;
+            }
+            const marcados = checks.filter(function(cb) { return cb.checked; }).length;
+            head.checked = marcados === checks.length;
+            head.indeterminate = marcados > 0 && marcados < checks.length;
+        }
+
+        function marcarSelecaoRomaneiosAdmin(marcar) {
+            if (!validarPermissaoAdmin()) {
+                return;
+            }
+            document.querySelectorAll('#adminRomaneiosTableBody .admin-romaneio-select').forEach(function(cb) {
+                cb.checked = !!marcar;
+            });
+            atualizarCheckboxCabecalhoAdmin();
+        }
+
+        function exportarRomaneiosAdminCsvFiltrados() {
+            if (!validarPermissaoAdmin()) {
+                return;
+            }
+
+            const lista = obterListaRomaneiosAdminFiltrada();
+            if (!lista.length) {
+                mostrarNotificacao('Não há romaneios filtrados para exportar.', 'info');
+                return;
+            }
+
+            function esc(valor) {
+                const v = String(valor == null ? '' : valor).replace(/"/g, '""');
+                return '"' + v + '"';
+            }
+
+            const cabecalho = [
+                'codigo_controle',
+                'data_romaneio',
+                'contrato',
+                'placa',
+                'usuario',
+                'status_sync',
+                'data_salvamento'
+            ];
+
+            const linhas = [cabecalho.map(esc).join(';')];
+
+            lista.forEach(function(r) {
+                const campos = r.campos || {};
+                const row = [
+                    r.codigoControle || '',
+                    formatarData(campos.dataRomaneio || ''),
+                    campos.contrato || '',
+                    (campos.placaCaminhao || '').toUpperCase(),
+                    obterNomeUsuarioPorId(r.usuarioId),
+                    r.syncStatus || 'pending',
+                    r.savedAt ? new Date(r.savedAt).toLocaleString('pt-BR') : ''
+                ];
+                linhas.push(row.map(esc).join(';'));
+            });
+
+            const csv = linesepSafe(linhas.join('\r\n'));
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'romaneios_filtrados_admin.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            registrarAuditoria('admin_export_csv_filtrado', 'Admin exportou CSV filtrado de romaneios (' + lista.length + ' itens)');
+        }
+
+        function linesepSafe(texto) {
+            return String(texto || '').replace(/\u2028|\u2029/g, ' ');
+        }
+
+        function apagarRomaneiosSelecionadosAdmin() {
+            if (!validarPermissaoAdmin()) {
+                return;
+            }
+
+            const selecionados = Array.from(document.querySelectorAll('#adminRomaneiosTableBody .admin-romaneio-select:checked')).map(function(cb) {
+                return cb.value;
+            });
+
+            if (!selecionados.length) {
+                mostrarNotificacao('Selecione pelo menos um romaneio para apagar.', 'warning');
+                return;
+            }
+
+            const ok = confirm('Confirma apagar ' + selecionados.length + ' romaneio(s)? A numeração de rastreio será recalculada automaticamente.');
+            if (!ok) {
+                return;
+            }
+
+            Promise.all(selecionados.map(function(codigo) {
+                return dbExcluirRomaneio(codigo);
+            }))
+                .then(function() {
+                    const setRemover = new Set(selecionados);
+                    cacheRomaneios = cacheRomaneios.filter(function(item) {
+                        return !setRemover.has(item.codigoControle);
+                    });
+
+                    removerMapaRastreabilidadePorCodigos(selecionados);
+                    recalcularSequenciaRastreioPorBaseLocal();
+
+                    atualizarKpisAdmin();
+                    atualizarTabelaRomaneiosUsuario();
+                    atualizarTabelaRomaneiosAdmin();
+                    atualizarTabelaPendentesSincronizacao();
+                    registrarAuditoria('admin_excluir_romaneio_lote', 'Admin excluiu ' + selecionados.length + ' romaneio(s) em lote');
+                    mostrarNotificacao(selecionados.length + ' romaneio(s) apagado(s) com sucesso.', 'success');
+                })
+                .catch(function(err) {
+                    console.error('Erro ao apagar romaneios em lote:', err);
+                    mostrarNotificacao('Falha ao apagar romaneios selecionados. Tente novamente.', 'error');
+                });
         }
 
         function coletarSnapshotMateriais() {
@@ -3542,7 +4541,9 @@
             }
         }
 
-        function sincronizarConfiguracoesGlobais() {
+        function sincronizarConfiguracoesGlobais(opcoes) {
+            const opts = opcoes || {};
+            const forcarAplicacao = !!opts.forcarAplicacao;
             const apiUrl = obterGoogleApiUrl();
             if (!apiUrl) return;
 
@@ -3572,6 +4573,12 @@
                         atualizarDatalistMateriais();
                     }
                     if (data.configuracoes) {
+                        const podeAplicar = forcarAplicacao || !configCabecalhoSujo;
+                        if (!podeAplicar) {
+                            console.log("Configurações globais recebidas, mas aplicação local foi adiada (edição em andamento).");
+                            return;
+                        }
+
                         const cfg = data.configuracoes;
                         const keys = [
                             { key: 'form_numero', storage: 'sucena_cfg_form_numero', id: 'cfgFormNumero' },
@@ -3651,6 +4658,29 @@
             .catch(function(err) {
                 console.warn("Erro ao sincronizar configurações globais:", err);
             });
+        }
+
+        function iniciarSincronizacaoAutomaticaConfiguracoes() {
+            if (globalConfigSyncTimer) {
+                clearInterval(globalConfigSyncTimer);
+                globalConfigSyncTimer = null;
+            }
+
+            const apiUrl = obterGoogleApiUrl();
+            if (!apiUrl) return;
+
+            globalConfigSyncTimer = setInterval(function() {
+                if (!usuarioAtual) return;
+                if (!navigator.onLine) return;
+                sincronizarConfiguracoesGlobais();
+            }, GLOBAL_CONFIG_SYNC_INTERVAL_MS);
+        }
+
+        function pararSincronizacaoAutomaticaConfiguracoes() {
+            if (globalConfigSyncTimer) {
+                clearInterval(globalConfigSyncTimer);
+                globalConfigSyncTimer = null;
+            }
         }
 
         function renderContratosNoSelect() {
@@ -3890,11 +4920,11 @@
             const nome = input.value.trim().toUpperCase();
 
             if (!contratoNome) {
-                alert('Selecione primeiro o contrato de origem.');
+                mostrarNotificacao('Selecione primeiro o contrato de origem.', 'warning');
                 return;
             }
             if (!nome) {
-                alert('Digite o nome do local de origem.');
+                mostrarNotificacao('Digite o nome do local de origem.', 'warning');
                 return;
             }
 
@@ -3905,7 +4935,7 @@
             document.getElementById('destinoOrigemNovoBox').style.display = 'none';
             gerarCodigoControle();
             atualizarQrPrevia();
-            alert('Origem cadastrada com sucesso!');
+            mostrarNotificacao('Origem cadastrada com sucesso!', 'success');
         }
 
         function adicionarDestinoDestinoPersonalizado() {
@@ -3914,11 +4944,11 @@
             const nome = input.value.trim().toUpperCase();
 
             if (!contratoNome) {
-                alert('Selecione primeiro o contrato de destino.');
+                mostrarNotificacao('Selecione primeiro o contrato de destino.', 'warning');
                 return;
             }
             if (!nome) {
-                alert('Digite o nome do local de destino.');
+                mostrarNotificacao('Digite o nome do local de destino.', 'warning');
                 return;
             }
 
@@ -3929,7 +4959,7 @@
             document.getElementById('destinoDestinoNovoBox').style.display = 'none';
             gerarCodigoControle();
             atualizarQrPrevia();
-            alert('Destino cadastrado com sucesso!');
+            mostrarNotificacao('Destino cadastrado com sucesso!', 'success');
         }
 
         function adicionarContratoPersonalizado() {
@@ -3937,7 +4967,7 @@
             const nome = input.value.trim().toUpperCase();
 
             if (!nome) {
-                alert('Informe o nome do novo contrato.');
+                mostrarNotificacao('Informe o nome do novo contrato.', 'warning');
                 return;
             }
 
@@ -3945,7 +4975,7 @@
             const jaExisteExtra = contratosExtras.includes(nome);
 
             if (jaExisteBase || jaExisteExtra) {
-                alert('Este contrato já existe na lista.');
+                mostrarNotificacao('Este contrato já existe na lista.', 'warning');
                 return;
             }
 
@@ -3976,7 +5006,7 @@
                 });
             }
 
-            alert('Contrato adicionado com sucesso.');
+            mostrarNotificacao('Contrato adicionado com sucesso.', 'success');
         }
 
         function renderFornecedoresNoSelect() {
@@ -4031,7 +5061,7 @@
             const local = document.getElementById('novoFornecedorLocal').value.trim();
 
             if (!nome) {
-                alert('Informe a razão social do novo fornecedor.');
+                mostrarNotificacao('Informe a razão social do novo fornecedor.', 'warning');
                 return;
             }
 
@@ -4073,7 +5103,7 @@
                 });
             }
 
-            alert('Fornecedor adicionado com sucesso.');
+            mostrarNotificacao('Fornecedor adicionado com sucesso.', 'success');
         }
 
         function obterFornecedorSelecionado(selectValue) {
@@ -4209,6 +5239,10 @@
                 return;
             }
 
+            if (isModoPlacasMuro()) {
+                aplicarNumeroInternoGeralNoFormulario(false);
+            }
+
             gerarCodigoControle();
             const fotos = atualizarFotosNaPrevia();
             const db = getBaseDadosLocal();
@@ -4269,11 +5303,16 @@
             const idxExistente = db.romaneios.findIndex(function(item) {
                 return item.codigoControle === registro.codigoControle;
             });
+            const eraNovoRegistro = idxExistente < 0;
 
             if (idxExistente >= 0) {
                 db.romaneios[idxExistente] = registro;
             } else {
                 db.romaneios.push(registro);
+            }
+
+            if (isModoPlacasMuro() && eraNovoRegistro) {
+                marcarNumeroInternoGeralComoUtilizado(registro.campos.ilsNumero);
             }
 
             if (sequenciaRaw !== 'NA') {
@@ -4288,6 +5327,9 @@
                 garantirOpcaoNoSelect('sequenciaNumero', proxima);
                 document.getElementById('sequenciaNumero').value = String(proxima);
             }
+            if (isModoPlacasMuro() && eraNovoRegistro) {
+                aplicarNumeroInternoGeralNoFormulario(true);
+            }
             gerarCodigoControle();
 
             dbSalvarRomaneio(registro).then(function() {
@@ -4297,9 +5339,9 @@
                 registrarAuditoria('salvar_romaneio', 'Registro salvo no IndexedDB local');
 
                 if (sequenciaRaw === 'NA') {
-                    alert('Registro salvo na base local com sucesso.');
+                mostrarNotificacao('Registro salvo na base local com sucesso.', 'success', 3000);
                 } else {
-                    alert('Registro salvo na base local com sucesso. Próxima sequência: ' + proxima + '.');
+                    mostrarNotificacao('Registro salvo na base local com sucesso. Próxima sequência: ' + proxima + '.', 'success', 3000);
                 }
 
                 if (navigator.onLine) {
@@ -4313,7 +5355,7 @@
 
         function aplicarRegistroNoFormulario(registro) {
             if (!registro || !registro.campos) {
-                alert('Registro inválido na base local.');
+                mostrarNotificacao('Registro inválido na base local.', 'error');
                 return;
             }
 
@@ -4499,7 +5541,7 @@
             }
             const db = getBaseDadosLocal();
             if (!db.romaneios.length) {
-                alert('Não há registros salvos na base local.');
+                mostrarNotificacao('Não há registros salvos na base local.', 'info');
                 return;
             }
             const ultimo = db.romaneios[db.romaneios.length - 1];
@@ -4559,10 +5601,12 @@
                             });
                         }
                         atualizarStatusBaseDados();
+                        sincronizarNumeroInternoGeralComHistorico();
+                        aplicarNumeroInternoGeralNoFormulario(false);
                         aplicarProximaSequenciaBanco(true);
                         atualizarKpisAdmin();
                         atualizarTabelaPendentesSincronizacao();
-                        alert('Base de dados importada com sucesso.');
+                        mostrarNotificacao('Base de dados importada com sucesso.', 'success');
                         registrarAuditoria('import_base_json', 'Importou backup da base local');
                         if (navigator.onLine) {
                             sincronizarPendentesComNuvem();
@@ -4572,7 +5616,7 @@
                         alert("Erro ao gravar importações no IndexedDB: " + err.toString());
                     });
                 } catch (err) {
-                    alert('Não foi possível importar. Verifique o arquivo JSON da base.');
+                    mostrarNotificacao('Não foi possível importar. Verifique o arquivo JSON da base.', 'error');
                 }
             };
             reader.readAsText(arquivo);
@@ -4585,8 +5629,12 @@
             if (!urlInput) return;
             const url = urlInput.value.trim();
             localStorage.setItem(GOOGLE_API_URL_STORAGE_KEY, url);
+            if (url && navigator.onLine) {
+                sincronizarConfiguracoesGlobais({ forcarAplicacao: true });
+            }
+            iniciarSincronizacaoAutomaticaConfiguracoes();
             atualizarTabelaPendentesSincronizacao();
-            alert('Configuração da API Google salva com sucesso!');
+            mostrarNotificacao('Configuração da API Google salva com sucesso!', 'success');
         }
 
         function carregarConfiguracaoGoogle() {
@@ -4829,6 +5877,7 @@
         window.addEventListener('online', function() {
             atualizarStatusConectividadeVisual();
             atualizarTabelaPendentesSincronizacao();
+            sincronizarConfiguracoesGlobais();
             sincronizarPendentesComNuvem();
         });
 
@@ -4991,6 +6040,10 @@
         }
 
         function gerarCodigoControle() {
+            if (isModoPlacasMuro()) {
+                aplicarNumeroInternoGeralNoFormulario(false);
+            }
+
             const cc = document.getElementById('contratoControle').value;
             const contratoCurto = obterContratoCurto(cc);
 
@@ -5051,6 +6104,7 @@
                 document.getElementById('razaoSocialFornecedor').value = 'FÁBRICA PRÓPRIA VERONA';
                 document.getElementById('codigoProdutoFiscal').value = '';
                 document.getElementById('descricaoProdutoFiscal').value = '';
+                aplicarNumeroInternoGeralNoFormulario(true);
             } else {
                 document.getElementById('ilsNumero').value = '';
                 document.getElementById('controleConcretoNumero').value = '';
@@ -5089,15 +6143,15 @@
                 if (produto === 'PLACA (PL)') {
                     const concreto = document.getElementById('controleConcretoNumero').value || 'Não informado';
                     return {
-                        label: 'ILS/FVS / Lotes',
-                        valor: 'ILS/FVS: ' + ils + ' | Lotes: ' + concreto,
-                        payload: 'ILS=' + ils + ';Lotes=' + concreto
+                        label: 'ILS/FVS: Nº / Lotes',
+                        valor: 'ILS/FVS: Nº ' + ils + ' | Lotes: ' + concreto,
+                        payload: 'ILSFVS=' + ils + ';Lotes=' + concreto
                     };
                 } else {
                     return {
-                        label: 'ILS/FVS',
-                        valor: 'ILS/FVS: ' + ils,
-                        payload: 'ILS=' + ils
+                        label: 'ILS/FVS: Nº',
+                        valor: 'ILS/FVS: Nº ' + ils,
+                        payload: 'ILSFVS=' + ils
                     };
                 }
             }
@@ -5654,6 +6708,14 @@
                 }
                 
                 let y = 15;
+                const PAGE_BOTTOM = 275;
+
+                function ensureSpace(heightNeeded) {
+                    if (y + heightNeeded > PAGE_BOTTOM) {
+                        pdf.addPage();
+                        y = 15;
+                    }
+                }
                 
                 pdf.setDrawColor(0);
                 pdf.setLineWidth(0.5);
@@ -5773,28 +6835,37 @@
                 }
                 
                 y += 27;
-                
-                pdf.rect(10, y, 92, 20);
-                pdf.rect(108, y, 92, 20);
-                
+
+                const fornLines = pdf.splitTextToSize(String(fornTexto || ''), 88);
+                const cnpjLines = cnpjTexto ? pdf.splitTextToSize(String(cnpjTexto), 88) : [];
+                const destLines = pdf.splitTextToSize(String(destino || ''), 88);
+                const fornecedorTotalLines = fornLines.length + cnpjLines.length;
+                const fornecedorBoxHeight = Math.max(20, 10 + (fornecedorTotalLines * 4));
+                const destinoBoxHeight = Math.max(20, 10 + (destLines.length * 4));
+                const origemDestinoBoxHeight = Math.max(fornecedorBoxHeight, destinoBoxHeight);
+
+                ensureSpace(origemDestinoBoxHeight + 5);
+                pdf.rect(10, y, 92, origemDestinoBoxHeight);
+                pdf.rect(108, y, 92, origemDestinoBoxHeight);
+
                 pdf.setFont('helvetica', 'bold');
+                pdf.setFontSize(10);
                 pdf.text('FORNECEDOR/ORIGEM:', 12, y + 6);
                 pdf.setFontSize(9);
                 pdf.setFont('helvetica', 'normal');
-                const fornLines = pdf.splitTextToSize(fornTexto, 88);
                 pdf.text(fornLines, 12, y + 11);
-                if (cnpjTexto) {
-                    pdf.text(cnpjTexto, 12, y + 11 + (fornLines.length * 4));
+                if (cnpjLines.length > 0) {
+                    pdf.text(cnpjLines, 12, y + 11 + (fornLines.length * 4));
                 }
-                
+
                 pdf.setFontSize(10);
                 pdf.setFont('helvetica', 'bold');
                 pdf.text('DESTINO:', 110, y + 6);
                 pdf.setFont('helvetica', 'normal');
-                const destLines = pdf.splitTextToSize(destino, 88);
+                pdf.setFontSize(9);
                 pdf.text(destLines, 110, y + 11);
-                
-                y += 25;
+
+                y += origemDestinoBoxHeight + 5;
                 
                 pdf.rect(10, y, 190, 12);
                 pdf.setFont('helvetica', 'bold');
@@ -5815,41 +6886,67 @@
                 y += 17;
 
                 const isMuro = isModoPlacasMuro();
-                const boxHeight = isMuro ? 20 : 32;
-                pdf.rect(10, y, 190, boxHeight);
-                pdf.setFontSize(10);
-                pdf.setFont('helvetica', 'bold');
-                pdf.text(docFiscal.label + ': ', 12, y + 6);
-                pdf.setFont('helvetica', 'normal');
-                const docLines = pdf.splitTextToSize(docFiscal.valor, 128);
-                pdf.text(docLines, 58, y + 6);
+                const lineHeight = 4;
+                const fieldGap = 2;
+                const docLines = pdf.splitTextToSize(String(docFiscal.valor || ''), 128);
+                const razaoLines = pdf.splitTextToSize(String(razaoFornecedorFiscal || ''), 128);
+                const cnpjLinesFiscal = pdf.splitTextToSize(String(cnpjFornecedorFiscal || ''), 128);
+                const codigoLines = pdf.splitTextToSize(String(codigoProdutoFiscal || ''), 128);
+                const descLines = pdf.splitTextToSize(String(descricaoProdutoFiscal || ''), 128);
 
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('Razão Social Fornecedor: ', 12, y + 12);
-                pdf.setFont('helvetica', 'normal');
-                const razaoLines = pdf.splitTextToSize(razaoFornecedorFiscal, 135);
-                pdf.text(razaoLines, 58, y + 12);
-
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('CNPJ Fornecedor: ', 12, y + 18);
-                pdf.setFont('helvetica', 'normal');
-                pdf.text(cnpjFornecedorFiscal, 42, y + 18);
+                let conteudoDocHeight = 0;
+                conteudoDocHeight += Math.max(1, docLines.length) * lineHeight + fieldGap;
+                conteudoDocHeight += Math.max(1, razaoLines.length) * lineHeight + fieldGap;
+                conteudoDocHeight += Math.max(1, cnpjLinesFiscal.length) * lineHeight;
 
                 if (!isMuro) {
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.text('Código Produto: ', 12, y + 24);
-                    pdf.setFont('helvetica', 'normal');
-                    pdf.text(codigoProdutoFiscal, 40, y + 24);
-
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.text('Descrição Produto: ', 12, y + 30);
-                    pdf.setFont('helvetica', 'normal');
-                    const descLines = pdf.splitTextToSize(descricaoProdutoFiscal, 140);
-                    pdf.text(descLines, 45, y + 30);
+                    conteudoDocHeight += fieldGap;
+                    conteudoDocHeight += Math.max(1, codigoLines.length) * lineHeight + fieldGap;
+                    conteudoDocHeight += Math.max(1, descLines.length) * lineHeight;
                 }
 
-                y += isMuro ? 25 : 37;
+                const boxHeight = Math.max(isMuro ? 20 : 32, conteudoDocHeight + 8);
+                ensureSpace(boxHeight + 5);
+                pdf.rect(10, y, 190, boxHeight);
+
+                pdf.setFontSize(10);
+                let fieldY = y + 6;
+
+                pdf.setFont('helvetica', 'bold');
+                pdf.text(docFiscal.label + ': ', 12, fieldY);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(docLines, 58, fieldY);
+                fieldY += Math.max(1, docLines.length) * lineHeight + fieldGap;
+
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Razão Social Fornecedor: ', 12, fieldY);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(razaoLines, 58, fieldY);
+                fieldY += Math.max(1, razaoLines.length) * lineHeight + fieldGap;
+
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('CNPJ Fornecedor: ', 12, fieldY);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text(cnpjLinesFiscal, 58, fieldY);
+                fieldY += Math.max(1, cnpjLinesFiscal.length) * lineHeight;
+
+                if (!isMuro) {
+                    fieldY += fieldGap;
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('Código Produto: ', 12, fieldY);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text(codigoLines, 58, fieldY);
+                    fieldY += Math.max(1, codigoLines.length) * lineHeight + fieldGap;
+
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('Descrição Produto: ', 12, fieldY);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text(descLines, 58, fieldY);
+                }
+
+                y += boxHeight + 5;
                 
+                ensureSpace(18);
                 pdf.setFont('helvetica', 'bold');
                 pdf.text('MATERIAIS TRANSPORTADOS:', 12, y);
                 y += 5;
@@ -5868,16 +6965,22 @@
                 
                 if (materiaisList.length > 0) {
                     materiaisList.forEach(function(mat) {
-                        pdf.rect(10, y, 120, 7);
-                        pdf.rect(130, y, 35, 7);
-                        pdf.rect(165, y, 35, 7);
-                        
+                        const materialNome = String(mat.nome || '').replace(/\r/g, '');
+                        const nomeLines = pdf.splitTextToSize(materialNome, 116);
+                        const rowHeight = Math.max(7, (Math.max(1, nomeLines.length) * 4) + 3);
+
+                        ensureSpace(rowHeight + 2);
+                        pdf.rect(10, y, 120, rowHeight);
+                        pdf.rect(130, y, 35, rowHeight);
+                        pdf.rect(165, y, 35, rowHeight);
+
                         pdf.setFont('helvetica', 'bold');
-                        pdf.text(mat.nome, 12, y + 5);
+                        pdf.text(nomeLines, 12, y + 4);
                         pdf.setFont('helvetica', 'normal');
-                        pdf.text(String(mat.qtd), 147, y + 5, { align: 'center' });
-                        pdf.text(mat.unidade, 182, y + 5, { align: 'center' });
-                        y += 7;
+                        const middleY = y + (rowHeight / 2) + 1;
+                        pdf.text(String(mat.qtd || '-'), 147, middleY, { align: 'center' });
+                        pdf.text(String(mat.unidade || '-'), 182, middleY, { align: 'center' });
+                        y += rowHeight;
                     });
                 } else {
                     pdf.rect(10, y, 190, 7);
@@ -5887,6 +6990,7 @@
 
                 y += 4;
 
+                ensureSpace(55);
                 pdf.setFont('helvetica', 'bold');
                 pdf.setFontSize(9);
                 pdf.text('REGISTRO FOTOGRÁFICO DA CARGA:', 12, y + 4);
@@ -5916,16 +7020,19 @@
 
                 y += 47;
                 y += 5;
-                
-                pdf.rect(10, y, 190, 25);
+
+                const obsLines = pdf.splitTextToSize(String(obs || ''), 186);
+                const obsBoxHeight = Math.max(25, 10 + (Math.max(1, obsLines.length) * 4));
+                ensureSpace(obsBoxHeight + 24);
+
+                pdf.rect(10, y, 190, obsBoxHeight);
                 pdf.setFont('helvetica', 'bold');
                 pdf.text('OBSERVAÇÕES:', 12, y + 6);
                 pdf.setFontSize(9);
                 pdf.setFont('helvetica', 'normal');
-                const obsLines = pdf.splitTextToSize(obs, 186);
                 pdf.text(obsLines, 12, y + 11);
-                
-                y += 30;
+
+                y += obsBoxHeight + 5;
 
                 pdf.rect(10, y, 190, 14);
                 pdf.setFont('helvetica', 'bold');
@@ -5938,11 +7045,8 @@
                 pdf.text('PREENCHIMENTO FÍSICO', 122, y + 6);
 
                 y += 19;
-                
-                if (y + 55 > 280) {
-                    pdf.addPage();
-                    y = 20;
-                }
+
+                ensureSpace(55);
                 
                 pdf.setLineWidth(0.5);
                 pdf.line(15, y + 30, 95, y + 30);
@@ -6253,6 +7357,42 @@
         document.getElementById('btnEntrarSistema').addEventListener('click', entrarSistema);
         document.getElementById('btnSairSistema').addEventListener('click', sairSistema);
         document.getElementById('btnAdminCriarUsuario').addEventListener('click', criarUsuarioAdmin);
+        document.getElementById('btnAdminRomaneiosFiltrar').addEventListener('click', atualizarTabelaRomaneiosAdmin);
+        document.getElementById('btnAdminRomaneiosLimparFiltro').addEventListener('click', function() {
+            const filtro = document.getElementById('adminRomaneiosFiltro');
+            const dataInicio = document.getElementById('adminRomaneiosDataInicio');
+            const dataFim = document.getElementById('adminRomaneiosDataFim');
+            if (filtro) {
+                filtro.value = '';
+            }
+            if (dataInicio) {
+                dataInicio.value = '';
+            }
+            if (dataFim) {
+                dataFim.value = '';
+            }
+            atualizarTabelaRomaneiosAdmin();
+        });
+        document.getElementById('btnAdminRomaneiosExportarCsv').addEventListener('click', exportarRomaneiosAdminCsvFiltrados);
+        document.getElementById('btnAdminRomaneiosMarcarTodos').addEventListener('click', function() {
+            marcarSelecaoRomaneiosAdmin(true);
+        });
+        document.getElementById('btnAdminRomaneiosDesmarcarTodos').addEventListener('click', function() {
+            marcarSelecaoRomaneiosAdmin(false);
+        });
+        document.getElementById('btnAdminRomaneiosApagarSelecionados').addEventListener('click', apagarRomaneiosSelecionadosAdmin);
+        document.getElementById('adminRomaneiosSelectAll').addEventListener('change', function(e) {
+            marcarSelecaoRomaneiosAdmin(e.target.checked);
+        });
+        document.getElementById('adminRomaneiosFiltro').addEventListener('input', function() {
+            atualizarTabelaRomaneiosAdmin();
+        });
+        document.getElementById('adminRomaneiosDataInicio').addEventListener('change', function() {
+            atualizarTabelaRomaneiosAdmin();
+        });
+        document.getElementById('adminRomaneiosDataFim').addEventListener('change', function() {
+            atualizarTabelaRomaneiosAdmin();
+        });
 
         ['tacNumero', 'pacoteNumero', 'kmNumero', 'sequenciaNumero', 'revisaoDocumento'].forEach(function(id) {
             document.getElementById(id).addEventListener('change', function() {
@@ -6324,6 +7464,13 @@
                 console.error("Erro ao carregar sequenceState:", e);
             }
 
+            try {
+                const numInternoRaw = localStorage.getItem(NUMERO_INTERNO_GERAL_STORAGE_KEY);
+                numeroInternoGeralAtual = Math.max(0, parseInt(numInternoRaw, 10) || 0);
+            } catch (e) {
+                console.error("Erro ao carregar numeração interna geral:", e);
+            }
+
             dbObterRomaneios().then(function(lista) {
                 cacheRomaneios = lista || [];
                 
@@ -6360,6 +7507,8 @@
                 atualizarStatusBaseDados();
                 atualizarTabelaPendentesSincronizacao();
                 atualizarTabelaRomaneiosUsuario();
+                sincronizarNumeroInternoGeralComHistorico();
+                aplicarNumeroInternoGeralNoFormulario(false);
                 
                 const apiUrl = obterGoogleApiUrl();
                 if (apiUrl) {
@@ -6418,11 +7567,12 @@
             if (fileInput && !fileInput.getAttribute('data-listener-registered')) {
                 fileInput.setAttribute('data-listener-registered', 'true');
                 fileInput.addEventListener('change', function(e) {
+                    configCabecalhoSujo = true;
                     const file = e.target.files[0];
                     if (!file) return;
                     
                     if (file.size > 100 * 1024) {
-                        alert('A imagem da logomarca deve ter no máximo 100KB.');
+                mostrarNotificacao('A imagem da logomarca deve ter no máximo 100KB.', 'warning');
                         e.target.value = '';
                         return;
                     }
@@ -6441,9 +7591,21 @@
                     reader.readAsDataURL(file);
                 });
             }
+
+            ['cfgFormNumero', 'cfgFormElaborado', 'cfgFormAprovado', 'cfgFormSetor', 'cfgFormRevisao', 'cfgFormData']
+                .forEach(function(id) {
+                    const el = document.getElementById(id);
+                    if (el && !el.getAttribute('data-dirty-listener')) {
+                        el.setAttribute('data-dirty-listener', 'true');
+                        el.addEventListener('input', function() {
+                            configCabecalhoSujo = true;
+                        });
+                    }
+                });
         }
 
         function limparLogomarcaConfig() {
+            configCabecalhoSujo = true;
             const input = document.getElementById('cfgLogoInput');
             if (input) input.value = '';
             const img = document.getElementById('cfgLogoPreview');
@@ -6456,8 +7618,8 @@
         }
 
         function salvarConfiguracaoCabecalho() {
-            if (!usuarioAtual || usuarioAtual.perfil !== 'admin') {
-                alert('Somente Administradores podem alterar as configurações do cabeçalho.');
+            if (!ehPerfilAdmin(usuarioAtual)) {
+                mostrarNotificacao('Somente Administradores podem alterar as configurações do cabeçalho.', 'error');
                 return;
             }
 
@@ -6482,6 +7644,7 @@
             } else {
                 localStorage.removeItem('sucena_cfg_logo_base64');
             }
+            configCabecalhoSujo = false;
 
             // Salvar na nuvem
             const apiUrl = obterGoogleApiUrl();
@@ -6507,18 +7670,19 @@
                 .then(function(data) {
                     mostrarIndicadorSincronizacao(false);
                     if (data && data.status === "success") {
-                        alert('Configurações de cabeçalho salvas na nuvem com sucesso!');
+                        sincronizarConfiguracoesGlobais({ forcarAplicacao: true });
+                        mostrarNotificacao('Configurações de cabeçalho salvas na nuvem com sucesso!', 'success');
                     } else {
-                        alert('Erro ao salvar na nuvem: ' + (data.message || 'Erro desconhecido'));
+                        mostrarNotificacao('Erro ao salvar na nuvem: ' + (data.message || 'Erro desconhecido'), 'error');
                     }
                 })
                 .catch(function(err) {
                     mostrarIndicadorSincronizacao(false);
                     console.error("Erro ao salvar configurações de cabeçalho na nuvem:", err);
-                    alert('Salvo apenas localmente (sem conexão de rede).');
+                    mostrarNotificacao('Salvo apenas localmente (sem conexão de rede).', 'warning');
                 });
             } else {
-                alert('Salvo localmente com sucesso (API do Google não configurada).');
+                mostrarNotificacao('Salvo localmente com sucesso (API do Google não configurada)', 'info');
             }
         }
 
@@ -6719,7 +7883,7 @@
             const nome = input.value.trim().toUpperCase();
 
             if (!nome) {
-                alert('Informe o nome do novo motorista.');
+                mostrarNotificacao('Informe o nome do novo motorista.', 'warning');
                 return;
             }
 
@@ -7161,11 +8325,12 @@
 
             if (!usuarioAtual) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748b; padding: 12px;">Faça login para ver seus romaneios.</td></tr>';
+                atualizarTabelaRomaneiosAdmin();
                 return;
             }
 
             const filtrados = cacheRomaneios.filter(function(r) {
-                if (usuarioAtual.perfil === 'admin') return true;
+                if (ehPerfilAdmin(usuarioAtual)) return true;
                 return r.usuarioId === usuarioAtual.id;
             });
 
@@ -7176,6 +8341,7 @@
             tbody.innerHTML = '';
             if (filtrados.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #64748b; padding: 12px;">Nenhum romaneio emitido.</td></tr>';
+                atualizarTabelaRomaneiosAdmin();
                 return;
             }
 
@@ -7197,6 +8363,14 @@
                     driveBtn = '<a href="' + r.pdfUrl + '" target="_blank" class="btn-success" style="padding: 4px 8px; font-size: 0.75em; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 4px; background: linear-gradient(135deg, #0284c7, #0ea5e9); box-shadow: 0 2px 4px rgba(14, 165, 233, 0.2);">📁 Ver no Drive</a>';
                 }
 
+                const btnExcluirAdmin = ehPerfilAdmin(usuarioAtual)
+                    ? '<button class="btn-warning" style="padding: 4px 8px; font-size: 0.75em; margin: 0; background: linear-gradient(135deg, #dc2626, #ef4444);" onclick="excluirRomaneioComoAdmin(\'' + r.codigoControle + '\')">🗑️ Apagar</button>'
+                    : '';
+
+                const linkExcluirSyncAdmin = ehPerfilAdmin(usuarioAtual) && r.syncStatus === 'synced'
+                    ? '<a href="#" onclick="excluirRomaneioSincronizadoComoAdmin(\'' + r.codigoControle + '\'); return false;" style="font-size: 0.75em; color: #b91c1c; text-decoration: underline;">☁️ Apagar sincronizado</a>'
+                    : '';
+
                 tr.innerHTML = '' +
                     '<td><strong>' + r.codigoControle + '</strong></td>' +
                     '<td>' + data + '</td>' +
@@ -7207,9 +8381,13 @@
                         '<button class="btn-primary" style="padding: 4px 8px; font-size: 0.75em; margin: 0;" onclick="gerarNovamenteRomaneio(\'' + r.codigoControle + '\')">🔄 Editar</button>' +
                         '<button class="btn-success" style="padding: 4px 8px; font-size: 0.75em; margin: 0; background: linear-gradient(135deg, #059669, #10b981);" onclick="baixarPdfRegistro(\'' + r.codigoControle + '\')">📄 Baixar PDF</button>' +
                         driveBtn +
+                        btnExcluirAdmin +
+                        linkExcluirSyncAdmin +
                     '</td>';
                 tbody.appendChild(tr);
             });
+
+            atualizarTabelaRomaneiosAdmin();
         }
 
         function gerarNovamenteRomaneio(codigoControle) {
