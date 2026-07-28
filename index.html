@@ -8770,10 +8770,59 @@
         verificarParametroVerificacaoQr();
     </script>
         <script>
+            const APP_PWA_BUILD = '2026-07-28-login-fix-1';
+
+            function forcarAtualizacaoPwaSeNecessario() {
+                if (!('caches' in window)) return Promise.resolve(false);
+
+                const buildAtual = localStorage.getItem('sucena_pwa_build_v1');
+                if (buildAtual === APP_PWA_BUILD) return Promise.resolve(false);
+
+                return caches.keys()
+                    .then(function(keys) {
+                        return Promise.all(keys.map(function(key) {
+                            return caches.delete(key);
+                        }));
+                    })
+                    .then(function() {
+                        localStorage.setItem('sucena_pwa_build_v1', APP_PWA_BUILD);
+                        return true;
+                    })
+                    .catch(function(err) {
+                        console.warn('Falha ao limpar cache PWA automaticamente:', err);
+                        return false;
+                    });
+            }
+
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function() {
                     navigator.serviceWorker.register('sw.js').then(function(registration) {
                         console.log('ServiceWorker registrado com sucesso com o escopo: ', registration.scope);
+
+                        // Garante verificação imediata de nova versão do SW
+                        registration.update();
+
+                        // Se houver um SW aguardando, ativa agora para evitar cache antigo
+                        if (registration.waiting) {
+                            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                        }
+
+                        registration.addEventListener('updatefound', function() {
+                            const newWorker = registration.installing;
+                            if (!newWorker) return;
+                            newWorker.addEventListener('statechange', function() {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                }
+                            });
+                        });
+
+                        forcarAtualizacaoPwaSeNecessario().then(function(limpouCache) {
+                            if (limpouCache) {
+                                registration.update();
+                                window.location.reload();
+                            }
+                        });
                     }, function(err) {
                         console.log('Falha ao registrar o ServiceWorker: ', err);
                     });

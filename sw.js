@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sucena-romaneio-v23';
+const CACHE_NAME = 'sucena-romaneio-v24';
 const urlsToCache = [
   './',
   './index.html',
@@ -20,6 +20,12 @@ self.addEventListener('install', event => {
   );
 });
 
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 // Intercepta as requisições com estratégia Network-First (tenta rede, se offline cai para o cache)
 self.addEventListener('fetch', event => {
   // Apenas intercepta requisições GET
@@ -33,6 +39,16 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(event.request)
       .then(response => {
+        if (!response || !response.ok) {
+          return caches.match(event.request).then(cached => {
+            if (cached) return cached;
+            if (event.request.mode === 'navigate') {
+              return caches.match('./index.html');
+            }
+            return response;
+          });
+        }
+
         // Se a resposta for válida, clona e atualiza no cache
         if (response && response.status === 200) {
           const responseToCache = response.clone();
@@ -44,7 +60,13 @@ self.addEventListener('fetch', event => {
       })
       .catch(() => {
         // Se a rede falhar (offline), busca no cache
-        return caches.match(event.request);
+        return caches.match(event.request).then(cached => {
+          if (cached) return cached;
+          if (event.request.mode === 'navigate') {
+            return caches.match('./index.html');
+          }
+          return new Response('Offline', { status: 503, statusText: 'Offline' });
+        });
       })
   );
 });
