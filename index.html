@@ -1327,9 +1327,9 @@
                         <label>Revisão</label>
                         <input type="text" id="cfgFormRevisao" placeholder="Ex: 01">
                     </div>
-                    <div class="form-group" style="display: none;">
+                    <div class="form-group">
                         <label>Data do Formulário</label>
-                        <input type="text" id="cfgFormData" placeholder="Ex: 13/11/2026">
+                        <input type="text" id="cfgFormData" placeholder="Ex: 01/05/2026">
                     </div>
                 </div>
                 <div class="row" style="margin-top: 10px; margin-bottom: 10px;">
@@ -6518,7 +6518,7 @@
             const cfgFormAprovado = localStorage.getItem('sucena_cfg_form_aprovado') || 'DIRETORIA';
             const cfgFormSetor = localStorage.getItem('sucena_cfg_form_setor') || 'QUALIDADE';
             const cfgFormRevisao = localStorage.getItem('sucena_cfg_form_revisao') || '01';
-            const cfgFormData = localStorage.getItem('sucena_cfg_form_data') || '13/11/2026';
+            const cfgFormData = localStorage.getItem('sucena_cfg_form_data') || '01/05/2026';
             const emissorVal = document.getElementById('emissorNome').value || 'Não informado';
 
             // Atualizar VIA 1
@@ -6535,7 +6535,7 @@
             document.getElementById('previewFormAprovado1').textContent = cfgFormAprovado;
             document.getElementById('previewFormSetor1').textContent = cfgFormSetor;
             document.getElementById('previewFormRevisao1_header').textContent = cfgFormRevisao;
-            document.getElementById('previewFormData1').textContent = formatarData(data);
+            document.getElementById('previewFormData1').textContent = cfgFormData;
             document.getElementById('previewDocFiscalLabel1').textContent = docFiscal.label;
             document.getElementById('previewDocFiscal1').textContent = docFiscal.valor;
             document.getElementById('previewRazaoFornecedor1').textContent = razaoFornecedorFiscal;
@@ -6562,7 +6562,7 @@
             document.getElementById('previewFormAprovado2').textContent = cfgFormAprovado;
             document.getElementById('previewFormSetor2').textContent = cfgFormSetor;
             document.getElementById('previewFormRevisao2_header').textContent = cfgFormRevisao;
-            document.getElementById('previewFormData2').textContent = formatarData(data);
+            document.getElementById('previewFormData2').textContent = cfgFormData;
             document.getElementById('previewDocFiscalLabel2').textContent = docFiscal.label;
             document.getElementById('previewDocFiscal2').textContent = docFiscal.valor;
             document.getElementById('previewRazaoFornecedor2').textContent = razaoFornecedorFiscal;
@@ -6674,7 +6674,7 @@
             const cfgFormAprovado = localStorage.getItem('sucena_cfg_form_aprovado') || 'DIRETORIA';
             const cfgFormSetor = localStorage.getItem('sucena_cfg_form_setor') || 'QUALIDADE';
             const cfgFormRevisao = localStorage.getItem('sucena_cfg_form_revisao') || '01';
-            const cfgFormData = localStorage.getItem('sucena_cfg_form_data') || '13/11/2026';
+            const cfgFormData = localStorage.getItem('sucena_cfg_form_data') || '01/05/2026';
             const cfgLogoBase64 = localStorage.getItem('sucena_cfg_logo_base64') || null;
             
             const pdf = new jsPDF('p', 'mm', 'a4');
@@ -6833,7 +6833,7 @@
                 pdf.text(cfgFormAprovado, 102.5, 43, { align: 'center' });
                 pdf.text(cfgFormSetor, 135, 43, { align: 'center' });
                 pdf.text(cfgFormRevisao, 160, 43, { align: 'center' });
-                pdf.text(data, 185, 43, { align: 'center' });
+                pdf.text(cfgFormData, 185, 43, { align: 'center' });
                 
                 y = 50;
                 
@@ -7565,7 +7565,7 @@
             const formAprovado = localStorage.getItem('sucena_cfg_form_aprovado') || 'DIRETORIA';
             const formSetor = localStorage.getItem('sucena_cfg_form_setor') || 'QUALIDADE';
             const formRevisao = localStorage.getItem('sucena_cfg_form_revisao') || '01';
-            const formData = localStorage.getItem('sucena_cfg_form_data') || '13/11/2026';
+            const formData = localStorage.getItem('sucena_cfg_form_data') || '01/05/2026';
             
             const elNumero = document.getElementById('cfgFormNumero');
             if (elNumero) elNumero.value = formNumero;
