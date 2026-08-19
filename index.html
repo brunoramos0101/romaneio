@@ -4583,9 +4583,13 @@
                         ];
                         keys.forEach(function(item) {
                             if (cfg[item.key] !== undefined) {
-                                localStorage.setItem(item.storage, cfg[item.key]);
+                                let val = cfg[item.key];
+                                if (item.key === 'form_data') {
+                                    val = formatarDataCabecalho(val);
+                                }
+                                localStorage.setItem(item.storage, val);
                                 const el = document.getElementById(item.id);
-                                if (el) el.value = cfg[item.key];
+                                if (el) el.value = val;
                             }
                         });
 
@@ -7578,7 +7582,7 @@
             const formAprovado = localStorage.getItem('sucena_cfg_form_aprovado') || 'DIRETORIA';
             const formSetor = localStorage.getItem('sucena_cfg_form_setor') || 'QUALIDADE';
             const formRevisao = localStorage.getItem('sucena_cfg_form_revisao') || '01';
-            const formData = localStorage.getItem('sucena_cfg_form_data') || '01/05/2026';
+            const formData = formatarDataCabecalho(localStorage.getItem('sucena_cfg_form_data') || '01/05/2026');
             
             const elNumero = document.getElementById('cfgFormNumero');
             if (elNumero) elNumero.value = formNumero;
@@ -7719,7 +7723,7 @@
             const formAprovado = document.getElementById('cfgFormAprovado').value.trim();
             const formSetor = document.getElementById('cfgFormSetor').value.trim();
             const formRevisao = document.getElementById('cfgFormRevisao').value.trim();
-            const formData = document.getElementById('cfgFormData').value.trim();
+            const formData = formatarDataCabecalho(document.getElementById('cfgFormData').value.trim());
             const img = document.getElementById('cfgLogoPreview');
             const logo = img ? (img.getAttribute('data-base64') || '') : '';
 
