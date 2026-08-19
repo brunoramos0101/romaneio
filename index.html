@@ -6518,7 +6518,7 @@
             const cfgFormAprovado = localStorage.getItem('sucena_cfg_form_aprovado') || 'DIRETORIA';
             const cfgFormSetor = localStorage.getItem('sucena_cfg_form_setor') || 'QUALIDADE';
             const cfgFormRevisao = localStorage.getItem('sucena_cfg_form_revisao') || '01';
-            const cfgFormData = localStorage.getItem('sucena_cfg_form_data') || '01/05/2026';
+            const cfgFormData = formatarDataCabecalho(localStorage.getItem('sucena_cfg_form_data') || '01/05/2026');
             const emissorVal = document.getElementById('emissorNome').value || 'Não informado';
 
             // Atualizar VIA 1
@@ -6634,6 +6634,19 @@
             return d.toLocaleDateString('pt-BR');
         }
 
+        function formatarDataCabecalho(str) {
+            if (!str) return '01/05/2026';
+            if (str.includes('GMT') || str.includes('00:00:00') || /[a-zA-Z]/.test(str)) {
+                try {
+                    const d = new Date(str);
+                    if (!isNaN(d.getTime())) {
+                        return padNumero(d.getDate(), 2) + '/' + padNumero(d.getMonth() + 1, 2) + '/' + d.getFullYear();
+                    }
+                } catch(e) {}
+            }
+            return str;
+        }
+
         function imprimirRomaneio() {
             if (!validarCamposObrigatorios()) {
                 return;
@@ -6674,7 +6687,7 @@
             const cfgFormAprovado = localStorage.getItem('sucena_cfg_form_aprovado') || 'DIRETORIA';
             const cfgFormSetor = localStorage.getItem('sucena_cfg_form_setor') || 'QUALIDADE';
             const cfgFormRevisao = localStorage.getItem('sucena_cfg_form_revisao') || '01';
-            const cfgFormData = localStorage.getItem('sucena_cfg_form_data') || '01/05/2026';
+            const cfgFormData = formatarDataCabecalho(localStorage.getItem('sucena_cfg_form_data') || '01/05/2026');
             const cfgLogoBase64 = localStorage.getItem('sucena_cfg_logo_base64') || null;
             
             const pdf = new jsPDF('p', 'mm', 'a4');
