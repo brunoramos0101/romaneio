@@ -1327,7 +1327,7 @@
                         <label>Revisão</label>
                         <input type="text" id="cfgFormRevisao" placeholder="Ex: 01">
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" style="display: none;">
                         <label>Data do Formulário</label>
                         <input type="text" id="cfgFormData" placeholder="Ex: 13/11/2026">
                     </div>
@@ -1342,7 +1342,8 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn-primary" type="button" id="btnSalvarConfigCabecalho" onclick="salvarConfiguracaoCabecalho()" style="margin-bottom: 25px;">Salvar Configurações de Cabeçalho</button>
+                <button class="btn-primary" type="button" id="btnSalvarConfigCabecalho" onclick="salvarConfiguracaoCabecalho()">Salvar Configurações de Cabeçalho</button>
+                <div id="cfgCabecalhoStatus" style="margin-top: 8px; margin-bottom: 25px; font-size: 0.85em; color: #64748b;"></div>
 
                 <div class="section-title" style="margin-top: 25px;">🔗 INTEGRAÇÃO GOOGLE (PLANILHA E DRIVE)</div>
                 <div class="row">
@@ -2286,6 +2287,18 @@
         let numeroInternoGeralAtual = 0;
         let globalConfigSyncTimer = null;
         let configCabecalhoSujo = false;
+        let configCabecalhoSujoDesde = 0;
+        const CONFIG_CABECALHO_SUJO_LIMITE_MS = 3 * 60 * 1000; // 3 minutos: edição considerada abandonada após esse tempo
+
+        function marcarConfigCabecalhoSujo() {
+            configCabecalhoSujo = true;
+            configCabecalhoSujoDesde = Date.now();
+        }
+
+        function limparConfigCabecalhoSujo() {
+            configCabecalhoSujo = false;
+            configCabecalhoSujoDesde = 0;
+        }
 
         // ============================================
         // SISTEMA CENTRALIZADO DE NOTIFICAÇÕES
@@ -2850,7 +2863,7 @@
             }
             usuarioAtual = null;
             pararSincronizacaoAutomaticaConfiguracoes();
-            configCabecalhoSujo = false;
+            limparConfigCabecalhoSujo();
 
             document.getElementById('mainHeader').classList.add('app-hidden');
             document.getElementById('sessionBar').classList.add('app-hidden');
@@ -4549,10 +4562,14 @@
                         atualizarDatalistMateriais();
                     }
                     if (data.configuracoes) {
-                        const podeAplicar = forcarAplicacao || !configCabecalhoSujo;
+                        const edicaoAbandonada = configCabecalhoSujo && (Date.now() - configCabecalhoSujoDesde) > CONFIG_CABECALHO_SUJO_LIMITE_MS;
+                        const podeAplicar = forcarAplicacao || !configCabecalhoSujo || edicaoAbandonada;
                         if (!podeAplicar) {
                             console.log("Configurações globais recebidas, mas aplicação local foi adiada (edição em andamento).");
                             return;
+                        }
+                        if (edicaoAbandonada) {
+                            limparConfigCabecalhoSujo();
                         }
 
                         const cfg = data.configuracoes;
@@ -4571,7 +4588,16 @@
                                 if (el) el.value = cfg[item.key];
                             }
                         });
-                        
+
+                        if (cfg.last_saved_at) {
+                            localStorage.setItem('sucena_cfg_last_saved_at', cfg.last_saved_at);
+                        }
+                        if (cfg.last_saved_by) {
+                            localStorage.setItem('sucena_cfg_last_saved_by', cfg.last_saved_by);
+                        }
+                        localStorage.setItem('sucena_cfg_last_sync', 'true');
+                        atualizarStatusConfigCabecalho();
+
                         if (cfg.logo_base64) {
                             localStorage.setItem('sucena_cfg_logo_base64', cfg.logo_base64);
                             const img = document.getElementById('cfgLogoPreview');
@@ -6509,7 +6535,7 @@
             document.getElementById('previewFormAprovado1').textContent = cfgFormAprovado;
             document.getElementById('previewFormSetor1').textContent = cfgFormSetor;
             document.getElementById('previewFormRevisao1_header').textContent = cfgFormRevisao;
-            document.getElementById('previewFormData1').textContent = cfgFormData;
+            document.getElementById('previewFormData1').textContent = formatarData(data);
             document.getElementById('previewDocFiscalLabel1').textContent = docFiscal.label;
             document.getElementById('previewDocFiscal1').textContent = docFiscal.valor;
             document.getElementById('previewRazaoFornecedor1').textContent = razaoFornecedorFiscal;
@@ -6536,7 +6562,7 @@
             document.getElementById('previewFormAprovado2').textContent = cfgFormAprovado;
             document.getElementById('previewFormSetor2').textContent = cfgFormSetor;
             document.getElementById('previewFormRevisao2_header').textContent = cfgFormRevisao;
-            document.getElementById('previewFormData2').textContent = cfgFormData;
+            document.getElementById('previewFormData2').textContent = formatarData(data);
             document.getElementById('previewDocFiscalLabel2').textContent = docFiscal.label;
             document.getElementById('previewDocFiscal2').textContent = docFiscal.valor;
             document.getElementById('previewRazaoFornecedor2').textContent = razaoFornecedorFiscal;
@@ -6807,7 +6833,7 @@
                 pdf.text(cfgFormAprovado, 102.5, 43, { align: 'center' });
                 pdf.text(cfgFormSetor, 135, 43, { align: 'center' });
                 pdf.text(cfgFormRevisao, 160, 43, { align: 'center' });
-                pdf.text(cfgFormData, 185, 43, { align: 'center' });
+                pdf.text(data, 185, 43, { align: 'center' });
                 
                 y = 50;
                 
@@ -7572,12 +7598,14 @@
                 container.style.display = 'none';
             }
 
+            atualizarStatusConfigCabecalho();
+
             // Registrar listener de upload apenas uma vez
             const fileInput = document.getElementById('cfgLogoInput');
             if (fileInput && !fileInput.getAttribute('data-listener-registered')) {
                 fileInput.setAttribute('data-listener-registered', 'true');
                 fileInput.addEventListener('change', function(e) {
-                    configCabecalhoSujo = true;
+                    marcarConfigCabecalhoSujo();
                     const file = e.target.files[0];
                     if (!file) return;
                     
@@ -7608,14 +7636,39 @@
                     if (el && !el.getAttribute('data-dirty-listener')) {
                         el.setAttribute('data-dirty-listener', 'true');
                         el.addEventListener('input', function() {
-                            configCabecalhoSujo = true;
+                            marcarConfigCabecalhoSujo();
                         });
                     }
                 });
         }
 
+        function atualizarStatusConfigCabecalho(mensagemForcada) {
+            const statusEl = document.getElementById('cfgCabecalhoStatus');
+            if (!statusEl) return;
+
+            if (mensagemForcada) {
+                statusEl.textContent = mensagemForcada;
+                return;
+            }
+
+            const salvoEm = localStorage.getItem('sucena_cfg_last_saved_at');
+            const salvoPor = localStorage.getItem('sucena_cfg_last_saved_by');
+            const sincronizado = localStorage.getItem('sucena_cfg_last_sync') === 'true';
+
+            if (!salvoEm) {
+                statusEl.textContent = '';
+                return;
+            }
+
+            const autorTexto = salvoPor ? (' por ' + salvoPor) : '';
+            const sincTexto = sincronizado
+                ? ' — ✅ Sincronizado com todos os usuários e acessos'
+                : ' — ⚠️ Salvo apenas neste dispositivo (sem sincronização na nuvem)';
+            statusEl.textContent = 'Última configuração salva em ' + salvoEm + autorTexto + sincTexto;
+        }
+
         function limparLogomarcaConfig() {
-            configCabecalhoSujo = true;
+            marcarConfigCabecalhoSujo();
             const input = document.getElementById('cfgLogoInput');
             if (input) input.value = '';
             const img = document.getElementById('cfgLogoPreview');
@@ -7625,6 +7678,21 @@
             }
             const container = document.getElementById('cfgLogoPreviewContainer');
             if (container) container.style.display = 'none';
+        }
+
+        // Ativa/desativa o indicador visual de "salvando" no botão de cabeçalho
+        function mostrarIndicadorSincronizacao(ativo) {
+            const btn = document.getElementById('btnSalvarConfigCabecalho');
+            if (!btn) return;
+            if (ativo) {
+                btn.setAttribute('data-texto-original', btn.textContent);
+                btn.disabled = true;
+                btn.textContent = 'Salvando e sincronizando...';
+            } else {
+                const original = btn.getAttribute('data-texto-original');
+                btn.disabled = false;
+                btn.textContent = original || 'Salvar Configurações de Cabeçalho';
+            }
         }
 
         function salvarConfiguracaoCabecalho() {
@@ -7642,7 +7710,10 @@
             const img = document.getElementById('cfgLogoPreview');
             const logo = img ? (img.getAttribute('data-base64') || '') : '';
 
-            // Salvar localmente
+            const salvoEm = new Date().toLocaleString('pt-BR');
+            const salvoPor = obterNomeUsuario(usuarioAtual);
+
+            // Salvar localmente (guarda sempre a última opção salva neste dispositivo)
             localStorage.setItem('sucena_cfg_form_numero', formNumero);
             localStorage.setItem('sucena_cfg_form_elaborado', formElaborado);
             localStorage.setItem('sucena_cfg_form_aprovado', formAprovado);
@@ -7654,7 +7725,11 @@
             } else {
                 localStorage.removeItem('sucena_cfg_logo_base64');
             }
-            configCabecalhoSujo = false;
+            localStorage.setItem('sucena_cfg_last_saved_at', salvoEm);
+            localStorage.setItem('sucena_cfg_last_saved_by', salvoPor);
+            localStorage.setItem('sucena_cfg_last_sync', 'false');
+            limparConfigCabecalhoSujo();
+            atualizarStatusConfigCabecalho();
 
             // Salvar na nuvem
             const apiUrl = obterGoogleApiUrl();
@@ -7672,7 +7747,9 @@
                             form_setor: formSetor,
                             form_revisao: formRevisao,
                             form_data: formData,
-                            logo_base64: logo
+                            logo_base64: logo,
+                            last_saved_at: salvoEm,
+                            last_saved_by: salvoPor
                         }
                     })
                 })
@@ -7680,18 +7757,23 @@
                 .then(function(data) {
                     mostrarIndicadorSincronizacao(false);
                     if (data && data.status === "success") {
+                        localStorage.setItem('sucena_cfg_last_sync', 'true');
+                        atualizarStatusConfigCabecalho();
                         sincronizarConfiguracoesGlobais({ forcarAplicacao: true });
-                        mostrarNotificacao('Configurações de cabeçalho salvas na nuvem com sucesso!', 'success');
+                        mostrarNotificacao('Cabeçalho salvo e sincronizado com todos os usuários e acessos!', 'success');
                     } else {
+                        atualizarStatusConfigCabecalho();
                         mostrarNotificacao('Erro ao salvar na nuvem: ' + (data.message || 'Erro desconhecido'), 'error');
                     }
                 })
                 .catch(function(err) {
                     mostrarIndicadorSincronizacao(false);
                     console.error("Erro ao salvar configurações de cabeçalho na nuvem:", err);
-                    mostrarNotificacao('Salvo apenas localmente (sem conexão de rede).', 'warning');
+                    atualizarStatusConfigCabecalho();
+                    mostrarNotificacao('Salvo apenas neste dispositivo (sem conexão de rede). Assim que houver internet, salve novamente para sincronizar com todos.', 'warning');
                 });
             } else {
+                atualizarStatusConfigCabecalho();
                 mostrarNotificacao('Salvo localmente com sucesso (API do Google não configurada)', 'info');
             }
         }
